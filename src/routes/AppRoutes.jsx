@@ -81,11 +81,12 @@ function AppRoutes() {
       {/* Área do Cliente */}
       <Route
         path="p/:slug"
-        element={
-          // <BookingProvider>
-          <BookingLayout />
-          //</BookingProvider>
-        }
+        element={<BookingLayout />}
+
+        //Mudar pra isto depois que tiver BookingContext implementado
+        //  <BookingProvider>
+        //   <BookingLayout />
+        // </BookingProvider>
       >
         <Route index element={<ServicePage />} />
         <Route path="date" element={<DatePage />} />
