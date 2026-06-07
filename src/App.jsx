@@ -8,6 +8,9 @@ import TimePage from './pages/public-booking/TimePage';
 import FormPage from './pages/public-booking/FormPage';
 import SummaryPage from './pages/public-booking/SummaryPage';
 // import BookingConfirm from './pages/public-booking/BookingConfirm';
+// import { AuthProvider } from "./context/AuthContext";
+// import { BusinessProvider } from "./context/BusinessContext";
+import AppRoutes from "./routes/AppRoutes";
 
 // Componentes Provisórios para teste de navegação
 const ServicePageMock = () => (
@@ -64,12 +67,18 @@ const SlugWrapper = () => {
     <div style={{ marginBottom: '15px', fontSize: '0.9rem', color: '#666' }}>
       Você está na página de: <strong>{slug}</strong>
     </div>
-  );
+ );
 };
 
 export default function App() {
   return (
-    <BrowserRouter>
+    // <AuthProvider>
+    // <BusinessProvider>
+    <AppRoutes />
+    // </BusinessProvider>
+    // </AuthProvider>
+    
+    <BrowserRouter>    
       <Routes>
         {/* Rota dinâmica baseada no slug do cliente (ex: localhost:5173/barbearia-do-joao) */}
         <Route path="/:slug" element={<BookingLayout />}>
