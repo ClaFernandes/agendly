@@ -1,3 +1,4 @@
+// src/pages/public-booking/FormPage.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -21,21 +22,22 @@ export default function FormPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     
+    // Aqui salvaremos os dados do cliente no BookingContext futuramente
     console.log('Dados do cliente coletados:', formData);
     
-    // Avança 
+    // Avança para a página de resumo/confirmação final
     navigate('../summary');
   };
 
   return (
-    <div>
-      <div>
+    <div className="form-page-container">
+      <div className="page-header">
         <h2>Seus Dados</h2>
         <p>Informe seus dados de contato para confirmar o agendamento.</p>
       </div>
 
-      <form onSubmit={handleSubmit}>
-        <div>
+      <form onSubmit={handleSubmit} className="booking-form">
+        <div className="form-group">
           <label htmlFor="client_name">Nome Completo *</label>
           <input
             type="text"
@@ -48,7 +50,7 @@ export default function FormPage() {
           />
         </div>
 
-        <div >
+        <div className="form-group">
           <label htmlFor="client_email">E-mail *</label>
           <input
             type="email"
@@ -61,20 +63,20 @@ export default function FormPage() {
           />
         </div>
 
-        <div >
+        <div className="form-group">
           <label htmlFor="client_phone">Telefone / WhatsApp *</label>
           <input
             type="tel"
             id="client_phone"
             name="client_phone"
             required
-            placeholder="99999-9999"
+            placeholder="(00) 99999-9999"
             value={formData.client_phone}
             onChange={handleChange}
           />
         </div>
 
-        <div >
+        <div className="form-group">
           <label htmlFor="notes">Observações (Opcional)</label>
           <textarea
             id="notes"
@@ -86,9 +88,9 @@ export default function FormPage() {
           />
         </div>
 
-        <div>
-          <Link to="../time" >Voltar</Link>
-          <button type="submit" >Ver Resumo →</button>
+        <div className="form-actions-row">
+          <Link to="../time" className="back-btn">← Voltar</Link>
+          <button type="submit" className="submit-form-btn">Ver Resumo →</button>
         </div>
       </form>
     </div>

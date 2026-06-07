@@ -1,3 +1,4 @@
+// src/pages/public-booking/SummaryPage.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -5,7 +6,8 @@ export default function SummaryPage() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const TempSummaryData = {
+  // Dados mockados consolidando o que foi escolhido nas etapas anteriores
+  const mockSummaryData = {
     business_name: 'Barbearia Premium',
     service: {
       name: 'Corte de Cabelo Masculino',
@@ -19,12 +21,13 @@ export default function SummaryPage() {
     client: {
       name: 'João Silva',
       email: 'joao@email.com',
-      phone: '99999-9999',
+      phone: '(11) 99999-9999',
       notes: 'Gostaria de cortar com a máquina 2 nas laterais.'
     }
   };
 
-  const formatDate = (dateStr) => {
+  // Formatação amigável da data para o cliente
+  const formatFriendlyDate = (dateStr) => {
     const [year, month, day] = dateStr.split('-');
     const dateObj = new Date(year, month - 1, day);
     return dateObj.toLocaleDateString('pt-BR', { 
@@ -37,6 +40,7 @@ export default function SummaryPage() {
   const handleConfirmAppointment = async () => {
     setIsSubmitting(true);
     
+    // Simula a requisição ao Supabase (ex: supabase.from('appointments').insert(...))
     setTimeout(() => {
       setIsSubmitting(false);
       console.log('Agendamento gravado com sucesso no Supabase!');
@@ -46,66 +50,67 @@ export default function SummaryPage() {
     }, 1500);
   };
 
-  const data = TempSummaryData;
+  const data = mockSummaryData;
 
   return (
-    <div >
-      <div >
+    <div className="summary-page-container">
+      <div className="page-header">
         <h2>Confirme seu Agendamento</h2>
         <p>Revise as informações abaixo antes de finalizar a reserva.</p>
       </div>
 
-      <div>
+      <div className="summary-card">
         {/* Detalhes do Profissional/Empresa */}
-        <div>
-          <span>Você vai agendar em</span>
+        <div className="summary-section text-center">
+          <span className="summary-business-tag">Você vai agendar em</span>
           <h3>{data.business_name}</h3>
         </div>
 
         {/* Detalhes do Serviço */}
-        <div>
+        <div className="summary-section">
           <h4>Serviço Selecionado</h4>
-          <div >
+          <div className="summary-row-item">
             <div>
-              <p >{data.service.name}</p>
-              <p >{data.service.duration_min} minutos</p>
+              <p className="item-title">{data.service.name}</p>
+              <p className="item-subtitle">⏱ {data.service.duration_min} minutos</p>
             </div>
-            <span >
+            <span className="item-price">
               {data.service.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
             </span>
           </div>
         </div>
 
         {/* Detalhes de Data e Hora */}
-        <div >
+        <div className="summary-section">
           <h4>Data e Horário</h4>
-          <div >
-            <p>📅 <span>{formatDate(data.appointment.date)}</span></p>
+          <div className="summary-datetime-box">
+            <p>📅 <span className="capitalize">{formatFriendlyDate(data.appointment.date)}</span></p>
             <p>⏰ <strong>{data.appointment.time} às 14:30</strong></p>
           </div>
         </div>
 
         {/* Seus Dados */}
-        <div >
+        <div className="summary-section">
           <h4>Seus Dados</h4>
-          <div >
+          <div className="summary-client-box">
             <p><strong>Nome:</strong> {data.client.name}</p>
             <p><strong>Telefone:</strong> {data.client.phone}</p>
             <p><strong>E-mail:</strong> {data.client.email}</p>
             {data.client.notes && (
-              <p ><strong>Obs:</strong> "{data.client.notes}"</p>
+              <p className="summary-notes"><strong>Obs:</strong> "{data.client.notes}"</p>
             )}
           </div>
         </div>
       </div>
 
       {/* Botões de Ação */}
-      <div >
-        <Link to="../form"  disabled={isSubmitting}>
+      <div className="summary-actions">
+        <Link to="../form" className="back-btn" disabled={isSubmitting}>
           ← Corrigir Dados
         </Link>
         <button 
           onClick={handleConfirmAppointment} 
+          className="confirm-booking-btn"
           disabled={isSubmitting}
         >
           {isSubmitting ? 'Confirmando...' : 'Confirmar Agendamento ✓'}

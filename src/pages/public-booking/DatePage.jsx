@@ -1,3 +1,4 @@
+// src/pages/public-booking/DatePage.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -36,18 +37,38 @@ export default function DatePage() {
     setSelectedDate(dateStr);
     console.log('Data selecionada:', dateStr);
     
-    // Avança 
+    // Avança para a tela de horários
     navigate('../time');
   };
 
   return (
-    <div>
-      <div>
+    <div className="date-page-container">
+      <div className="page-header">
         <h2>Escolha a Data</h2>
         <p>Selecione o melhor dia para o seu atendimento.</p>
-      </div>     
+      </div>
 
-      <div>
+      {/* Opção 1: Seleção Rápida em Carrossel/Grid (Excelente para Mobile) */}
+      <div className="quick-dates-grid">
+        {quickDays.map((day) => {
+          const isSelected = selectedDate === day.isoString;
+          return (
+            <button
+              key={day.isoString}
+              type="button"
+              className={`date-card ${isSelected ? 'selected' : ''}`}
+              onClick={() => handleSelectDate(day.isoString)}
+            >
+              <span className="date-card-weekday">{day.weekday}</span>
+              <span className="date-card-num">{day.dayNum}</span>
+              <span className="date-card-month">{day.month}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Opção 2: Input de Data Tradicional para escolher mais à frente */}
+      <div className="manual-date-picker">
         <label htmlFor="manual-date">Ou escolha outra data:</label>
         <input
           type="date"
@@ -59,8 +80,9 @@ export default function DatePage() {
         />
       </div>
 
-      <div>
-        <Link to="../" >Voltar aos Serviços</Link>
+      {/* Ações de Navegação */}
+      <div className="page-actions">
+        <Link to="../" className="back-btn">← Voltar aos Serviços</Link>
       </div>
     </div>
   );
