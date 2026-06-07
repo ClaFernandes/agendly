@@ -39,7 +39,7 @@ export default function Login() {
     try {
       // O await garante que a sessão é criada no Supabase
       const profile = await login(email, password);
-      
+
       // Se a tua função login já retornar os dados do perfil obtidos na hora:
       if (profile?.role === "admin") {
         navigate("/admin", { replace: true });
@@ -47,9 +47,8 @@ export default function Login() {
         navigate("/dashboard", { replace: true });
       }
       // Caso a função login não retorne nada, o useEffect acima resolve a navegação assim que o estado mudar!
-
     } catch (err) {
-      setError("Email ou password incorretos.");
+      setError("Email ou password incorretos.", err);
     } finally {
       setLoading(false);
     }
@@ -66,7 +65,9 @@ export default function Login() {
       await recoverPassword(email);
       setSuccess(email);
     } catch {
-      setError("Não foi possível enviar o email. Verifica o endereço introduzido.");
+      setError(
+        "Não foi possível enviar o email. Verifica o endereço introduzido.",
+      );
     } finally {
       setLoading(false);
     }
@@ -88,22 +89,36 @@ export default function Login() {
       {/* Coluna esquerda — marketing */}
       <div className="auth-marketing">
         <div className="auth-brand">
-          <img src={logo} alt="Agendly" className="auth-logo" style={{ height: "32px", width: "auto" }} />
+          <img
+            src={logo}
+            alt="Agendly"
+            className="auth-logo"
+            style={{ height: "32px", width: "auto" }}
+          />
           <span>Agendly</span>
         </div>
 
         <h2>Gere o teu negócio com clareza</h2>
         <p>CRM, agenda e financeiro num único painel.</p>
         <ul className="auth-features">
-          <li><AiOutlineCheck /> Página pública de agendamento</li>
-          <li><AiOutlineCheck /> Relatório financeiro e CSV</li>
+          <li>
+            <AiOutlineCheck /> Página pública de agendamento
+          </li>
+          <li>
+            <AiOutlineCheck /> Relatório financeiro e CSV
+          </li>
         </ul>
       </div>
 
       {/* Coluna formulário */}
       <div className="auth-card">
         <div className="auth-brand">
-          <img src={logo} alt="Agendly" className="auth-logo" style={{ height: "32px", width: "auto" }} />
+          <img
+            src={logo}
+            alt="Agendly"
+            className="auth-logo"
+            style={{ height: "32px", width: "auto" }}
+          />
           <span>Agendly</span>
         </div>
 
@@ -116,13 +131,19 @@ export default function Login() {
             {error && <p className="auth-error">{error}</p>}
 
             {/* Botão Google */}
-            <button type="button" className="auth-google-btn" onClick={handleGoogle}>
+            <button
+              type="button"
+              className="auth-google-btn"
+              onClick={handleGoogle}
+            >
               <FcGoogle className="auth-google-icon" />
               Continuar com Google
             </button>
 
             {/* Separador */}
-            <div className="auth-divider"><span>ou</span></div>
+            <div className="auth-divider">
+              <span>ou</span>
+            </div>
 
             <form onSubmit={handleLogin}>
               <div className="auth-field">
@@ -180,7 +201,8 @@ export default function Login() {
             </form>
 
             <p className="auth-footer">
-              Não tens conta? <Link to="/register">Regista-te gratuitamente</Link>
+              Não tens conta?{" "}
+              <Link to="/register">Regista-te gratuitamente</Link>
             </p>
           </>
         )}
@@ -188,9 +210,13 @@ export default function Login() {
         {/* Formulário de recuperação de password */}
         {mode === "recover" && (
           <>
-            <div className="auth-lock-icon"><FiLock /></div>
+            <div className="auth-lock-icon">
+              <FiLock />
+            </div>
             <h2>Recuperar acesso</h2>
-            <p className="auth-subtitle">Introduz o email da tua conta e enviamos-te um link</p>
+            <p className="auth-subtitle">
+              Introduz o email da tua conta e enviamos-te um link
+            </p>
 
             {success ? (
               <div className="auth-success-box">
@@ -204,7 +230,11 @@ export default function Login() {
                 {error && <p className="auth-error">{error}</p>}
                 <div className="auth-info">
                   <FiMail />
-                  <p> Receberás um email com um link para criar uma nova password. O link expira em 1 hora. </p>
+                  <p>
+                    {" "}
+                    Receberás um email com um link para criar uma nova password.
+                    O link expira em 1 hora.{" "}
+                  </p>
                 </div>
               </>
             )}

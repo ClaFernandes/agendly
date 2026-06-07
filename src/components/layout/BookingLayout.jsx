@@ -12,10 +12,10 @@ export default function BookingLayout() {
     return <Outlet />;
   }
 
-  const { business, loadingBusiness } = bookingContext;
+  const { business, loadingBusiness, loadingError } = bookingContext;
 
   if (loadingBusiness) return <div className="loading-screen">Carregando dados do estabelecimento...</div>;
-  if (!business) return <div className="error-screen">Estabelecimento não encontrado.</div>;
+  if (!business) return <div className="error-screen">{loadingError || 'Estabelecimento não encontrado.'}</div>;
 
   return (
     <div className="booking-container">
