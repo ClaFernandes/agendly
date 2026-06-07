@@ -1,4 +1,3 @@
-import React from 'react';
 import { Outlet } from 'react-router-dom';
 import '../../pages/public-booking/PublicBooking.css';
 import StepProgress from '../booking-flow/StepProgress';
@@ -7,9 +6,9 @@ export default function BookingLayout() {
   return (
     <div className="booking-container">
       <header className="booking-header">
-        <div className="booking-logo-container">
+        <div className="business-logo">
           {/* Logo provisória ou futuramente vinda do banco via Context */}
-          <div className="booking-logo-placeholder">Agendly</div>
+          <div className="business-logo-placeholder">Agendly</div>
         </div>
       </header>
 
