@@ -31,6 +31,8 @@ import BookingConfirm from "../pages/public-booking/BookingConfirm";
 
 import NotFound from "../pages/NotFound";
 
+import { BookingProvider } from "../context/BookingContext";
+
 function AppRoutes() {
   return (
     <Routes>
@@ -81,21 +83,19 @@ function AppRoutes() {
       {/* Área do Cliente */}
       <Route
         path="p/:slug"
-        element={<BookingLayout />}
-
-        //Mudar pra isto depois que tiver BookingContext implementado
-        //  <BookingProvider>
-        //   <BookingLayout />
-        // </BookingProvider>
+        element={
+          <BookingProvider>
+            <BookingLayout />
+          </BookingProvider>
+        }
       >
         <Route index element={<ServicePage />} />
         <Route path="date" element={<DatePage />} />
         <Route path="time" element={<TimePage />} />
         <Route path="form" element={<FormPage />} />
         <Route path="summary" element={<SummaryPage />} />
-      </Route>
-
-      <Route path="/p/:slug/confirmation" element={<BookingConfirm />} />
+        <Route path="confirm" element={<BookingConfirm />} />
+      </Route>      
 
       {/* Not Found */}
       <Route path="*" element={<NotFound />} />

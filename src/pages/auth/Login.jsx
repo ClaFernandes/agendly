@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { FiEye, FiEyeOff, FiMail, FiLock, FiArrowLeft } from "react-icons/fi";
@@ -8,7 +8,7 @@ import logo from "../../assets/logo.svg";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login, recoverPassword, loginWithGoogle, userRole } = useAuth();
+  const { login, recoverPassword, loginWithGoogle, user, userRole } = useAuth();
 
   const [mode, setMode] = useState("login"); // "login" ou "recover"
   const [email, setEmail] = useState("");
@@ -18,27 +18,44 @@ export default function Login() {
   const [success, setSuccess] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Login com email e password, redireciona para o dashboard ou admin conforme a role
+  // 🔄 Guarda de Redirecionamento Automático:
+  // Se o estado do AuthContext atualizar (via Email ou Google), manda o utilizador para o sítio certo
+  useEffect(() => {
+    if (user && userRole) {
+      if (userRole === "admin") {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/dashboard", { replace: true });
+      }
+    }
+  }, [user, userRole, navigate]);
+
+  // Login com email e password
   async function handleLogin(e) {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
     try {
-      await login(email, password);
-      if (userRole === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/dashboard");
+      // O await garante que a sessão é criada no Supabase
+      const profile = await login(email, password);
+      
+      // Se a tua função login já retornar os dados do perfil obtidos na hora:
+      if (profile?.role === "admin") {
+        navigate("/admin", { replace: true });
+      } else if (profile?.role === "provider") {
+        navigate("/dashboard", { replace: true });
       }
-    } catch {
+      // Caso a função login não retorne nada, o useEffect acima resolve a navegação assim que o estado mudar!
+
+    } catch (err) {
       setError("Email ou password incorretos.");
     } finally {
       setLoading(false);
     }
   }
 
-  // Envia email de recuperação, mostra mensagem de sucesso ou erro
+  // Envia email de recuperação
   async function handleRecover(e) {
     e.preventDefault();
     setError(null);
@@ -49,19 +66,18 @@ export default function Login() {
       await recoverPassword(email);
       setSuccess(email);
     } catch {
-      setError(
-        "Não foi possível enviar o email. Verifica o endereço introduzido.",
-      );
+      setError("Não foi possível enviar o email. Verifica o endereço introduzido.");
     } finally {
       setLoading(false);
     }
   }
 
-  // Google abre um popup de autenticação e redireciona para o dashboard se tiver sucesso
+  // Google Autenticação
   async function handleGoogle() {
     setError(null);
     try {
       await loginWithGoogle();
+      // O Supabase redireciona a página para o teu provedor e, ao voltar, o useEffect ali de cima encarrega-se do resto!
     } catch {
       setError("Erro ao entrar com Google. Tenta novamente.");
     }
@@ -72,38 +88,22 @@ export default function Login() {
       {/* Coluna esquerda — marketing */}
       <div className="auth-marketing">
         <div className="auth-brand">
-          {/* Quando tiver CSS, tirar */}
-          <img
-            src={logo}
-            alt="Agendly"
-            className="auth-logo"
-            style={{ height: "32px", width: "auto" }}
-          />
+          <img src={logo} alt="Agendly" className="auth-logo" style={{ height: "32px", width: "auto" }} />
           <span>Agendly</span>
         </div>
 
         <h2>Gere o teu negócio com clareza</h2>
         <p>CRM, agenda e financeiro num único painel.</p>
         <ul className="auth-features">
-          <li>
-            <AiOutlineCheck /> Página pública de agendamento
-          </li>
-          <li>
-            <AiOutlineCheck /> Relatório financeiro e CSV
-          </li>
+          <li><AiOutlineCheck /> Página pública de agendamento</li>
+          <li><AiOutlineCheck /> Relatório financeiro e CSV</li>
         </ul>
       </div>
 
       {/* Coluna formulário */}
       <div className="auth-card">
         <div className="auth-brand">
-          {/* Quando tiver CSS, tirar */}
-          <img
-            src={logo}
-            alt="Agendly"
-            className="auth-logo"
-            style={{ height: "32px", width: "auto" }}
-          />
+          <img src={logo} alt="Agendly" className="auth-logo" style={{ height: "32px", width: "auto" }} />
           <span>Agendly</span>
         </div>
 
@@ -116,19 +116,13 @@ export default function Login() {
             {error && <p className="auth-error">{error}</p>}
 
             {/* Botão Google */}
-            <button
-              type="button"
-              className="auth-google-btn"
-              onClick={handleGoogle}
-            >
+            <button type="button" className="auth-google-btn" onClick={handleGoogle}>
               <FcGoogle className="auth-google-icon" />
               Continuar com Google
             </button>
 
             {/* Separador */}
-            <div className="auth-divider">
-              <span>ou</span>
-            </div>
+            <div className="auth-divider"><span>ou</span></div>
 
             <form onSubmit={handleLogin}>
               <div className="auth-field">
@@ -186,8 +180,7 @@ export default function Login() {
             </form>
 
             <p className="auth-footer">
-              Não tens conta?{" "}
-              <Link to="/register">Regista-te gratuitamente</Link>
+              Não tens conta? <Link to="/register">Regista-te gratuitamente</Link>
             </p>
           </>
         )}
@@ -195,13 +188,9 @@ export default function Login() {
         {/* Formulário de recuperação de password */}
         {mode === "recover" && (
           <>
-            <div className="auth-lock-icon">
-              <FiLock />
-            </div>
+            <div className="auth-lock-icon"><FiLock /></div>
             <h2>Recuperar acesso</h2>
-            <p className="auth-subtitle">
-              Introduz o email da tua conta e enviamos-te um link
-            </p>
+            <p className="auth-subtitle">Introduz o email da tua conta e enviamos-te um link</p>
 
             {success ? (
               <div className="auth-success-box">
@@ -215,10 +204,7 @@ export default function Login() {
                 {error && <p className="auth-error">{error}</p>}
                 <div className="auth-info">
                   <FiMail />
-                  <p>
-                    Receberás um email com um link para criar uma nova password.
-                    O link expira em 1 hora.
-                  </p>
+                  <p> Receberás um email com um link para criar uma nova password. O link expira em 1 hora. </p>
                 </div>
               </>
             )}

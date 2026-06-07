@@ -1,57 +1,70 @@
-// src/pages/public-booking/TimePage.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-
-// Simulação de horários vindos da lib/slots filtrados pelos já agendados
-const MOCK_SLOTS = [
-  { time: '08:00', available: true },
-  { time: '08:30', available: false }, // Ocupado
-  { time: '09:00', available: true },
-  { time: '09:30', available: true },
-  { time: '10:00', available: true },
-  { time: '10:30', available: false }, // Ocupado
-  { time: '11:00', available: true },
-  { time: '11:30', available: true },
-  { time: '14:00', available: true },
-  { time: '14:30', available: true },
-  { time: '15:00', available: true },
-  { time: '15:30', available: false }, // Ocupado
-  { time: '16:00', available: true },
-  { time: '16:30', available: true },
-  { time: '17:00', available: true },
-];
+import { useBooking } from '../../context/BookingContext';
+import { generateSlots, filterAvailableSlots } from '../../lib/slots';
+import { supabase } from '../../lib/supabase';
 
 export default function TimePage() {
   const navigate = useNavigate();
-  const [selectedTime, setSelectedTime] = useState('');
+  const { business, selectedService, selectedDate, selectedTime, setSelectedTime } = useBooking();
+  const [slots, setSlots] = useState([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
 
-  // Separa os horários por turno para organizar a tela
-  const morningSlots = MOCK_SLOTS.filter(slot => slot.time < '12:00');
-  const afternoonSlots = MOCK_SLOTS.filter(slot => slot.time >= '12:00');
+  useEffect(() => {
+    async function loadAvailableTimes() {
+      if (!business || !selectedService || !selectedDate) return;
+      setLoadingSlots(true);
+
+      // 1. Gera todos os blocos teóricos baseado no expediente da empresa
+      // Exemplo padrão: 08:00 às 18:00 caso não haja tabela dinâmica de horários ainda
+      const allPossibleSlots = generateSlots(
+        business.start_time || "08:00", 
+        business.end_time || "18:00", 
+        selectedService.duration_min
+      );
+
+      // 2. Busca no Supabase agendamentos existentes neste dia para este negócio
+      const { data: appointments, error } = await supabase
+        .from("appointments")
+        .select("starts_at")
+        .eq("business_id", business.id)
+        .gte("starts_at", `${selectedDate}T00:00:00`)
+        .lte("starts_at", `${selectedDate}T23:59:59`);
+
+      if (error) {
+        console.error("Erro ao buscar agendamentos:", error.message);
+        setSlots([]);
+      } else {
+        // 3. Aplica o filtro desenvolvido pelo seu colega de equipe
+        const filtered = filterAvailableSlots(allPossibleSlots, appointments || []);
+        setSlots(filtered);
+      }
+      setLoadingSlots(false);
+    }
+
+    loadAvailableTimes();
+  }, [business, selectedService, selectedDate]);
 
   const handleSelectTime = (time) => {
     setSelectedTime(time);
-    console.log('Horário selecionado:', time);
-    
-    // Avança para a tela de formulário dos dados do cliente
     navigate('../form');
   };
 
+  const morningSlots = slots.filter(s => s.time < '12:00');
+  const afternoonSlots = slots.filter(s => s.time >= '12:00');
+
+  if (loadingSlots) return <div>A procurar horários disponíveis...</div>;
+
   return (
     <div className="time-page-container">
-      <div className="page-header">
-        <h2>Escolha o Horário</h2>
-        <p>Selecione um dos horários disponíveis para o dia escolhido.</p>
-      </div>
-
-      {/* Turno da Manhã */}
+      <h2>Escolha o Horário</h2>
+      
       <div className="time-section">
-        <h3 className="turno-title">🌅 Manhã</h3>
+        <h3>🌅 Manhã</h3>
         <div className="time-grid">
-          {morningSlots.map((slot) => (
+          {morningSlots.map(slot => (
             <button
               key={slot.time}
-              type="button"
               className={`time-slot-btn ${selectedTime === slot.time ? 'selected' : ''}`}
               disabled={!slot.available}
               onClick={() => handleSelectTime(slot.time)}
@@ -62,14 +75,12 @@ export default function TimePage() {
         </div>
       </div>
 
-      {/* Turno da Tarde */}
       <div className="time-section">
-        <h3 className="turno-title">☀️ Tarde</h3>
+        <h3>☀️ Tarde</h3>
         <div className="time-grid">
-          {afternoonSlots.map((slot) => (
+          {afternoonSlots.map(slot => (
             <button
               key={slot.time}
-              type="button"
               className={`time-slot-btn ${selectedTime === slot.time ? 'selected' : ''}`}
               disabled={!slot.available}
               onClick={() => handleSelectTime(slot.time)}
@@ -79,11 +90,8 @@ export default function TimePage() {
           ))}
         </div>
       </div>
-
-      {/* Ações de Navegação */}
-      <div className="page-actions">
-        <Link to="../date" className="back-btn">← Voltar para a Data</Link>
-      </div>
+      
+      <Link to="../date" className="back-btn">← Voltar</Link>
     </div>
   );
 }
