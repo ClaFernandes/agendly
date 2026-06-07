@@ -1,7 +1,20 @@
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export default function AdminLayout() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  const { user, logout } = useAuth();
+
+  async function handleLogout() {
+    try {
+      await logout();
+      navigate("/login");
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error.message);
+    }
+  }
 
   const isActive = (path) => {
     if (path === "/admin") return pathname === "/admin";
@@ -32,6 +45,13 @@ export default function AdminLayout() {
             Administradores
           </Link>
         </nav>
+
+        <div className="sidebar-footer">
+          <span className="sidebar-user">{user?.email}</span>
+          <button onClick={handleLogout} className="logout-btn">
+            Sair
+          </button>
+        </div>
       </aside>
 
       <main className="admin-content">

@@ -1,5 +1,6 @@
 // src/App.jsx
-import React from 'react';
+import { AuthProvider } from "./context/AuthContext";
+import { BusinessProvider } from "./context/BusinessContext";
 import { BrowserRouter, Routes, Route, Link, useParams } from 'react-router-dom';
 import BookingLayout from './components/layout/BookingLayout';
 import ServicePage from './pages/public-booking/ServicePage';
@@ -8,8 +9,6 @@ import TimePage from './pages/public-booking/TimePage';
 import FormPage from './pages/public-booking/FormPage';
 import SummaryPage from './pages/public-booking/SummaryPage';
 // import BookingConfirm from './pages/public-booking/BookingConfirm';
-// import { AuthProvider } from "./context/AuthContext";
-// import { BusinessProvider } from "./context/BusinessContext";
 import AppRoutes from "./routes/AppRoutes";
 
 // Componentes Provisórios para teste de navegação
@@ -72,11 +71,11 @@ const SlugWrapper = () => {
 
 export default function App() {
   return (
-    // <AuthProvider>
-    // <BusinessProvider>
+    <AuthProvider>
+    <BusinessProvider>
     <AppRoutes />
-    // </BusinessProvider>
-    // </AuthProvider>
+    </BusinessProvider>
+    </AuthProvider>
     
     <BrowserRouter>    
       <Routes>
