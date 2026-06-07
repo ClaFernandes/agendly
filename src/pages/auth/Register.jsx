@@ -1,7 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { FiEye, FiEyeOff, FiMail, FiLock, FiUser, FiCheck, FiX } from "react-icons/fi";
+import {
+  FiEye,
+  FiEyeOff,
+  FiMail,
+  FiLock,
+  FiUser,
+  FiCheck,
+  FiX,
+} from "react-icons/fi";
 import { AiOutlineCheck } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import logo from "../../assets/logo.svg";
@@ -11,7 +19,11 @@ const passwordRules = [
   { id: "upper", label: "Uma letra maiúscula", test: (p) => /[A-Z]/.test(p) },
   { id: "lower", label: "Uma letra minúscula", test: (p) => /[a-z]/.test(p) },
   { id: "number", label: "Um número", test: (p) => /[0-9]/.test(p) },
-  { id: "special", label: "Um carácter especial", test: (p) => /[^A-Za-z0-9]/.test(p) },
+  {
+    id: "special",
+    label: "Um carácter especial",
+    test: (p) => /[^A-Za-z0-9]/.test(p),
+  },
 ];
 
 export default function Register() {
@@ -64,7 +76,10 @@ export default function Register() {
       await register(email, password, firstName, lastName);
       navigate("/onboarding", { replace: true });
     } catch (err) {
-      if (err.message?.includes("already registered") || err.message?.includes("User already exists")) {
+      if (
+        err.message?.includes("already registered") ||
+        err.message?.includes("User already exists")
+      ) {
         setError("Este email já está registado. Tenta fazer login.");
       } else {
         setError("Erro ao criar conta. Tenta novamente.");
@@ -87,21 +102,38 @@ export default function Register() {
     <div className="auth-container">
       <div className="auth-marketing">
         <div className="auth-brand">
-          <img src={logo} alt="Agendly" className="auth-logo" style={{ height: "32px", width: "auto" }} />
+          <img
+            src={logo}
+            alt="Agendly"
+            className="auth-logo"
+            style={{ height: "32px", width: "auto" }}
+          />
           <span>Agendly</span>
         </div>
 
         <h2>Começa em menos de 2 minutos</h2>
-        <p>Cria a tua conta, configura o negócio e partilha o link com os teus clientes.</p>
+        <p>
+          Cria a tua conta, configura o negócio e partilha o link com os teus
+          clientes.
+        </p>
         <ul className="auth-features">
-          <li><AiOutlineCheck /> Página pública ativa imediatamente</li>
-          <li><AiOutlineCheck /> Cancelamento a qualquer momento</li>
+          <li>
+            <AiOutlineCheck /> Página pública ativa imediatamente
+          </li>
+          <li>
+            <AiOutlineCheck /> Cancelamento a qualquer momento
+          </li>
         </ul>
       </div>
 
       <div className="auth-card">
         <div className="auth-brand">
-          <img src={logo} alt="Agendly" className="auth-logo" style={{ height: "32px", width: "auto" }} />
+          <img
+            src={logo}
+            alt="Agendly"
+            className="auth-logo"
+            style={{ height: "32px", width: "auto" }}
+          />
           <span>Agendly</span>
         </div>
 
@@ -110,15 +142,24 @@ export default function Register() {
 
         {error && <p className="auth-error">{error}</p>}
 
-        <button type="button" className="auth-google-btn" onClick={handleGoogle}>
+        <button
+          type="button"
+          className="auth-google-btn"
+          onClick={handleGoogle}
+        >
           <FcGoogle className="auth-google-icon" />
           Continuar com Google
         </button>
 
-        <div className="auth-divider"><span>ou</span></div>
+        <div className="auth-divider">
+          <span>ou</span>
+        </div>
 
         <form onSubmit={handleRegister}>
-          <div className="auth-field-row" style={{ display: "flex", gap: "12px" }}>
+          <div
+            className="auth-field-row"
+            style={{ display: "flex", gap: "12px" }}
+          >
             <div className="auth-field" style={{ flex: 1 }}>
               <label htmlFor="firstName">Primeiro nome</label>
               <div className="auth-input-wrapper">
@@ -186,10 +227,21 @@ export default function Register() {
             </div>
 
             {password.length > 0 && (
-              <ul className="auth-password-rules" style={{ listStyle: "none", padding: 0, marginTop: "8px" }}>
+              <ul
+                className="auth-password-rules"
+                style={{ listStyle: "none", padding: 0, marginTop: "8px" }}
+              >
                 {rulesStatus.map((rule) => (
-                  <li key={rule.id} className={rule.passed ? "rule-passed" : "rule-failed"}>
-                    {rule.passed ? <FiCheck color="green" /> : <FiX color="red" />} {rule.label}
+                  <li
+                    key={rule.id}
+                    className={rule.passed ? "rule-passed" : "rule-failed"}
+                  >
+                    {rule.passed ? (
+                      <FiCheck color="green" />
+                    ) : (
+                      <FiX color="red" />
+                    )}{" "}
+                    {rule.label}
                   </li>
                 ))}
               </ul>
@@ -218,8 +270,22 @@ export default function Register() {
             </div>
 
             {confirmPassword.length > 0 && (
-              <p className={passwordsMatch ? "auth-match-ok" : "auth-match-error"}>
-                {passwordsMatch ? <> <FiCheck color="green" /> As passwords coincidem </> : <> <FiX color="red" /> As passwords não coincidem </>}
+              <p
+                className={
+                  passwordsMatch ? "auth-match-ok" : "auth-match-error"
+                }
+              >
+                {passwordsMatch ? (
+                  <>
+                    {" "}
+                    <FiCheck color="green" /> As passwords coincidem{" "}
+                  </>
+                ) : (
+                  <>
+                    {" "}
+                    <FiX color="red" /> As passwords não coincidem{" "}
+                  </>
+                )}
               </p>
             )}
           </div>

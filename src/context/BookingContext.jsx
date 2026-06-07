@@ -5,6 +5,7 @@ import { supabase } from "../lib/supabase";
 
 const BookingContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useBooking() {
   return useContext(BookingContext);
 }
@@ -16,6 +17,7 @@ export function BookingProvider({ children }) {
   const [business, setBusiness] = useState(null);
   const [services, setServices] = useState([]);
   const [loadingBusiness, setLoadingBusiness] = useState(true);
+  const [loadingError, setLoadingError] = useState(null);
 
   // Estados do Fluxo de Agendamento (O que o cliente escolheu)
   const [selectedService, setSelectedService] = useState(null);
@@ -25,7 +27,7 @@ export function BookingProvider({ children }) {
     client_name: "",
     client_email: "",
     client_phone: "",
-    notes: ""
+    notes: "",
   });
 
   // Busca os dados da empresa e os serviços ativos pelo slug da URL
@@ -33,16 +35,25 @@ export function BookingProvider({ children }) {
     async function fetchPublicSpecs() {
       if (!slug) return;
       setLoadingBusiness(true);
-      
+
       try {
         // 1. Busca o negócio pelo slug
         const { data: bData, error: bError } = await supabase
           .from("business")
           .select("*")
-          .eq("slug", slug) // Assumindo coluna slug no banco, ou 'id' se for UUID
-          .single();
+          .eq("slug", slug)
+          .maybeSingle();
 
         if (bError) throw bError;
+        if (!bData) {
+          const message = `Negócio não encontrado para o slug: ${slug}`;
+          console.warn(message);
+          setLoadingError(message);
+          setBusiness(null);
+          setServices([]);
+          return;
+        }
+
         setBusiness(bData);
 
         // 2. Busca os serviços desse negócio
@@ -50,13 +61,17 @@ export function BookingProvider({ children }) {
           .from("services")
           .select("*")
           .eq("business_id", bData.id)
-          .eq("is_active", true); // Apenas os ativos
+          .eq("active", true); // usa a coluna correta do schema
 
         if (sError) throw sError;
-        setServices(sData);
-
+        setServices(sData || []);
       } catch (err) {
-        console.error("Erro ao carregar página de agendamento:", err.message);
+        const message =
+          err?.message || "Erro desconhecido ao carregar o estabelecimento.";
+        console.error("Erro ao carregar página de agendamento:", message);
+        setLoadingError(message);
+        setBusiness(null);
+        setServices([]);
       } finally {
         setLoadingBusiness(false);
       }
@@ -70,7 +85,12 @@ export function BookingProvider({ children }) {
     setSelectedService(null);
     setSelectedDate("");
     setSelectedTime("");
-    setClientData({ client_name: "", client_email: "", client_phone: "", notes: "" });
+    setClientData({
+      client_name: "",
+      client_email: "",
+      client_phone: "",
+      notes: "",
+    });
   }
 
   const value = {
@@ -78,6 +98,7 @@ export function BookingProvider({ children }) {
     business,
     services,
     loadingBusiness,
+    loadingError,
     selectedService,
     setSelectedService,
     selectedDate,
@@ -86,8 +107,10 @@ export function BookingProvider({ children }) {
     setSelectedTime,
     clientData,
     setClientData,
-    resetBooking
+    resetBooking,
   };
 
-  return <BookingContext.Provider value={value}>{children}</BookingContext.Provider>;
+  return (
+    <BookingContext.Provider value={value}>{children}</BookingContext.Provider>
+  );
 }
