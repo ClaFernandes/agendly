@@ -1,28 +1,25 @@
-import { Outlet } from "react-router-dom";
-// import StepProgress from "../booking-flow/StepProgress";
+import { Outlet } from 'react-router-dom';
+import '../../pages/public-booking/PublicBooking.css';
+import StepProgress from '../booking-flow/StepProgress';
 
-function BookingLayout() {
+export default function BookingLayout() {
   return (
-    <div className="booking-layout">
-      {/* Identificação do negócio - dinâmico no futuro */}
+    <div className="booking-container">
       <header className="booking-header">
         <div className="business-logo">
-          <div>Logo do negócio</div>
+          {/* Logo provisória ou futuramente vinda do banco via Context */}
+          <div className="business-logo-placeholder">Agendly</div>
         </div>
-        <h1>Nome do Negócio</h1>
-        <p>Selecione os dados para realizar o seu agendamento</p>
       </header>
 
-      <div className="booking-progress-container">
-        {/* <StepProgress /> */}
-        <p>Fluxo de Agendamento</p>
-      </div>
-
-      <main className="booking-step-content">
+      <main className="booking-content">
+        <StepProgress/>
         <Outlet />
       </main>
+
+      <footer className="booking-footer">
+        <p>Desenvolvido por <strong>Agendly</strong></p>
+      </footer>
     </div>
   );
 }
-
-export default BookingLayout;
