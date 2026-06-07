@@ -1,26 +1,34 @@
-// No futuro, buscar dados do negócio no Supabase
-
+//BookingLayout.jsx
 import { Outlet } from 'react-router-dom'; //incluir depois: useParams
 import '../../pages/public-booking/PublicBooking.css';
 import StepProgress from '../booking-flow/StepProgress';
+import { useBooking } from '../../context/BookingContext';
 
 export default function BookingLayout() {
-  // const { slug } = useParams();
+  const bookingContext = useBooking();
+
+  // 🛡️ Segurança máxima: Se o contexto não existir, não quebra a página
+  if (!bookingContext) {
+    return <Outlet />;
+  }
+
+  const { business, loadingBusiness } = bookingContext;
+
+  if (loadingBusiness) return <div className="loading-screen">Carregando dados do estabelecimento...</div>;
+  if (!business) return <div className="error-screen">Estabelecimento não encontrado.</div>;
+
   return (
     <div className="booking-container">
       <header className="booking-header">
         <div className="business-logo">
-
-          <div>Logo do negócio</div>
+          {business.logo_url ? <img src={business.logo_url} alt={business.name} /> : <div>Logo</div>}
         </div>
-
-        {/* Substituir por: <h1>{business.name}</h1> */}
-        <h1>Nome do Negócio</h1>
-        <p>Selecione os dados para realizar o seu agendamento</p>
+        <h1>{business.name}</h1>
+        <p>{business.description || "Selecione os dados para realizar o seu agendamento"}</p>
       </header>
 
       <main className="booking-content">
-        <StepProgress/>
+        <StepProgress />
         <Outlet />
       </main>
 
