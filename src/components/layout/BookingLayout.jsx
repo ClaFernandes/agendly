@@ -1,18 +1,16 @@
 // No futuro, buscar dados do negócio no Supabase
 
-import { Outlet } from "react-router-dom"; //incluir depois: useParams
-
-// import StepProgress from "../booking-flow/StepProgress";
+import { Outlet } from 'react-router-dom'; //incluir depois: useParams
+import '../../pages/public-booking/PublicBooking.css';
+import StepProgress from '../booking-flow/StepProgress';
 
 export default function BookingLayout() {
   // const { slug } = useParams();
-
   return (
-    <div className="booking-layout">
-      {/* Identificação do negócio - dinâmico no futuro */}
+    <div className="booking-container">
       <header className="booking-header">
         <div className="business-logo">
-          {/* Substituir pela imagem real: <img src={business.logo_url} /> */}
+
           <div>Logo do negócio</div>
         </div>
 
@@ -21,15 +19,14 @@ export default function BookingLayout() {
         <p>Selecione os dados para realizar o seu agendamento</p>
       </header>
 
-      <div className="booking-progress-container">
-        {/* <StepProgress /> */}
-        <p>Fluxo de Agendamento</p>
-      </div>
-
-      {/* Outlet renderiza fluxo: ServicePage → DatePage → TimePage → FormPage → SummaryPage */}
-      <main className="booking-step-content">
+      <main className="booking-content">
+        <StepProgress/>
         <Outlet />
       </main>
+
+      <footer className="booking-footer">
+        <p>Desenvolvido por <strong>Agendly</strong></p>
+      </footer>
     </div>
   );
 }
