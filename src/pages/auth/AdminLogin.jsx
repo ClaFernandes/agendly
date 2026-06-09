@@ -1,17 +1,22 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { FiEye, FiEyeOff, FiMail, FiLock, FiArrowLeft } from "react-icons/fi";
-import { AiOutlineCheck } from "react-icons/ai";
-import { FcGoogle } from "react-icons/fc";
+import {
+  FiEye,
+  FiEyeOff,
+  FiMail,
+  FiLock,
+  FiArrowLeft,
+  FiCheck,
+} from "react-icons/fi";
 import logo from "../../assets/logo.svg";
 import "./Auth.css";
 
-export default function Login() {
+export default function AdminLogin() {
   const navigate = useNavigate();
-  const { login, recoverPassword, loginWithGoogle, user, userRole } = useAuth();
+  const { login, recoverPassword, user, userRole } = useAuth();
 
-  const [mode, setMode] = useState("login");
+  const [mode, setMode] = useState("login"); // "login" | "recover"
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -19,34 +24,30 @@ export default function Login() {
   const [success, setSuccess] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Redireciona automaticamente quando o AuthContext atualizar
+  // Redireciona se detetar sessão de admin ativa
   useEffect(() => {
-    if (user && userRole) {
-      if (userRole === "admin") {
-        navigate("/admin", { replace: true });
-      } else {
-        navigate("/onboarding", { replace: true });
-      }
+    if (user && userRole === "admin") {
+      navigate("/admin", { replace: true });
     }
   }, [user, userRole, navigate]);
 
-  // Login com email e password
-  async function handleLogin(e) {
+  async function handleAdminLogin(e) {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
     try {
       await login(email, password);
-      // O useEffect trata do redirect quando o userRole atualizar
+      // useEffect trata do redirect se o role for admin. Se não for admin, mostra erro
     } catch {
-      setError("Email ou password incorretos.");
+      setError(
+        "Credenciais administrativas inválidas ou acesso não autorizado.",
+      );
     } finally {
       setLoading(false);
     }
   }
 
-  // Envia email de recuperação
   async function handleRecover(e) {
     e.preventDefault();
     setError(null);
@@ -65,18 +66,8 @@ export default function Login() {
     }
   }
 
-  // Google — o Supabase redireciona para o provider e ao voltar o useEffect trata do redirect
-  async function handleGoogle() {
-    setError(null);
-    try {
-      await loginWithGoogle();
-    } catch {
-      setError("Erro ao entrar com Google. Tenta novamente.");
-    }
-  }
-
   return (
-    <div className="auth-container">
+    <div className="auth-container admin-mode">
       {/* Coluna esquerda — marketing */}
       <div className="auth-marketing">
         <Link to="/" className="auth-brand">
@@ -85,17 +76,20 @@ export default function Login() {
         </Link>
 
         <div className="auth-marketing-body">
-          <h2>Gere o teu negócio com clareza</h2>
-          <p>CRM, agenda e financeiro num único painel.</p>
+          <h2>Painel de Administração</h2>
+          <p>
+            Acesso restrito para gestão global do sistema, auditoria de negócios
+            e controlo de utilizadores.
+          </p>
           <ul className="auth-features">
             <li>
-              <AiOutlineCheck /> Página pública de agendamento
+              <FiCheck /> Monitorização de plataformas ativas
             </li>
             <li>
-              <AiOutlineCheck /> Histórico, valor gasto e visitas por cliente
+              <FiCheck /> Gestão e suporte de prestadores
             </li>
             <li>
-              <AiOutlineCheck /> Relatório financeiro e CSV
+              <FiCheck /> Acesso controlado por convite
             </li>
           </ul>
         </div>
@@ -112,69 +106,61 @@ export default function Login() {
           {/* Formulário de login */}
           {mode === "login" && (
             <>
-              <h2>Bem-vindo de volta</h2>
-              <p className="auth-subtitle">Acede ao teu painel de gestão</p>
+              <h2>Autenticação Segura</h2>
+              <p className="auth-subtitle">
+                Introduza as suas credenciais de administrador
+              </p>
 
               {error && <p className="auth-error">{error}</p>}
 
-              <button
-                type="button"
-                className="auth-google-btn"
-                onClick={handleGoogle}
-              >
-                <FcGoogle className="auth-google-icon" />
-                Continuar com Google
-              </button>
-
-              <div className="auth-divider">
-                <span>ou</span>
-              </div>
-
-              <form onSubmit={handleLogin}>
+              <form onSubmit={handleAdminLogin}>
                 <div className="auth-field">
-                  <label htmlFor="email">Email</label>
+                  <label htmlFor="admin-email">Email</label>
                   <div className="auth-input-wrapper">
                     <FiMail className="auth-input-icon" />
                     <input
-                      id="email"
+                      id="admin-email"
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="email@email.com"
+                      placeholder="admin@mail.com"
                       required
+                      disabled={loading}
                     />
                   </div>
                 </div>
 
                 <div className="auth-field">
-                  <label htmlFor="password">Palavra-passe</label>
+                  <label htmlFor="admin-password">Palavra-passe</label>
                   <div className="auth-input-wrapper">
                     <FiLock className="auth-input-icon" />
                     <input
-                      id="password"
+                      id="admin-password"
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
                       required
+                      disabled={loading}
                     />
                     <button
                       type="button"
                       className="auth-eye-btn"
                       onClick={() => setShowPassword((prev) => !prev)}
+                      disabled={loading}
                     >
                       {showPassword ? <FiEyeOff /> : <FiEye />}
                     </button>
                   </div>
                 </div>
 
+                {/* Link para recuperar password */}
                 <button
                   type="button"
                   className="auth-link"
                   onClick={() => {
                     setMode("recover");
                     setError(null);
-                    setSuccess(null);
                   }}
                 >
                   Esqueceste a palavra-passe?
@@ -186,13 +172,14 @@ export default function Login() {
               </form>
 
               <p className="auth-footer">
-                Não tens conta?{" "}
-                <Link to="/register">Regista-te gratuitamente</Link>
+                <Link to="/" className="auth-link">
+                  <FiArrowLeft /> Voltar à Página Inicial
+                </Link>
               </p>
             </>
           )}
 
-          {/* Formulário de recuperação de password */}
+          {/* Formulário de recuperação */}
           {mode === "recover" && (
             <>
               <div className="auth-lock-icon">
@@ -217,7 +204,7 @@ export default function Login() {
                     <FiMail />
                     <p>
                       Receberás um email com um link para criar uma nova
-                      password. O link expira em 1 hora.
+                      palavra-passe. O link expira em 1 hora.
                     </p>
                   </div>
                 </>
@@ -233,7 +220,7 @@ export default function Login() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="mail@mail.com"
+                      placeholder="admin@mail.com"
                       required
                       disabled={!!success}
                     />

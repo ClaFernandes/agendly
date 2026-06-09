@@ -2,8 +2,11 @@ import { Routes, Route } from "react-router-dom";
 
 import ProtectedRoute from "./ProtectedRoute";
 
+import Home from "../pages/Home";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
+import AdminLogin from "../pages/auth/AdminLogin";
+
 import Onboarding from "../pages/onboarding/Onboarding";
 
 import DashboardLayout from "../components/layout/DashboardLayout";
@@ -20,7 +23,7 @@ import AdminDashboard from "../pages/admin/AdminDashboard";
 import AdminBusiness from "../pages/admin/AdminBusiness";
 import AdminUsers from "../pages/admin/AdminUsers";
 
-// import { BookingProvider } from "../context/BookingContext";
+import { BookingProvider } from "../context/BookingContext";
 import BookingLayout from "../components/layout/BookingLayout";
 import ServicePage from "../pages/public-booking/ServicePage";
 import DatePage from "../pages/public-booking/DatePage";
@@ -31,14 +34,14 @@ import BookingConfirm from "../pages/public-booking/BookingConfirm";
 
 import NotFound from "../pages/NotFound";
 
-import { BookingProvider } from "../context/BookingContext";
-
 function AppRoutes() {
   return (
     <Routes>
       {/* Rotas públicas */}
+      <Route path="/" element={<Home />} />
       <Route path="login" element={<Login />} />
       <Route path="register" element={<Register />} />
+      <Route path="admin/login" element={<AdminLogin />} />
       <Route
         path="onboarding"
         element={
@@ -47,7 +50,6 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
       {/* Área do Prestador */}
       <Route
         path="dashboard"
@@ -65,7 +67,6 @@ function AppRoutes() {
         <Route path="financial" element={<Financial />} />
         <Route path="settings" element={<Settings />} />
       </Route>
-
       {/* Área do Admin */}
       <Route
         path="admin"
@@ -79,7 +80,6 @@ function AppRoutes() {
         <Route path="businesses" element={<AdminBusiness />} />
         <Route path="users" element={<AdminUsers />} />
       </Route>
-
       {/* Área do Cliente */}
       <Route
         path="p/:slug"
@@ -95,8 +95,7 @@ function AppRoutes() {
         <Route path="form" element={<FormPage />} />
         <Route path="summary" element={<SummaryPage />} />
         <Route path="confirm" element={<BookingConfirm />} />
-      </Route>      
-
+      </Route>
       {/* Not Found */}
       <Route path="*" element={<NotFound />} />
     </Routes>

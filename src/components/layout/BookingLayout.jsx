@@ -1,8 +1,7 @@
-//BookingLayout.jsx
-import { Outlet } from 'react-router-dom'; //incluir depois: useParams
-import '../../pages/public-booking/PublicBooking.css';
-import StepProgress from '../booking-flow/StepProgress';
-import { useBooking } from '../../context/BookingContext';
+import { Outlet } from "react-router-dom"; //incluir depois: useParams
+import "../../pages/public-booking/PublicBooking.css";
+import StepProgress from "../booking-flow/StepProgress";
+import { useBooking } from "../../context/BookingContext";
 
 export default function BookingLayout() {
   const bookingContext = useBooking();
@@ -14,17 +13,34 @@ export default function BookingLayout() {
 
   const { business, loadingBusiness, loadingError } = bookingContext;
 
-  if (loadingBusiness) return <div className="loading-screen">Carregando dados do estabelecimento...</div>;
-  if (!business) return <div className="error-screen">{loadingError || 'Estabelecimento não encontrado.'}</div>;
+  if (loadingBusiness)
+    return (
+      <div className="loading-screen">
+        Carregando dados do estabelecimento...
+      </div>
+    );
+  if (!business)
+    return (
+      <div className="error-screen">
+        {loadingError || "Estabelecimento não encontrado."}
+      </div>
+    );
 
   return (
     <div className="booking-container">
       <header className="booking-header">
         <div className="business-logo">
-          {business.logo_url ? <img src={business.logo_url} alt={business.name} /> : <div>Logo</div>}
+          {business.logo_url ? (
+            <img src={business.logo_url} alt={business.name} />
+          ) : (
+            <div>Logo</div>
+          )}
         </div>
         <h1>{business.name}</h1>
-        <p>{business.description || "Selecione os dados para realizar o seu agendamento"}</p>
+        <p>
+          {business.description ||
+            "Selecione os dados para realizar o seu agendamento"}
+        </p>
       </header>
 
       <main className="booking-content">
@@ -33,7 +49,9 @@ export default function BookingLayout() {
       </main>
 
       <footer className="booking-footer">
-        <p>Desenvolvido por <strong>Agendly</strong></p>
+        <p>
+          Desenvolvido por <strong>Agendly</strong>
+        </p>
       </footer>
     </div>
   );
