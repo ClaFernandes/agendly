@@ -1,10 +1,8 @@
 import { createContext, useContext, useEffect, useState, useRef } from "react";
 import { supabase } from "../lib/supabase";
 
-// Criação do contexto
 const AuthContext = createContext();
 
-// Hook personalizado para consumir contexto
 // eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   return useContext(AuthContext);
@@ -16,15 +14,12 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const isRegistering = useRef(false);
 
-  //Busca role do utilizador à tabela profiles através do id
   async function fetchRole(userId, retries = 5, delay = 500) {
     await new Promise((res) => setTimeout(res, 500));
 
-    // Tenta buscar o role várias vezes, com um timeout para cada tentativa
     for (let i = 0; i < retries; i++) {
       console.log(`fetchRole tentativa ${i + 1} para userId:`, userId);
 
-      // Promise para buscar o role, com timeout de 2 segundos
       const { data, error } = await Promise.race([
         supabase.from("profiles").select("role").eq("id", userId).single(),
         new Promise((_, reject) =>
@@ -34,10 +29,8 @@ export function AuthProvider({ children }) {
 
       console.log(`fetchRole resultado ${i + 1}:`, data, error?.message);
 
-      // Se encontrou o role, retorna
       if (data?.role) return data.role;
 
-      // Se deu timeout ou outro erro, espera um pouco antes de tentar novamente
       if (i < retries - 1) {
         await new Promise((res) => setTimeout(res, delay));
       }
@@ -47,9 +40,15 @@ export function AuthProvider({ children }) {
     return null;
   }
 
-  // Verifica a sessão atual e verifica mudanças de autenticação
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      // 🔴 Durante recovery, não processar sessão —
+      // o UpdatePassword.jsx gere isto diretamente
+      if (window.location.pathname.includes("update-password")) {
+        setLoading(false);
+        return;
+      }
+
       if (session?.user) {
         const role = await fetchRole(session.user.id);
         setUser(session.user);
@@ -58,7 +57,6 @@ export function AuthProvider({ children }) {
       setLoading(false);
     });
 
-    // Verifica mudanças na autenticação (login/logout) e atualiza estado
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -71,10 +69,19 @@ export function AuthProvider({ children }) {
 
       if (isRegistering.current) return;
 
+      // 🔴 Durante recovery, ignorar completamente —
+      // o UpdatePassword.jsx gere a sessão diretamente
+      if (
+        event === "PASSWORD_RECOVERY" ||
+        event === "USER_UPDATED" ||
+        (event === "SIGNED_IN" &&
+          window.location.pathname.includes("update-password"))
+      )
+        return;
+
       if (session?.user) {
         let role = await fetchRole(session.user.id);
 
-        // Primeiro login com Google — o perfil ainda não existe, então cria um novo com role "provider"
         if (!role) {
           console.log("Role null — a inserir perfil...");
           const { error: insertError } = await supabase
@@ -98,7 +105,6 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  //Login com email
   async function login(email, password) {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -108,8 +114,6 @@ export function AuthProvider({ children }) {
     return data;
   }
 
-  //Registo de novo prestador
-  // Função de registo
   async function register(email, password, fullName) {
     isRegistering.current = true;
 
@@ -122,13 +126,9 @@ export function AuthProvider({ children }) {
       if (error) throw error;
 
       const { data: loginData, error: loginError } =
-        await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        await supabase.auth.signInWithPassword({ email, password });
       if (loginError) throw loginError;
 
-      // Usa os dados do signInWithPassword diretamente para garantir o usuário logado
       const sessionUser = loginData?.user;
       console.log("register — sessionUser:", sessionUser?.id);
 
@@ -144,13 +144,11 @@ export function AuthProvider({ children }) {
     }
   }
 
-  //Logout
   async function logout() {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
   }
 
-  //Recuperação de password
   async function recoverPassword(email) {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/agendly/update-password`,
@@ -158,12 +156,11 @@ export function AuthProvider({ children }) {
     if (error) throw error;
   }
 
-  // Login/registo com Google
   async function loginWithGoogle() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/agendly/dashboard`,
+        redirectTo: `${window.location.origin}/agendly/register`,
       },
     });
     if (error) throw error;
@@ -180,6 +177,5 @@ export function AuthProvider({ children }) {
     loginWithGoogle,
   };
 
-  // Renderiza o provedor de contexto
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

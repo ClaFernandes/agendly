@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { supabase } from "../../lib/supabase";
 import {
   FiEye,
   FiEyeOff,
@@ -16,7 +17,7 @@ export default function AdminLogin() {
   const navigate = useNavigate();
   const { login, recoverPassword, user, userRole } = useAuth();
 
-  const [mode, setMode] = useState("login"); // "login" | "recover"
+  const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -38,7 +39,20 @@ export default function AdminLogin() {
 
     try {
       await login(email, password);
-      // useEffect trata do redirect se o role for admin. Se não for admin, mostra erro
+      // Verifica se o utilizador é admin
+      const { data: userData } = await supabase.auth.getUser();
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", userData.user.id)
+        .single();
+
+      if (profile?.role !== "admin") {
+        // Faz logout imediato — não deixa provider ficar autenticado aqui
+        await supabase.auth.signOut();
+        setError("Acesso restrito a administradores.");
+      }
+      // Se for admin, o useEffect acima trata do redirect
     } catch {
       setError(
         "Credenciais administrativas inválidas ou acesso não autorizado.",
