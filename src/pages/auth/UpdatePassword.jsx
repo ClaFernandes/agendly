@@ -29,27 +29,39 @@ export default function UpdatePassword() {
   const [sessionReady, setSessionReady] = useState(false);
 
   useEffect(() => {
-    // Se havia token de recovery no hash, o Supabase já processou
-    // e criou sessão — basta confirmar com getSession
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setSessionReady(true);
-      } else {
-        // Última tentativa: aguarda 1s e tenta de novo
-        // (race condition rara entre o cliente criar sessão e getSession)
-        setTimeout(() => {
-          supabase.auth.getSession().then(({ data: { session: s } }) => {
-            if (s) {
-              setSessionReady(true);
-            } else {
-              setError(
-                "Link inválido ou expirado. Pede um novo link de recuperação.",
-              );
-            }
-          });
-        }, 1000);
-      }
-    });
+    // Lê o hash e extrai os parâmetros manualmente
+    const hash = window.location.hash.substring(1); // remove o '#'
+    const params = new URLSearchParams(hash);
+
+    const accessToken = params.get("access_token");
+    const refreshToken = params.get("refresh_token");
+    const type = params.get("type");
+
+    if (type === "recovery" && accessToken) {
+      // Define a sessão manualmente com os tokens do URL
+      supabase.auth
+        .setSession({ access_token: accessToken, refresh_token: refreshToken })
+        .then(({ data: { session }, error }) => {
+          if (session && !error) {
+            setSessionReady(true);
+          } else {
+            setError(
+              "Link inválido ou expirado. Pede um novo link de recuperação.",
+            );
+          }
+        });
+    } else {
+      // Fallback: talvez já haja sessão ativa (ex: refresh de página)
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          setSessionReady(true);
+        } else {
+          setError(
+            "Link inválido ou expirado. Pede um novo link de recuperação.",
+          );
+        }
+      });
+    }
   }, []);
 
   const rulesStatus = passwordRules.map((rule) => ({
