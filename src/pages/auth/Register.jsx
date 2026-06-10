@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { supabase } from "../../lib/supabase";
 import {
   FiEye,
   FiEyeOff,
@@ -13,7 +14,9 @@ import {
 import { AiOutlineCheck } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import logo from "../../assets/logo.svg";
+import "./Auth.css";
 
+// Regras de password
 const passwordRules = [
   { id: "length", label: "Mínimo 8 caracteres", test: (p) => p.length >= 8 },
   { id: "upper", label: "Uma letra maiúscula", test: (p) => /[A-Z]/.test(p) },
@@ -28,25 +31,50 @@ const passwordRules = [
 
 export default function Register() {
   const navigate = useNavigate();
-  const { register, loginWithGoogle, user } = useAuth();
+  const { register, loginWithGoogle, user, userRole, loading } = useAuth();
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
 
-  // Se o utilizador já se registou com sucesso e está logado, leva-o diretamente para o onboarding
+  // Redirecionamento pós-registo/login
   useEffect(() => {
-    if (user) {
-      navigate("/onboarding", { replace: true });
-    }
-  }, [user, navigate]);
+    if (loading) return;
+    if (!user || userRole !== "provider") return;
 
+    //  Google - vai para o dashboard se tiver negócio, ou para onboarding se não tiver
+    const isGoogleUser = user.app_metadata?.provider === "google";
+
+    if (!isGoogleUser) {
+      // Registo por email — utilizador novo, vai sempre para onboarding
+      navigate("/onboarding", { replace: true });
+      return;
+    }
+
+    // Google — verifica se já tem negócio
+    async function handleGoogleRedirect() {
+      const { data } = await supabase
+        .from("business")
+        .select("id")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (data) {
+        navigate("/dashboard", { replace: true });
+      } else {
+        navigate("/onboarding", { replace: true });
+      }
+    }
+
+    handleGoogleRedirect();
+  }, [user, userRole, loading, navigate]);
+
+  // Avaliação das regras de password
   const rulesStatus = passwordRules.map((rule) => ({
     ...rule,
     passed: rule.test(password),
@@ -55,7 +83,7 @@ export default function Register() {
   const allRulesPassed = rulesStatus.every((r) => r.passed);
   const passwordsMatch = password === confirmPassword && confirmPassword !== "";
 
-  // Submit do formulário de registo
+  // Função de registo — tenta criar conta e fazer login imediato - useEffect trata do redirecionamento
   async function handleRegister(e) {
     e.preventDefault();
     setError(null);
@@ -69,12 +97,10 @@ export default function Register() {
       return;
     }
 
-    setLoading(true);
+    setFormLoading(true);
 
     try {
-      // Envia os parâmetros para o AuthContext mapear o profile do utilizador na tabela pública
-      await register(email, password, firstName, lastName);
-      navigate("/onboarding", { replace: true });
+      await register(email, password, fullName);
     } catch (err) {
       if (
         err.message?.includes("already registered") ||
@@ -84,11 +110,11 @@ export default function Register() {
       } else {
         setError("Erro ao criar conta. Tenta novamente.");
       }
-    } finally {
-      setLoading(false);
+      setFormLoading(false);
     }
   }
 
+  //Função para buscar role do utilizador, com retries para lidar com delay na criação do perfil
   async function handleGoogle() {
     setError(null);
     try {
@@ -100,208 +126,179 @@ export default function Register() {
 
   return (
     <div className="auth-container">
+      {/* Coluna esquerda — marketing */}
       <div className="auth-marketing">
-        <div className="auth-brand">
-          <img
-            src={logo}
-            alt="Agendly"
-            className="auth-logo"
-            style={{ height: "32px", width: "auto" }}
-          />
+        <Link to="/" className="auth-brand">
+          <img src={logo} alt="Agendly" className="auth-logo" />
           <span>Agendly</span>
-        </div>
+        </Link>
 
-        <h2>Começa em menos de 2 minutos</h2>
-        <p>
-          Cria a tua conta, configura o negócio e partilha o link com os teus
-          clientes.
-        </p>
-        <ul className="auth-features">
-          <li>
-            <AiOutlineCheck /> Página pública ativa imediatamente
-          </li>
-          <li>
-            <AiOutlineCheck /> Cancelamento a qualquer momento
-          </li>
-        </ul>
+        <div className="auth-marketing-body">
+          <h2>Começa em menos de 2 minutos</h2>
+          <p>
+            Cria a tua conta, configura o negócio e partilha o link com os teus
+            clientes.
+          </p>
+          <ul className="auth-features">
+            <li>
+              <AiOutlineCheck /> Registo 100% gratuito
+            </li>
+            <li>
+              <AiOutlineCheck /> Página pública ativa imediatamente
+            </li>
+            <li>
+              <AiOutlineCheck /> Cancelamento a qualquer momento
+            </li>
+          </ul>
+        </div>
       </div>
 
-      <div className="auth-card">
-        <div className="auth-brand">
-          <img
-            src={logo}
-            alt="Agendly"
-            className="auth-logo"
-            style={{ height: "32px", width: "auto" }}
-          />
-          <span>Agendly</span>
-        </div>
+      {/* Coluna direita — formulário */}
+      <div className="auth-form-side">
+        <div className="auth-card">
+          <Link to="/" className="auth-brand">
+            <img src={logo} alt="Agendly" className="auth-logo" />
+            <span>Agendly</span>
+          </Link>
 
-        <h2>Criar conta</h2>
-        <p className="auth-subtitle">Começa a gerir o teu negócio hoje</p>
+          <h2>Criar conta</h2>
+          <p className="auth-subtitle">Começa a gerir o teu negócio hoje</p>
 
-        {error && <p className="auth-error">{error}</p>}
-
-        <button
-          type="button"
-          className="auth-google-btn"
-          onClick={handleGoogle}
-        >
-          <FcGoogle className="auth-google-icon" />
-          Continuar com Google
-        </button>
-
-        <div className="auth-divider">
-          <span>ou</span>
-        </div>
-
-        <form onSubmit={handleRegister}>
-          <div
-            className="auth-field-row"
-            style={{ display: "flex", gap: "12px" }}
-          >
-            <div className="auth-field" style={{ flex: 1 }}>
-              <label htmlFor="firstName">Primeiro nome</label>
-              <div className="auth-input-wrapper">
-                <FiUser className="auth-input-icon" />
-                <input
-                  id="firstName"
-                  type="text"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  placeholder="José"
-                  required
-                />
-              </div>
-            </div>
-            <div className="auth-field" style={{ flex: 1 }}>
-              <label htmlFor="lastName">Apelido</label>
-              <div className="auth-input-wrapper">
-                <FiUser className="auth-input-icon" />
-                <input
-                  id="lastName"
-                  type="text"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  placeholder="Silva"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="auth-field">
-            <label htmlFor="email">Email</label>
-            <div className="auth-input-wrapper">
-              <FiMail className="auth-input-icon" />
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="nome@negocio.com"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="auth-field">
-            <label htmlFor="password">Password</label>
-            <div className="auth-input-wrapper">
-              <FiLock className="auth-input-icon" />
-              <input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-              />
-              <button
-                type="button"
-                className="auth-eye-btn"
-                onClick={() => setShowPassword((prev) => !prev)}
-              >
-                {showPassword ? <FiEyeOff /> : <FiEye />}
-              </button>
-            </div>
-
-            {password.length > 0 && (
-              <ul
-                className="auth-password-rules"
-                style={{ listStyle: "none", padding: 0, marginTop: "8px" }}
-              >
-                {rulesStatus.map((rule) => (
-                  <li
-                    key={rule.id}
-                    className={rule.passed ? "rule-passed" : "rule-failed"}
-                  >
-                    {rule.passed ? (
-                      <FiCheck color="green" />
-                    ) : (
-                      <FiX color="red" />
-                    )}{" "}
-                    {rule.label}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          <div className="auth-field">
-            <label htmlFor="confirmPassword">Confirmar password</label>
-            <div className="auth-input-wrapper">
-              <FiLock className="auth-input-icon" />
-              <input
-                id="confirmPassword"
-                type={showConfirmPassword ? "text" : "password"}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-              />
-              <button
-                type="button"
-                className="auth-eye-btn"
-                onClick={() => setShowConfirmPassword((prev) => !prev)}
-              >
-                {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
-              </button>
-            </div>
-
-            {confirmPassword.length > 0 && (
-              <p
-                className={
-                  passwordsMatch ? "auth-match-ok" : "auth-match-error"
-                }
-              >
-                {passwordsMatch ? (
-                  <>
-                    {" "}
-                    <FiCheck color="green" /> As passwords coincidem{" "}
-                  </>
-                ) : (
-                  <>
-                    {" "}
-                    <FiX color="red" /> As passwords não coincidem{" "}
-                  </>
-                )}
-              </p>
-            )}
-          </div>
+          {error && <p className="auth-error">{error}</p>}
 
           <button
-            type="submit"
-            className="auth-btn"
-            disabled={loading || !allRulesPassed || !passwordsMatch}
+            type="button"
+            className="auth-google-btn"
+            onClick={handleGoogle}
           >
-            {loading ? "A criar conta..." : "Criar conta"}
+            <FcGoogle className="auth-google-icon" />
+            Continuar com Google
           </button>
-        </form>
 
-        <p className="auth-footer">
-          Já tens conta? <Link to="/login">Entra aqui</Link>
-        </p>
+          <div className="auth-divider">
+            <span>ou</span>
+          </div>
+
+          <form onSubmit={handleRegister}>
+            <div className="auth-field">
+              <label htmlFor="fullName">Nome completo</label>
+              <div className="auth-input-wrapper">
+                <FiUser className="auth-input-icon" />
+                <input
+                  id="fullName"
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="Manuel Silva"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="auth-field">
+              <label htmlFor="email">Email</label>
+              <div className="auth-input-wrapper">
+                <FiMail className="auth-input-icon" />
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="mail@mail.com"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="auth-field">
+              <label htmlFor="password">Palavra-passe</label>
+              <div className="auth-input-wrapper">
+                <FiLock className="auth-input-icon" />
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  className="auth-eye-btn"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
+
+              {password.length > 0 && (
+                <ul className="auth-password-rules">
+                  {rulesStatus.map((rule) => (
+                    <li
+                      key={rule.id}
+                      className={rule.passed ? "rule-passed" : "rule-failed"}
+                    >
+                      {rule.passed ? <FiCheck /> : <FiX />}
+                      {rule.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div className="auth-field">
+              <label htmlFor="confirmPassword">Confirmar palavra-passe</label>
+              <div className="auth-input-wrapper">
+                <FiLock className="auth-input-icon" />
+                <input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  className="auth-eye-btn"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                >
+                  {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
+
+              {confirmPassword.length > 0 && (
+                <p
+                  className={
+                    passwordsMatch ? "auth-match-ok" : "auth-match-error"
+                  }
+                >
+                  {passwordsMatch ? (
+                    <>
+                      <FiCheck /> As palavras-passe coincidem
+                    </>
+                  ) : (
+                    <>
+                      <FiX /> As palavras-passe não coincidem
+                    </>
+                  )}
+                </p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="auth-btn"
+              disabled={formLoading || !allRulesPassed || !passwordsMatch}
+            >
+              {formLoading ? "A criar conta..." : "Criar conta"}
+            </button>
+          </form>
+
+          <p className="auth-footer">
+            Já tens conta? <Link to="/login">Entra aqui</Link>
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -1,0 +1,550 @@
+.onboarding-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--color-page-bg);
+    padding: 32px 24px 64px;
+    gap: 28px;
+}
+
+/* Header */
+
+.onboarding-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.onboarding-logo {
+    height: 50px;
+    width: auto;
+    background: var(--color-brand-subtle);
+    padding: 6px;
+    border-radius: var(--radius-md);
+}
+
+/* Barra de progresso */
+
+.onboarding-progress {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+}
+
+.onboarding-progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    min-width: 100px;
+}
+
+/* Linha conectora entre passos */
+.onboarding-progress-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: calc(50% + 18px);
+    width: calc(100% - 36px);
+    height: 2px;
+    background: var(--color-border);
+    transition: background 0.3s;
+}
+
+.onboarding-progress-step.done:not(:last-child)::after {
+    background: var(--color-brand);
+}
+
+.onboarding-progress-dot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    border: 2px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-weight: var(--font-semi);
+    transition: all 0.2s;
+    z-index: 1;
+}
+
+.onboarding-progress-step.active .onboarding-progress-dot {
+    border-color: var(--color-brand);
+    background: var(--color-brand);
+    color: #fff;
+}
+
+.onboarding-progress-step.done .onboarding-progress-dot {
+    border-color: var(--color-brand);
+    background: var(--color-brand);
+    color: #fff;
+}
+
+.onboarding-progress-step span {
+    font-size: var(--text-xs);
+    color: var(--color-text-subtle);
+    white-space: nowrap;
+    text-align: center;
+}
+
+.onboarding-progress-step.active span,
+.onboarding-progress-step.done span {
+    color: var(--color-brand);
+    font-weight: var(--font-medium);
+}
+
+/* Card principal */
+
+.onboarding-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 40px 48px;
+    width: 100%;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: var(--shadow-md);
+}
+
+.onboarding-card h2 {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+    letter-spacing: -0.3px;
+}
+
+.onboarding-subtitle {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin: -8px 0 0;
+    line-height: 1.6;
+}
+
+/* Campos */
+
+.onboarding-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.onboarding-field label {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.onboarding-label-hint {
+    font-size: var(--text-xs);
+    color: var(--color-text-subtle);
+    font-weight: var(--font-normal);
+}
+
+.onboarding-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.onboarding-input-wrapper input {
+    width: 100%;
+    padding: 10px 40px 10px 38px;
+    border-radius: var(--radius-md);
+}
+
+.onboarding-input-icon {
+    position: absolute;
+    left: 12px;
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-subtle);
+    pointer-events: none;
+    flex-shrink: 0;
+}
+
+.onboarding-slug-ok {
+    position: absolute;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--text-xs);
+    color: var(--color-ok);
+    white-space: nowrap;
+}
+
+.onboarding-slug-error {
+    position: absolute;
+    right: 10px;
+    font-size: var(--text-xs);
+    color: var(--color-error);
+    white-space: nowrap;
+}
+
+.onboarding-slug-preview {
+    font-size: var(--text-xs);
+    color: var(--color-text-subtle);
+    margin: 0;
+}
+
+.onboarding-slug-preview strong {
+    color: var(--color-brand);
+}
+
+.onboarding-textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    resize: vertical;
+    min-height: 80px;
+    font-family: var(--font-main);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border-strong);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.onboarding-textarea:focus {
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 3px var(--color-brand-subtle);
+}
+
+.onboarding-textarea::placeholder {
+    color: var(--color-text-subtle);
+}
+
+/* Upload da logo */
+
+.onboarding-logo-upload {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.onboarding-logo-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: var(--radius-md);
+    object-fit: cover;
+    border: 1px solid var(--color-border);
+}
+
+.onboarding-logo-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100px;
+    height: 100px;
+    border-radius: var(--radius-md);
+    border: 2px dashed var(--color-border-strong);
+    color: var(--color-text-subtle);
+    font-size: var(--text-xs);
+    text-align: center;
+}
+
+.onboarding-logo-placeholder svg {
+    width: 20px;
+    height: 20px;
+}
+
+.onboarding-logo-btn {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-brand);
+    cursor: pointer;
+    padding: 8px 14px;
+    border: 1px solid var(--color-brand);
+    border-radius: var(--radius-md);
+    transition: background 0.15s;
+}
+
+.onboarding-logo-btn:hover {
+    background: var(--color-brand-subtle);
+}
+
+/* Horários */
+
+.onboarding-hours {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Bloco de cada dia — cabeçalho + intervalos */
+.onboarding-day-block {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-2);
+    overflow: hidden;
+    transition: border-color 0.15s;
+}
+
+.onboarding-day-block.is-active {
+    border-color: var(--color-brand);
+    background: var(--color-brand-subtle);
+}
+
+/* Cabeçalho do dia — toggle + nome + botão adicionar */
+.onboarding-day-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+}
+
+.onboarding-day-label {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-text);
+    flex: 1;
+}
+
+/* Botão para adicionar novo intervalo */
+.onboarding-add-interval {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    color: var(--color-brand);
+    padding: 4px 8px;
+    border: 1px solid var(--color-brand);
+    border-radius: var(--radius-md);
+    background: transparent;
+    transition: background 0.15s;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.onboarding-add-interval:hover {
+    background: var(--color-surface);
+}
+
+.onboarding-add-interval svg {
+    width: 12px;
+    height: 12px;
+}
+
+.onboarding-day-closed {
+    font-size: var(--text-sm);
+    color: var(--color-text-subtle);
+}
+
+/* Container dos intervalos */
+.onboarding-intervals {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 14px 12px;
+}
+
+/* Linha de um intervalo — início + separador + fim + botão remover */
+.onboarding-interval-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    padding: 6px 10px;
+}
+
+.onboarding-interval-row input[type="time"] {
+    padding: 4px 8px;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border-strong);
+    color: var(--color-text);
+    flex: 1;
+}
+
+.onboarding-interval-sep {
+    color: var(--color-text-subtle);
+    font-size: var(--text-sm);
+    flex-shrink: 0;
+}
+
+/* Botão de remover intervalo */
+.onboarding-remove-interval {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    color: var(--color-error);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+
+.onboarding-remove-interval:hover {
+    background: var(--color-error-subtle);
+}
+
+.onboarding-remove-interval svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Toggle */
+
+.onboarding-toggle {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    border-radius: var(--radius-full);
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.onboarding-toggle.on {
+    background: var(--color-brand);
+}
+
+.onboarding-toggle.off {
+    background: var(--color-border-strong);
+}
+
+.onboarding-toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 14px;
+    height: 14px;
+    border-radius: var(--radius-full);
+    background: #fff;
+    transition: transform 0.2s;
+    pointer-events: none;
+}
+
+.onboarding-toggle.on .onboarding-toggle-thumb {
+    transform: translateX(16px);
+}
+
+/* Botões */
+
+.onboarding-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 20px;
+    background: var(--color-brand);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--font-semi);
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s;
+    margin-top: 4px;
+}
+
+.onboarding-btn:hover:not(:disabled) {
+    background: var(--color-brand-hover);
+    box-shadow: var(--shadow-md);
+}
+
+.onboarding-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.onboarding-btn-back {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 20px;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.onboarding-btn-back:hover {
+    background: var(--color-surface-2);
+}
+
+.onboarding-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.onboarding-actions .onboarding-btn {
+    flex: 1;
+    margin-top: 0;
+}
+
+/* Erro */
+
+.onboarding-error {
+    font-size: var(--text-sm);
+    color: var(--color-error);
+    background: var(--color-error-subtle);
+    border: 1px solid var(--color-danger-400);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    margin: 0;
+}
+
+/*  Responsividade */
+
+@media (max-width: 600px) {
+    .onboarding-container {
+        padding: 24px 16px 48px;
+        gap: 20px;
+    }
+
+    .onboarding-card {
+        padding: 28px 20px;
+    }
+
+    .onboarding-progress-step {
+        min-width: 72px;
+    }
+
+    .onboarding-progress-step span {
+        font-size: 10px;
+    }
+
+    .onboarding-day-header {
+        flex-wrap: wrap;
+    }
+
+    .onboarding-interval-row {
+        flex-wrap: wrap;
+    }
+
+    .onboarding-interval-row input[type="time"] {
+        flex: unset;
+        width: calc(50% - 24px);
+    }
+}

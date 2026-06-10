@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useRef } from "react";
 import { supabase } from "../lib/supabase";
 
 // Criação do contexto
@@ -14,23 +14,40 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
+  const isRegistering = useRef(false);
 
   //Busca role do utilizador à tabela profiles através do id
-  async function fetchRole(userId) {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", userId)
-      .single();
+  async function fetchRole(userId, retries = 5, delay = 500) {
+    await new Promise((res) => setTimeout(res, 500));
 
-    if (error) {
-      console.error("Erro ao buscar role:", error.message);
-      return null;
+    // Tenta buscar o role várias vezes, com um timeout para cada tentativa
+    for (let i = 0; i < retries; i++) {
+      console.log(`fetchRole tentativa ${i + 1} para userId:`, userId);
+
+      // Promise para buscar o role, com timeout de 2 segundos
+      const { data, error } = await Promise.race([
+        supabase.from("profiles").select("role").eq("id", userId).single(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("timeout")), 2000),
+        ),
+      ]).catch((err) => ({ data: null, error: err }));
+
+      console.log(`fetchRole resultado ${i + 1}:`, data, error?.message);
+
+      // Se encontrou o role, retorna
+      if (data?.role) return data.role;
+
+      // Se deu timeout ou outro erro, espera um pouco antes de tentar novamente
+      if (i < retries - 1) {
+        await new Promise((res) => setTimeout(res, delay));
+      }
     }
-    return data.role;
+
+    console.error("Erro ao buscar role após várias tentativas.");
+    return null;
   }
 
-  // Verifica se há sessão ativa e remove loading depois de verificar
+  // Verifica a sessão atual e verifica mudanças de autenticação
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
@@ -45,24 +62,37 @@ export function AuthProvider({ children }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log(
+        "onAuthStateChange disparou — event:",
+        event,
+        "user:",
+        session?.user?.id,
+      );
+
+      if (isRegistering.current) return;
+
       if (session?.user) {
         let role = await fetchRole(session.user.id);
 
         // Primeiro login com Google — o perfil ainda não existe, então cria um novo com role "provider"
         if (!role) {
-          await supabase
+          console.log("Role null — a inserir perfil...");
+          const { error: insertError } = await supabase
             .from("profiles")
             .insert({ id: session.user.id, role: "provider" });
+          console.log("Insert resultado:", insertError?.message);
           role = "provider";
         }
 
         setUser(session.user);
         setUserRole(role);
+        console.log("AuthContext pronto — role:", role);
+        setLoading(false);
       } else {
         setUser(null);
         setUserRole(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -79,23 +109,39 @@ export function AuthProvider({ children }) {
   }
 
   //Registo de novo prestador
-  async function register(email, password, firstName, lastName) {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { first_name: firstName, last_name: lastName },
-      },
-    });
-    if (error) throw error;
+  // Função de registo
+  async function register(email, password, fullName) {
+    isRegistering.current = true;
 
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .insert({ id: data.user.id, role: "provider" });
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: fullName } },
+      });
+      if (error) throw error;
 
-    if (profileError) throw profileError;
+      const { data: loginData, error: loginError } =
+        await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+      if (loginError) throw loginError;
 
-    return data;
+      // Usa os dados do signInWithPassword diretamente para garantir o usuário logado
+      const sessionUser = loginData?.user;
+      console.log("register — sessionUser:", sessionUser?.id);
+
+      if (sessionUser) {
+        setUser(sessionUser);
+        setUserRole("provider");
+        setLoading(false);
+      }
+
+      return data;
+    } finally {
+      isRegistering.current = false;
+    }
   }
 
   //Logout
@@ -134,5 +180,6 @@ export function AuthProvider({ children }) {
     loginWithGoogle,
   };
 
+  // Renderiza o provedor de contexto
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

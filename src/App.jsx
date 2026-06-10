@@ -1,11 +1,13 @@
-// src/App.jsx
-import AppRoutes from "./routes/AppRoutes"; // ou o caminho correto do teu ficheiro
+import AppRoutes from "./routes/AppRoutes";
 import { AuthProvider } from "./context/AuthContext";
+import { BusinessProvider } from "./context/BusinessContext";
 
 function App() {
   return (
     <AuthProvider>
-      <AppRoutes />
+      <BusinessProvider>
+        <AppRoutes />
+      </BusinessProvider>
     </AuthProvider>
   );
 }
