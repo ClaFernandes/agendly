@@ -22,28 +22,37 @@ export function AuthProvider({ children }) {
   const isRegistering = useRef(false);
   const justSignedOut = useRef(false);
 
-  async function fetchRole(userId, retries = 3, delay = 500) {
-    await new Promise((res) => setTimeout(res, 500));
+  async function fetchRole(userId) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
+      .maybeSingle();
 
-    for (let i = 0; i < retries; i++) {
-      const { data } = await Promise.race([
-        supabase.from("profiles").select("role").eq("id", userId).maybeSingle(),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("timeout")), 2000),
-        ),
-      ]).catch((err) => ({ data: null, error: err }));
-
-      if (data?.role) return data.role;
-
-      if (i < retries - 1) {
-        await new Promise((res) => setTimeout(res, delay));
-      }
+    if (error) {
+      console.error("fetchRole:", error.message);
+      return null;
     }
 
-    console.error(
-      "fetchRole: não foi possível obter role após várias tentativas.",
-    );
-    return null;
+    return data?.role ?? null;
+  }
+
+  async function ensureProfileRole(userId) {
+    const role = await fetchRole(userId);
+    if (role) return role;
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .insert({ id: userId, role: "provider" })
+      .select("role")
+      .single();
+
+    if (error) {
+      console.error("ensureProfileRole:", error.message);
+      return "provider"; // Fallback seguro
+    }
+
+    return data?.role ?? "provider";
   }
 
   useEffect(() => {
@@ -58,12 +67,17 @@ export function AuthProvider({ children }) {
         return;
       }
 
-      if (session?.user) {
-        const role = await fetchRole(session.user.id);
-        setUser(session.user);
-        setUserRole(role);
+      try {
+        if (session?.user) {
+          const role = await ensureProfileRole(session.user.id);
+          setUser(session.user);
+          setUserRole(role || "provider");
+        }
+      } catch (error) {
+        console.error("Erro ao inicializar sessão:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     const {
@@ -88,23 +102,18 @@ export function AuthProvider({ children }) {
 
       justSignedOut.current = false;
 
-      if (session?.user) {
-        let role = await fetchRole(session.user.id);
-
-        if (!role) {
-          const { error: insertError } = await supabase
-            .from("profiles")
-            .insert({ id: session.user.id, role: "provider" });
-          if (insertError) console.error("Insert perfil:", insertError.message);
-          role = "provider";
+      try {
+        if (session?.user) {
+          const role = await ensureProfileRole(session.user.id);
+          setUser(session.user);
+          setUserRole(role || "provider");
+        } else {
+          setUser(null);
+          setUserRole(null);
         }
-
-        setUser(session.user);
-        setUserRole(role);
-        setLoading(false);
-      } else {
-        setUser(null);
-        setUserRole(null);
+      } catch (error) {
+        console.error("Erro no onAuthStateChange:", error);
+      } finally {
         setLoading(false);
       }
     });
@@ -139,8 +148,9 @@ export function AuthProvider({ children }) {
       const sessionUser = loginData?.user;
 
       if (sessionUser) {
+        const role = await ensureProfileRole(sessionUser.id);
         setUser(sessionUser);
-        setUserRole("provider");
+        setUserRole(role ?? "provider");
         setLoading(false);
       }
 
