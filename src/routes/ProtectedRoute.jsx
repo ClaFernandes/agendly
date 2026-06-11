@@ -26,6 +26,9 @@ export default function ProtectedRoute({ children, role }) {
 
   // Se está autenticado mas não tem o role, manda para o login
   if (role && userRole !== role) {
+    // Se não tem role ainda, espera o loading (tratado acima)
+    if (!userRole) return <div>A carregar perfil...</div>;
+
     if (userRole === "provider") {
       return <Navigate to="/dashboard" replace />;
     }

@@ -167,8 +167,8 @@ export default function Onboarding() {
       setError("Nome e URL são obrigatórios.");
       return;
     }
-    if (phone && !/^\+\d{1,3}(\s\d{2,5}){1,4}$/.test(phone)) {
-      setError("Formato de telefone inválido. Exemplo: +351 911 111 111");
+    if (phone && !/^\+?[\d\s\-()]{8,20}$/.test(phone)) {
+      setError("Telefone inválido.");
       return;
     }
     const available = await checkSlug(slug);
@@ -353,12 +353,12 @@ export default function Onboarding() {
       prev.map((h) =>
         h.day_of_week === dayId
           ? {
-              ...h,
-              intervals: [
-                ...h.intervals,
-                { start_time: "09:00", end_time: "18:00" },
-              ],
-            }
+            ...h,
+            intervals: [
+              ...h.intervals,
+              { start_time: "09:00", end_time: "18:00" },
+            ],
+          }
           : h,
       ),
     );
@@ -483,9 +483,9 @@ export default function Onboarding() {
                   placeholder="+351 000 000 000"
                 />
               </div>
-              {phone && !/^\+\d{1,3}(\s\d{2,5}){1,4}$/.test(phone) && (
+              {phone && !/^\+?[\d\s\-()]{8,20}$/.test(phone) && (
                 <p className="onboarding-field-hint">
-                  Formato esperado: +351 000 000 000
+                  Formato de telefone inválido.
                 </p>
               )}
             </div>
