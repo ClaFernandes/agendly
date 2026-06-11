@@ -6,6 +6,7 @@ import Home from "../pages/Home";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import AdminLogin from "../pages/auth/AdminLogin";
+import UpdatePassword from "../pages/auth/UpdatePassword";
 
 import Onboarding from "../pages/onboarding/Onboarding";
 
@@ -42,6 +43,8 @@ function AppRoutes() {
       <Route path="login" element={<Login />} />
       <Route path="register" element={<Register />} />
       <Route path="admin/login" element={<AdminLogin />} />
+      <Route path="update-password" element={<UpdatePassword />} />
+
       <Route
         path="onboarding"
         element={

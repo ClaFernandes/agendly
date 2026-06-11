@@ -1,0 +1,318 @@
+/* ── 1. LAYOUT BASE ─────────────────────────────────────────────── */
+
+/* Wrapper que divide a tela em sidebar + conteúdo */
+.dl-wrapper {
+    display: flex;
+    height: 100vh;
+    background-color: var(--color-page-bg);
+    overflow: hidden;
+    /* evita scroll duplo — cada zona faz o seu próprio */
+}
+
+/* ── 2. SIDEBAR ──────────────────────────────────────────────────── */
+
+.dl-sidebar {
+    width: 72px;
+    /* sidebar estreita — só ícone + label curta */
+    min-height: 100vh;
+    background-color: var(--color-primary-600);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 0;
+    flex-shrink: 0;
+    /* não encolhe quando o conteúdo é grande */
+}
+
+/* Avatar com a inicial do negócio */
+/* Container da marca na sidebar */
+.dl-brand {
+    padding: 24px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+/* Estilo para a imagem da logo */
+.dl-avatar-img {
+    width: 48px;
+    height: 48px;
+    /* MUDANÇA PRINCIPAL: object-fit: contain mantém a proporção original da imagem */
+    object-fit: contain;
+    /* Fundo branco (ou leve) caso a logo seja transparente e a cor da sidebar a oculte */
+    background-color: white;
+    border-radius: 8px;
+    /* Cantos levemente arredondados */
+    padding: 4px;
+    /* Espaçamento interno para a logo não "colar" na borda */
+}
+
+/* Estilo para o fallback de iniciais */
+.dl-avatar {
+    width: 48px;
+    height: 48px;
+    background: #ffffff;
+    /* Fundo branco para as iniciais ficarem legíveis */
+    color: #4f46e5;
+    /* Texto em roxo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+/* ── 3. NAVEGAÇÃO ────────────────────────────────────────────────── */
+
+.dl-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    /* empurra o footer para o fundo */
+    width: 100%;
+}
+
+/* Cada item de navegação — ícone em cima, label em baixo */
+.dl-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 56px;
+    padding: 8px 4px;
+    border-radius: var(--radius-lg);
+    color: rgba(255, 255, 255, 0.65);
+    /* inativo: branco com opacidade */
+    text-decoration: none;
+    transition: background-color 0.15s, color 0.15s;
+    cursor: pointer;
+}
+
+.dl-nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    text-decoration: none;
+    /* anula o hover do <a> global */
+}
+
+/* Estado ativo — fundo branco translúcido + texto branco */
+.dl-nav-item--active {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.dl-nav-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.dl-nav-label {
+    font-size: 10px;
+    /* muito pequeno mas legível — igual ao wireframe */
+    font-weight: var(--font-medium);
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-align: center;
+}
+
+/* ── 4. RODAPÉ DA SIDEBAR ────────────────────────────────────────── */
+
+.dl-sidebar-footer {
+    margin-top: auto;
+    padding-top: 8px;
+}
+
+.dl-logout-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    padding: 8px 4px;
+    border-radius: var(--radius-lg);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 10px;
+    font-weight: var(--font-medium);
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.dl-logout-btn:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* ── 5. ÁREA DE CONTEÚDO ─────────────────────────────────────────── */
+
+.dl-main {
+    flex: 1;
+    overflow-y: auto;
+    /* scroll só no conteúdo, não na sidebar */
+    padding: 32px;
+}
+
+/* ── 6. UTILITÁRIOS DE PÁGINA ────────────────────────────────────── 
+   Classes reutilizáveis por todas as páginas do dashboard.
+   Convenção: prefixo "pg-" (page) para não colidir com outros estilos.
+*/
+
+/* Cabeçalho de página — título + ação opcional (ex: botão "+ Novo") */
+.pg-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.pg-title {
+    font-size: var(--text-xl);
+    font-weight: var(--font-semi);
+    color: var(--color-text);
+    line-height: 1.2;
+}
+
+.pg-subtitle {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-top: 2px;
+}
+
+/* Grid de cards de estatísticas — 2, 3 ou 4 colunas */
+.pg-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+/* Card de estatística individual */
+.pg-stat-card {
+    background-color: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 16px 20px;
+    box-shadow: var(--shadow-sm);
+}
+
+.pg-stat-label {
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+}
+
+.pg-stat-value {
+    font-size: var(--text-xl);
+    font-weight: var(--font-semi);
+    color: var(--color-text);
+    line-height: 1.1;
+}
+
+.pg-stat-meta {
+    font-size: var(--text-xs);
+    color: var(--color-text-subtle);
+    margin-top: 4px;
+}
+
+/* Destaque de tendência positiva/negativa nos cards */
+.pg-stat-meta--up {
+    color: var(--color-ok);
+}
+
+.pg-stat-meta--down {
+    color: var(--color-error);
+}
+
+/* Secção com título + conteúdo */
+.pg-section {
+    background-color: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 24px;
+}
+
+.pg-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.pg-section-title {
+    font-size: var(--text-base);
+    font-weight: var(--font-semi);
+    color: var(--color-text);
+}
+
+/* Botão primário — usado em toda a app do prestador */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background-color: var(--color-brand);
+    color: #fff;
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    border-radius: var(--radius-md);
+    transition: background-color 0.15s;
+    white-space: nowrap;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-brand-hover);
+    text-decoration: none;
+    color: #fff;
+}
+
+/* Botão secundário — contorno, sem fundo */
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background-color: transparent;
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    border: 0.5px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    transition: background-color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-surface-2);
+    text-decoration: none;
+    color: var(--color-text);
+}
+
+/* Estado vazio — usado em listas sem dados */
+.pg-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    color: var(--color-text-subtle);
+    text-align: center;
+    gap: 8px;
+}
+
+.pg-empty-icon {
+    font-size: 32px;
+    opacity: 0.4;
+}
+
+.pg-empty-text {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}

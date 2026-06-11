@@ -1,10 +1,19 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function ProtectedRoute({ children, role }) {
   const { user, userRole, loading } = useAuth();
+  const location = useLocation(); // Obtém a rota atua
+
+  // Verifica se é a página de reset de password
+  const isResetPage = location.pathname.includes("/update-password");
 
   if (loading) return <div>A carregar...</div>;
+
+  // Se for a página de reset, permite o acesso independentemente da autenticação
+  if (isResetPage) {
+    return children;
+  }
 
   if (!user) {
     // Se a rota era do painel admin, vai para o login do admin

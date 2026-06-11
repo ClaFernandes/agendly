@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { supabase } from "../../lib/supabase";
 import { FiEye, FiEyeOff, FiMail, FiLock, FiArrowLeft } from "react-icons/fi";
 import { AiOutlineCheck } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
@@ -19,18 +20,35 @@ export default function Login() {
   const [success, setSuccess] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Redireciona automaticamente quando o AuthContext atualizar
+  // Redireciona após login — não atua se vier de fluxo de recovery
   useEffect(() => {
-    if (user && userRole) {
-      if (userRole === "admin") {
-        navigate("/admin", { replace: true });
+    if (!user || !userRole) return;
+
+    // 🔴 Não redirecionar se o utilizador está em fluxo de recuperação de password
+    if (window.location.pathname.includes("update-password")) return;
+
+    if (userRole === "admin") {
+      navigate("/admin", { replace: true });
+      return;
+    }
+
+    async function checkBusiness() {
+      const { data } = await supabase
+        .from("business")
+        .select("id")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (data) {
+        navigate("/dashboard", { replace: true });
       } else {
         navigate("/onboarding", { replace: true });
       }
     }
+
+    checkBusiness();
   }, [user, userRole, navigate]);
 
-  // Login com email e password
   async function handleLogin(e) {
     e.preventDefault();
     setError(null);
@@ -38,7 +56,6 @@ export default function Login() {
 
     try {
       await login(email, password);
-      // O useEffect trata do redirect quando o userRole atualizar
     } catch {
       setError("Email ou password incorretos.");
     } finally {
@@ -46,7 +63,6 @@ export default function Login() {
     }
   }
 
-  // Envia email de recuperação
   async function handleRecover(e) {
     e.preventDefault();
     setError(null);
@@ -65,7 +81,6 @@ export default function Login() {
     }
   }
 
-  // Google — o Supabase redireciona para o provider e ao voltar o useEffect trata do redirect
   async function handleGoogle() {
     setError(null);
     try {
@@ -77,7 +92,6 @@ export default function Login() {
 
   return (
     <div className="auth-container">
-      {/* Coluna esquerda — marketing */}
       <div className="auth-marketing">
         <Link to="/" className="auth-brand">
           <img src={logo} alt="Agendly" className="auth-logo" />
@@ -101,7 +115,6 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Coluna direita — formulário */}
       <div className="auth-form-side">
         <div className="auth-card">
           <Link to="/" className="auth-brand">
@@ -109,7 +122,6 @@ export default function Login() {
             <span>Agendly</span>
           </Link>
 
-          {/* Formulário de login */}
           {mode === "login" && (
             <>
               <h2>Bem-vindo de volta</h2>
@@ -192,7 +204,6 @@ export default function Login() {
             </>
           )}
 
-          {/* Formulário de recuperação de password */}
           {mode === "recover" && (
             <>
               <div className="auth-lock-icon">

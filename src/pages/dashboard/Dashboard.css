@@ -1,1 +1,308 @@
+/* ── SERVICES ────────────────────────────────────────────────────── */
 
+/* Tabela de serviços */
+.svc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+}
+
+.svc-table thead tr {
+    border-bottom: 0.5px solid var(--color-border);
+}
+
+.svc-table th {
+    padding: 12px 20px;
+    text-align: left;
+    font-size: var(--text-xs);
+    font-weight: var(--font-semi);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.svc-th-center,
+.svc-td-center {
+    text-align: center;
+}
+
+.svc-th-actions,
+.svc-td-actions {
+    text-align: right;
+}
+
+.svc-row {
+    border-bottom: 0.5px solid var(--color-border);
+    transition: background-color 0.1s;
+}
+
+.svc-row:last-child {
+    border-bottom: none;
+}
+
+.svc-row:hover {
+    background-color: var(--color-surface-2);
+}
+
+.svc-table td {
+    padding: 14px 20px;
+    vertical-align: middle;
+}
+
+/* Nome + duração */
+.svc-td-name {
+    min-width: 160px;
+}
+
+.svc-name {
+    font-weight: var(--font-medium);
+    color: var(--color-text);
+}
+
+.svc-duration {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    margin-top: 2px;
+}
+
+/* Preço */
+.svc-td-price {
+    font-weight: var(--font-medium);
+    color: var(--color-text);
+    white-space: nowrap;
+}
+
+/* Badge ativo/inativo */
+.svc-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s;
+}
+
+.svc-badge:hover {
+    opacity: 0.8;
+}
+
+.svc-badge--active {
+    background-color: var(--color-ok-subtle);
+    color: var(--color-ok);
+}
+
+.svc-badge--inactive {
+    background-color: var(--color-surface-2);
+    color: var(--color-text-muted);
+}
+
+/* Estrela de destaque */
+.svc-star {
+    font-size: 18px;
+    padding: 4px;
+    border-radius: var(--radius-md);
+    transition: color 0.15s, background-color 0.15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.svc-star--on {
+    color: var(--color-alert);
+}
+
+.svc-star--off {
+    color: var(--color-text-subtle);
+}
+
+.svc-star:hover {
+    background-color: var(--color-surface-2);
+}
+
+/* Botões de ação (editar/apagar) */
+.svc-td-actions {
+    white-space: nowrap;
+}
+
+.svc-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    transition: background-color 0.12s, color 0.12s;
+    gap: 4px;
+}
+
+.svc-action-btn:hover {
+    background-color: var(--color-surface-2);
+    color: var(--color-text);
+}
+
+.svc-action-btn--danger:hover {
+    background-color: var(--color-error-subtle);
+    color: var(--color-error);
+}
+
+/* Confirmação inline de apagar */
+.svc-confirm-delete {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.svc-confirm-text {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+}
+
+/* Erro global */
+.svc-error {
+    padding: 12px 16px;
+    background-color: var(--color-error-subtle);
+    color: var(--color-error);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    margin-bottom: 16px;
+}
+
+/* ── MODAL ───────────────────────────────────────────────────────── */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 23, 42, 0.5);
+    /* --color-dark-page com opacidade */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 16px;
+}
+
+.modal {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    border: 0.5px solid var(--color-border);
+    box-shadow: var(--shadow-md);
+    width: 100%;
+    max-width: 460px;
+    padding: 24px;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.modal-title {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semi);
+    color: var(--color-text);
+}
+
+.modal-close {
+    font-size: 22px;
+    color: var(--color-text-muted);
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: var(--radius-md);
+    transition: background-color 0.12s;
+}
+
+.modal-close:hover {
+    background-color: var(--color-surface-2);
+}
+
+/* Formulário dentro do modal */
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Dois campos lado a lado */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.form-label {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-text);
+}
+
+.form-label--inline {
+    /* Label ao lado do checkbox */
+    margin-bottom: 0;
+}
+
+.form-required {
+    color: var(--color-error);
+    margin-left: 2px;
+}
+
+.form-optional {
+    color: var(--color-text-subtle);
+    font-weight: var(--font-normal);
+    font-size: var(--text-xs);
+}
+
+.form-input {
+    width: 100%;
+    padding: 8px 12px;
+    line-height: 1.5;
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.form-field--checkbox {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--color-brand);
+    flex-shrink: 0;
+}
+
+.form-error {
+    font-size: var(--text-sm);
+    color: var(--color-error);
+    background-color: var(--color-error-subtle);
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+}
+
+/* Botões do modal */
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 0.5px solid var(--color-border);
+}
