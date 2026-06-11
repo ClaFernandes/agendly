@@ -27,7 +27,7 @@ export function AuthProvider({ children }) {
 
     for (let i = 0; i < retries; i++) {
       const { data } = await Promise.race([
-        supabase.from("profiles").select("role").eq("id", userId).single(),
+        supabase.from("profiles").select("role").eq("id", userId).maybeSingle(),
         new Promise((_, reject) =>
           setTimeout(() => reject(new Error("timeout")), 2000),
         ),
@@ -71,7 +71,6 @@ export function AuthProvider({ children }) {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (isRegistering.current) return;
 
-      // SIGNED_OUT — regista sempre, independente da página
       if (event === "SIGNED_OUT") {
         justSignedOut.current = true;
         setUser(null);

@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "./AuthContext";
 
-// Criação do contexto
 const BusinessContext = createContext();
 
 // Hook personalizado para consumir o contexto
@@ -20,7 +19,6 @@ export function BusinessProvider({ children }) {
 
   useEffect(() => {
     async function fetchBusiness() {
-      // Se não há utilizador ou não é provider, limpa e sai
       if (!user || userRole !== "provider") {
         setBusiness(null);
         setLoading(false);
@@ -34,7 +32,7 @@ export function BusinessProvider({ children }) {
         .from("business")
         .select("*")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         if (error.code === "PGRST116") {
@@ -53,7 +51,6 @@ export function BusinessProvider({ children }) {
     fetchBusiness();
   }, [user, userRole]);
 
-  // Função para atualizar os dados do negócio localmente após edição
   function updateBusiness(updatedFields) {
     setBusiness((prev) => ({ ...prev, ...updatedFields }));
   }
