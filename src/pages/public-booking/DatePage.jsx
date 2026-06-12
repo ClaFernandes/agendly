@@ -1,10 +1,11 @@
 // src/pages/public-booking/DatePage.jsx
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function DatePage() {
   const navigate = useNavigate();
-  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState("");
 
   // Configuração de datas limite (Hoje até 30 dias para frente)
   const today = new Date();
@@ -21,10 +22,14 @@ export default function DatePage() {
       // if (tempDate.getDay() === 0) { ... }
 
       days.push({
-        isoString: tempDate.toISOString().split('T')[0],
+        isoString: tempDate.toISOString().split("T")[0],
         dayNum: tempDate.getDate(),
-        month: tempDate.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', ''),
-        weekday: tempDate.toLocaleDateString('pt-BR', { weekday: 'short' }).split(',')[0]
+        month: tempDate
+          .toLocaleDateString("pt-BR", { month: "short" })
+          .replace(".", ""),
+        weekday: tempDate
+          .toLocaleDateString("pt-BR", { weekday: "short" })
+          .split(",")[0],
       });
       tempDate.setDate(tempDate.getDate() + 1);
     }
@@ -35,10 +40,10 @@ export default function DatePage() {
 
   const handleSelectDate = (dateStr) => {
     setSelectedDate(dateStr);
-    console.log('Data selecionada:', dateStr);
-    
+    console.log("Data selecionada:", dateStr);
+
     // Avança para a tela de horários
-    navigate('../time');
+    navigate("../time");
   };
 
   return (
@@ -56,7 +61,7 @@ export default function DatePage() {
             <button
               key={day.isoString}
               type="button"
-              className={`date-card ${isSelected ? 'selected' : ''}`}
+              className={`date-card ${isSelected ? "selected" : ""}`}
               onClick={() => handleSelectDate(day.isoString)}
             >
               <span className="date-card-weekday">{day.weekday}</span>
@@ -73,8 +78,8 @@ export default function DatePage() {
         <input
           type="date"
           id="manual-date"
-          min={today.toISOString().split('T')[0]}
-          max={maxDate.toISOString().split('T')[0]}
+          min={today.toISOString().split("T")[0]}
+          max={maxDate.toISOString().split("T")[0]}
           value={selectedDate}
           onChange={(e) => handleSelectDate(e.target.value)}
         />
@@ -82,7 +87,9 @@ export default function DatePage() {
 
       {/* Ações de Navegação */}
       <div className="page-actions">
-        <Link to="../" className="back-btn">← Voltar aos Serviços</Link>
+        <Link to="../" className="back-btn">
+          ← Voltar aos Serviços
+        </Link>
       </div>
     </div>
   );

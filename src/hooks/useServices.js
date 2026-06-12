@@ -1,4 +1,5 @@
-// Hook que centraliza toda a lógica de CRUD de serviços.
+// src/hooks/useServices.js
+// Centraliza toda a lógica de CRUD de serviços
 
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../lib/supabase";
@@ -10,10 +11,9 @@ export function useServices() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // Controla operações pontuais (criar/editar/apagar) sem bloquear a lista
   const [saving, setSaving] = useState(false);
 
-  // Carregar serviços
+  // Carrega todos os serviços do negócio ordenados por destaque e data de criação
   const fetchServices = useCallback(async () => {
     if (!business?.id) return;
 
@@ -24,7 +24,7 @@ export function useServices() {
       .from("services")
       .select("*")
       .eq("business_id", business.id)
-      .order("is_featured", { ascending: false }) // destaques primeiro
+      .order("is_featured", { ascending: false })
       .order("created_at", { ascending: true });
 
     if (error) {
@@ -41,7 +41,7 @@ export function useServices() {
     fetchServices();
   }, [fetchServices]);
 
-  // Criar serviço
+  // Cria serviço novo
   async function createService(fields) {
     setSaving(true);
     setError(null);
@@ -67,7 +67,7 @@ export function useServices() {
     return { success: true };
   }
 
-  // Atualizar serviço
+  // Atualiza serviço existente
   async function updateService(id, fields) {
     setSaving(true);
     setError(null);
@@ -90,9 +90,18 @@ export function useServices() {
       return { success: false, error: error.message };
     }
 
-    // Atualiza localmente sem re-fetch — mais rápido e sem flash
+    // Atualiza localmente
     setServices((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, ...fields } : s)),
+      prev.map((s) =>
+        s.id === id
+          ? {
+              ...s,
+              ...fields,
+              duration_min: Number(fields.duration_min),
+              price: Number(fields.price),
+            }
+          : s,
+      ),
     );
 
     setSaving(false);
@@ -116,15 +125,17 @@ export function useServices() {
       return { success: false, error: error.message };
     }
 
-    // Remove localmente — evita re-fetch desnecessário
+    // Remove localmente sem recarregar
     setServices((prev) => prev.filter((s) => s.id !== id));
     setSaving(false);
     return { success: true };
   }
 
-  // Alternar destaque (is_featured)
+  // Alternar destaque (is_featured) com optimistic update
   async function toggleFeatured(id, current) {
-    // Optimistic update — muda logo na UI, corrige se falhar
+    setSaving(true);
+
+    // Optimistic update
     setServices((prev) =>
       prev.map((s) => (s.id === id ? { ...s, is_featured: !current } : s)),
     );
@@ -136,17 +147,20 @@ export function useServices() {
       .eq("business_id", business.id);
 
     if (error) {
-      // Reverte se falhou
+      // Reverte se falhar
       setServices((prev) =>
         prev.map((s) => (s.id === id ? { ...s, is_featured: current } : s)),
       );
       setError(error.message);
     }
+
+    setSaving(false);
   }
 
-  // Alternar ativo/inativo
+  // Alterna ativo/inativo com optimistic update
   async function toggleActive(id, current) {
-    // Optimistic update
+    setSaving(true);
+
     setServices((prev) =>
       prev.map((s) => (s.id === id ? { ...s, active: !current } : s)),
     );
@@ -158,12 +172,13 @@ export function useServices() {
       .eq("business_id", business.id);
 
     if (error) {
-      // Reverte se falhou
       setServices((prev) =>
         prev.map((s) => (s.id === id ? { ...s, active: current } : s)),
       );
       setError(error.message);
     }
+
+    setSaving(false);
   }
 
   return {

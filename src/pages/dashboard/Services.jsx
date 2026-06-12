@@ -1,7 +1,4 @@
-// Services.jsx
-// Página de gestão de serviços do prestador.
-// Lista todos os serviços com opções de destacar, ativar/desativar,
-// editar e apagar. Modal para criar e editar.
+// src/pages/dashboard/Services.jsx
 
 import { useState } from "react";
 import {
@@ -15,7 +12,6 @@ import {
 import { useServices } from "../../hooks/useServices";
 import "./Dashboard.css";
 
-// Valores iniciais do formulário
 const EMPTY_FORM = {
   name: "",
   description: "",
@@ -24,19 +20,18 @@ const EMPTY_FORM = {
   active: true,
 };
 
-// Componente do Modal
 function ServiceModal({ service, saving, onClose, onSubmit }) {
   const isEditing = Boolean(service);
 
   const [form, setForm] = useState(
     isEditing
       ? {
-          name: service.name,
-          description: service.description || "",
-          duration_min: service.duration_min,
-          price: service.price,
-          active: service.active,
-        }
+        name: service.name,
+        description: service.description || "",
+        duration_min: service.duration_min,
+        price: service.price,
+        active: service.active,
+      }
       : EMPTY_FORM,
   );
   const [formError, setFormError] = useState(null);
@@ -53,7 +48,6 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
     e.preventDefault();
     setFormError(null);
 
-    // Validação básica no cliente
     if (!form.name.trim()) {
       setFormError("O nome do serviço é obrigatório.");
       return;
@@ -71,11 +65,9 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
     if (!result.success) {
       setFormError(result.error || "Ocorreu um erro. Tenta novamente.");
     }
-    // Se success, o pai fecha o modal
   }
 
   return (
-    // Overlay escuro — clique fora fecha o modal
     <div className="modal-overlay" onClick={onClose}>
       <div
         className="modal"
@@ -84,7 +76,6 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
         aria-modal="true"
         aria-labelledby="modal-title"
       >
-        {/* Cabeçalho do modal */}
         <div className="modal-header">
           <h2 id="modal-title" className="modal-title">
             {isEditing ? "Editar serviço" : "Novo serviço"}
@@ -98,9 +89,7 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
           </button>
         </div>
 
-        {/* Formulário */}
         <form onSubmit={handleSubmit} className="modal-form">
-          {/* Nome */}
           <div className="form-field">
             <label htmlFor="svc-name" className="form-label">
               Nome do serviço <span className="form-required">*</span>
@@ -117,7 +106,6 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
             />
           </div>
 
-          {/* Descrição */}
           <div className="form-field">
             <label htmlFor="svc-desc" className="form-label">
               Descrição <span className="form-optional">(opcional)</span>
@@ -133,7 +121,6 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
             />
           </div>
 
-          {/* Duração + Preço lado a lado */}
           <div className="form-row">
             <div className="form-field">
               <label htmlFor="svc-duration" className="form-label">
@@ -169,7 +156,6 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
             </div>
           </div>
 
-          {/* Ativo — só aparece na edição */}
           {isEditing && (
             <div className="form-field form-field--checkbox">
               <input
@@ -189,10 +175,8 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
             </div>
           )}
 
-          {/* Erro do formulário */}
           {formError && <p className="form-error">{formError}</p>}
 
-          {/* Ações */}
           <div className="modal-actions">
             <button
               type="button"
@@ -216,7 +200,6 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
   );
 }
 
-// ── Componente principal ──────────────────────────────────────────────
 export default function Services() {
   const {
     services,
@@ -230,13 +213,8 @@ export default function Services() {
     toggleActive,
   } = useServices();
 
-  // null = modal fechado | "new" = criar | objeto = editar
   const [modalMode, setModalMode] = useState(null);
-
-  // ID do serviço a apagar — activa o mini-confirm inline
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
-
-  // ── Handlers ──────────────────────────────────────────────────────
 
   async function handleCreate(fields) {
     const result = await createService(fields);
@@ -255,14 +233,11 @@ export default function Services() {
     setConfirmDeleteId(null);
   }
 
-  // ── Contadores para o subtítulo ───────────────────────────────────
   const totalServices = services.length;
   const activeServices = services.filter((s) => s.active).length;
 
-  // ── Render ────────────────────────────────────────────────────────
   return (
     <div className="db-page">
-      {/* Cabeçalho da página */}
       <div className="pg-header">
         <div>
           <h1 className="pg-title">Serviços</h1>
@@ -280,19 +255,16 @@ export default function Services() {
         </button>
       </div>
 
-      {/* Estado de carregamento */}
       {loading && (
         <div className="db-loading">
           <span className="db-loading-text">A carregar serviços...</span>
         </div>
       )}
 
-      {/* Erro global do hook */}
       {error && !loading && (
         <div className="svc-error">Erro ao carregar serviços: {error}</div>
       )}
 
-      {/* Lista vazia */}
       {!loading && !error && services.length === 0 && (
         <div className="pg-section">
           <div className="pg-empty">
@@ -313,7 +285,6 @@ export default function Services() {
         </div>
       )}
 
-      {/* Tabela de serviços */}
       {!loading && services.length > 0 && (
         <div className="pg-section" style={{ padding: 0, overflow: "hidden" }}>
           <table className="svc-table">
@@ -322,13 +293,7 @@ export default function Services() {
                 <th>Serviço</th>
                 <th>Estado</th>
                 <th>Preço</th>
-                {/* Coluna destaque — ícone de estrela */}
-                <th
-                  className="svc-th-center"
-                  title="Destaque na página pública"
-                >
-                  ★
-                </th>
+                <th className="svc-th-center" title="Destaque na página pública">★</th>
                 <th className="svc-th-actions">Ações</th>
               </tr>
             </thead>
@@ -341,16 +306,12 @@ export default function Services() {
                     <p className="svc-duration">{service.duration_min} min</p>
                   </td>
 
-                  {/* Badge ativo/inativo — clicável para alternar */}
+                  {/* Badge estado */}
                   <td>
                     <button
                       className={`svc-badge ${service.active ? "svc-badge--active" : "svc-badge--inactive"}`}
                       onClick={() => toggleActive(service.id, service.active)}
-                      title={
-                        service.active
-                          ? "Clica para desativar"
-                          : "Clica para ativar"
-                      }
+                      title={service.active ? "Clica para desativar" : "Clica para ativar"}
                     >
                       {service.active ? "ativo" : "inativo"}
                     </button>
@@ -361,23 +322,13 @@ export default function Services() {
                     €{Number(service.price).toFixed(2)}
                   </td>
 
-                  {/* Estrela de destaque */}
+                  {/* Estrela */}
                   <td className="svc-td-center">
                     <button
                       className={`svc-star ${service.is_featured ? "svc-star--on" : "svc-star--off"}`}
-                      onClick={() =>
-                        toggleFeatured(service.id, service.is_featured)
-                      }
-                      title={
-                        service.is_featured
-                          ? "Remover destaque"
-                          : "Marcar como destaque"
-                      }
-                      aria-label={
-                        service.is_featured
-                          ? "Remover destaque"
-                          : "Marcar como destaque"
-                      }
+                      onClick={() => toggleFeatured(service.id, service.is_featured)}
+                      title={service.is_featured ? "Remover destaque" : "Marcar como destaque"}
+                      aria-label={service.is_featured ? "Remover destaque" : "Marcar como destaque"}
                     >
                       {service.is_featured ? (
                         <RiStarFill aria-hidden="true" />
@@ -387,14 +338,11 @@ export default function Services() {
                     </button>
                   </td>
 
-                  {/* Ações — editar e apagar */}
+                  {/* Ações */}
                   <td className="svc-td-actions">
-                    {/* Confirmação inline de apagar */}
                     {confirmDeleteId === service.id ? (
                       <div className="svc-confirm-delete">
-                        <span className="svc-confirm-text">
-                          Tens a certeza?
-                        </span>
+                        <span className="svc-confirm-text">Tens a certeza?</span>
                         <button
                           className="svc-action-btn svc-action-btn--danger"
                           onClick={() => handleDelete(service.id)}
@@ -437,11 +385,8 @@ export default function Services() {
         </div>
       )}
 
-      {/* Modal — só renderiza quando está aberto */}
       {modalMode !== null && (
         <ServiceModal
-          // Se modalMode for "new", não passa service (criação)
-          // Se for um objeto, passa o serviço (edição)
           service={modalMode === "new" ? null : modalMode}
           saving={saving}
           onClose={() => setModalMode(null)}

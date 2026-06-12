@@ -1,3 +1,5 @@
+/* src/pages/public-booking/PublicBooking.css */
+
 .booking-container {
   display: flex;
   flex-direction: column;
@@ -20,7 +22,8 @@
 .booking-logo-placeholder {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #4f46e5; /* Roxo moderno */
+  color: #4f46e5;
+  /* Roxo moderno */
   letter-spacing: -0.05em;
 }
 
@@ -28,7 +31,8 @@
 .booking-content {
   flex: 1;
   width: 100%;
-  max-width: 600px; /* Largura máxima ideal para fluxo de agendamento */
+  max-width: 600px;
+  /* Largura máxima ideal para fluxo de agendamento */
   margin: 0 auto;
   padding: 1.5rem;
   box-sizing: border-box;
@@ -56,6 +60,7 @@
   font-size: 1rem;
   transition: all 0.2s;
 }
+
 .demo-btn:hover {
   border-color: #4f46e5;
   background-color: #f5f3ff;
@@ -130,7 +135,8 @@
   height: 2px;
   background-color: #e5e7eb;
   margin: 0 -10px;
-  transform: translateY(-12px); /* Alinha com o centro dos círculos */
+  transform: translateY(-12px);
+  /* Alinha com o centro dos círculos */
   transition: background-color 0.3s ease;
 }
 
@@ -148,7 +154,8 @@
 
 /* Estados: Completado (Etapas que já passaram) */
 .step-item.completed .step-circle {
-  background-color: #10b981; /* Verde */
+  background-color: #10b981;
+  /* Verde */
   color: white;
 }
 
@@ -197,7 +204,8 @@
 
 .service-card {
   background: white;
-  border: 2px solid #e0e7ff; /* Borda sutil roxa para destaque */
+  border: 2px solid #e0e7ff;
+  /* Borda sutil roxa para destaque */
   border-radius: 12px;
   padding: 1.25rem;
   cursor: pointer;
@@ -310,14 +318,16 @@
 /* Grid de Datas Rápidas */
 .quick-dates-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 colunas por linha */
+  grid-template-columns: repeat(4, 1fr);
+  /* 4 colunas por linha */
   gap: 0.75rem;
   margin-top: 0.5rem;
 }
 
 @media (max-width: 480px) {
   .quick-dates-grid {
-    grid-template-columns: repeat(3, 1fr); /* 3 colunas em telas muito pequenas */
+    grid-template-columns: repeat(3, 1fr);
+    /* 3 colunas em telas muito pequenas */
   }
 }
 
@@ -440,13 +450,15 @@
 /* Grid de Horários */
 .time-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 colunas de horários */
+  grid-template-columns: repeat(4, 1fr);
+  /* 4 colunas de horários */
   gap: 0.5rem;
 }
 
 @media (max-width: 400px) {
   .time-grid {
-    grid-template-columns: repeat(3, 1fr); /* 3 colunas em telas minúsculas */
+    grid-template-columns: repeat(3, 1fr);
+    /* 3 colunas em telas minúsculas */
   }
 }
 
@@ -643,6 +655,7 @@
 .summary-datetime-box p {
   margin-bottom: 0.25rem;
 }
+
 .summary-datetime-box p:last-child {
   margin-bottom: 0;
 }
@@ -668,7 +681,8 @@
 }
 
 .confirm-booking-btn {
-  background-color: #10b981; /* Verde Sucesso */
+  background-color: #10b981;
+  /* Verde Sucesso */
   color: white;
   padding: 0.85rem 1.75rem;
   border-radius: 8px;

@@ -1,3 +1,5 @@
+// src/pages/Home.jsx
+
 import { Link } from "react-router-dom";
 import { FiCalendar, FiUsers, FiBarChart2, FiCheck } from "react-icons/fi";
 import logo from "../assets/logo.svg";

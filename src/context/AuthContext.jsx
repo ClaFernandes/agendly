@@ -1,3 +1,5 @@
+// src/context/AuthContext.jsx
+
 import {
   createContext,
   useContext,
@@ -6,6 +8,7 @@ import {
   useRef,
   useMemo,
 } from "react";
+
 import { supabase } from "../lib/supabase";
 
 const AuthContext = createContext();
@@ -48,8 +51,7 @@ export function AuthProvider({ children }) {
       .single();
 
     if (error) {
-      console.error("ensureProfileRole:", error.message);
-      return "provider"; // Fallback seguro
+      return "provider";
     }
 
     return data?.role ?? "provider";
@@ -57,11 +59,6 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      // Pode apagar os console depois
-      console.log("HASH:", window.location.hash);
-      console.log("SEARCH:", window.location.search);
-      console.log("HREF:", window.location.href);
-
       if (window.location.pathname.includes("update-password")) {
         setLoading(false);
         return;
@@ -161,8 +158,16 @@ export function AuthProvider({ children }) {
   }
 
   async function logout() {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setUser(null);
+      setUserRole(null);
+      justSignedOut.current = true;
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+      throw error;
+    }
   }
 
   async function recoverPassword(email) {

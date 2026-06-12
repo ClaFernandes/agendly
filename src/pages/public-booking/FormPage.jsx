@@ -1,32 +1,33 @@
 // src/pages/public-booking/FormPage.jsx
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function FormPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    client_name: '',
-    client_email: '',
-    client_phone: '',
-    notes: ''
+    client_name: "",
+    client_email: "",
+    client_phone: "",
+    notes: "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     // Aqui salvaremos os dados do cliente no BookingContext futuramente
-    console.log('Dados do cliente coletados:', formData);
-    
+    console.log("Dados do cliente coletados:", formData);
+
     // Avança para a página de resumo/confirmação final
-    navigate('../summary');
+    navigate("../summary");
   };
 
   return (
@@ -89,8 +90,12 @@ export default function FormPage() {
         </div>
 
         <div className="form-actions-row">
-          <Link to="../time" className="back-btn">← Voltar</Link>
-          <button type="submit" className="submit-form-btn">Ver Resumo →</button>
+          <Link to="../time" className="back-btn">
+            ← Voltar
+          </Link>
+          <button type="submit" className="submit-form-btn">
+            Ver Resumo →
+          </button>
         </div>
       </form>
     </div>

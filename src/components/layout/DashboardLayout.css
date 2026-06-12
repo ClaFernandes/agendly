@@ -1,19 +1,19 @@
-/* ── 1. LAYOUT BASE ─────────────────────────────────────────────── */
+/* src/components/layout/DashboardLayout.css */
 
-/* Wrapper que divide a tela em sidebar + conteúdo */
+
+/* Layout base */
+
 .dl-wrapper {
     display: flex;
     height: 100vh;
     background-color: var(--color-page-bg);
     overflow: hidden;
-    /* evita scroll duplo — cada zona faz o seu próprio */
 }
 
-/* ── 2. SIDEBAR ──────────────────────────────────────────────────── */
+/* Sidebar */
 
 .dl-sidebar {
-    width: 72px;
-    /* sidebar estreita — só ícone + label curta */
+    width: 88px;
     min-height: 100vh;
     background-color: var(--color-primary-600);
     display: flex;
@@ -21,11 +21,8 @@
     align-items: center;
     padding: 16px 0;
     flex-shrink: 0;
-    /* não encolhe quando o conteúdo é grande */
 }
 
-/* Avatar com a inicial do negócio */
-/* Container da marca na sidebar */
 .dl-brand {
     padding: 24px 0;
     display: flex;
@@ -34,28 +31,20 @@
     margin-bottom: 20px;
 }
 
-/* Estilo para a imagem da logo */
 .dl-avatar-img {
     width: 48px;
     height: 48px;
-    /* MUDANÇA PRINCIPAL: object-fit: contain mantém a proporção original da imagem */
     object-fit: contain;
-    /* Fundo branco (ou leve) caso a logo seja transparente e a cor da sidebar a oculte */
     background-color: white;
     border-radius: 8px;
-    /* Cantos levemente arredondados */
     padding: 4px;
-    /* Espaçamento interno para a logo não "colar" na borda */
 }
 
-/* Estilo para o fallback de iniciais */
 .dl-avatar {
     width: 48px;
     height: 48px;
     background: #ffffff;
-    /* Fundo branco para as iniciais ficarem legíveis */
     color: #4f46e5;
-    /* Texto em roxo */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -64,7 +53,7 @@
     font-size: 1.1rem;
 }
 
-/* ── 3. NAVEGAÇÃO ────────────────────────────────────────────────── */
+/* Navegação */
 
 .dl-nav {
     display: flex;
@@ -72,22 +61,19 @@
     align-items: center;
     gap: 4px;
     flex: 1;
-    /* empurra o footer para o fundo */
     width: 100%;
 }
 
-/* Cada item de navegação — ícone em cima, label em baixo */
 .dl-nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 4px;
-    width: 56px;
-    padding: 8px 4px;
+    width: 72px;
+    padding: 10px 4px;
     border-radius: var(--radius-lg);
-    color: rgba(255, 255, 255, 0.65);
-    /* inativo: branco com opacidade */
+    color: rgba(255, 255, 255, 0.75);
     text-decoration: none;
     transition: background-color 0.15s, color 0.15s;
     cursor: pointer;
@@ -97,30 +83,27 @@
     background-color: rgba(255, 255, 255, 0.12);
     color: #fff;
     text-decoration: none;
-    /* anula o hover do <a> global */
 }
 
-/* Estado ativo — fundo branco translúcido + texto branco */
 .dl-nav-item--active {
     background-color: rgba(255, 255, 255, 0.2);
     color: #fff;
 }
 
 .dl-nav-icon {
-    font-size: 20px;
+    font-size: 22px;
     flex-shrink: 0;
 }
 
 .dl-nav-label {
-    font-size: 10px;
-    /* muito pequeno mas legível — igual ao wireframe */
+    font-size: 11px;
     font-weight: var(--font-medium);
     line-height: 1;
     letter-spacing: 0.01em;
     text-align: center;
 }
 
-/* ── 4. RODAPÉ DA SIDEBAR ────────────────────────────────────────── */
+/* Rodapé */
 
 .dl-sidebar-footer {
     margin-top: auto;
@@ -132,35 +115,31 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 56px;
-    padding: 8px 4px;
+    gap: 4px;
+    width: 72px;
+    padding: 10px 4px;
     border-radius: var(--radius-lg);
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 10px;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 11px;
     font-weight: var(--font-medium);
     transition: background-color 0.15s, color 0.15s;
 }
 
 .dl-logout-btn:hover {
-    background-color: rgba(255, 255, 255, 0.12);
-    color: rgba(255, 255, 255, 0.85);
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #fff;
 }
 
-/* ── 5. ÁREA DE CONTEÚDO ─────────────────────────────────────────── */
+/* Área do conteúdo */
 
 .dl-main {
     flex: 1;
     overflow-y: auto;
-    /* scroll só no conteúdo, não na sidebar */
     padding: 32px;
 }
 
-/* ── 6. UTILITÁRIOS DE PÁGINA ────────────────────────────────────── 
-   Classes reutilizáveis por todas as páginas do dashboard.
-   Convenção: prefixo "pg-" (page) para não colidir com outros estilos.
-*/
+/* Utilitários */
 
-/* Cabeçalho de página — título + ação opcional (ex: botão "+ Novo") */
 .pg-header {
     display: flex;
     align-items: center;
@@ -181,7 +160,6 @@
     margin-top: 2px;
 }
 
-/* Grid de cards de estatísticas — 2, 3 ou 4 colunas */
 .pg-stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -189,7 +167,6 @@
     margin-bottom: 32px;
 }
 
-/* Card de estatística individual */
 .pg-stat-card {
     background-color: var(--color-surface);
     border: 0.5px solid var(--color-border);
@@ -204,7 +181,7 @@
     color: var(--color-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 .pg-stat-value {
@@ -220,7 +197,8 @@
     margin-top: 4px;
 }
 
-/* Destaque de tendência positiva/negativa nos cards */
+
+
 .pg-stat-meta--up {
     color: var(--color-ok);
 }
@@ -229,7 +207,6 @@
     color: var(--color-error);
 }
 
-/* Secção com título + conteúdo */
 .pg-section {
     background-color: var(--color-surface);
     border: 0.5px solid var(--color-border);
@@ -252,7 +229,6 @@
     color: var(--color-text);
 }
 
-/* Botão primário — usado em toda a app do prestador */
 .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -273,7 +249,11 @@
     color: #fff;
 }
 
-/* Botão secundário — contorno, sem fundo */
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 .btn-secondary {
     display: inline-flex;
     align-items: center;
@@ -295,7 +275,6 @@
     color: var(--color-text);
 }
 
-/* Estado vazio — usado em listas sem dados */
 .pg-empty {
     display: flex;
     flex-direction: column;
@@ -315,4 +294,47 @@
 .pg-empty-text {
     font-size: var(--text-sm);
     color: var(--color-text-muted);
+}
+
+/* Responsividade */
+
+@media (max-width: 640px) {
+    .dl-sidebar {
+        width: 72px;
+    }
+
+    .dl-nav-item,
+    .dl-logout-btn {
+        width: 56px;
+        padding: 8px 4px;
+    }
+
+    .dl-main {
+        padding: 20px 16px;
+    }
+
+    .pg-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .pg-header .btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .pg-stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .pg-section {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 400px) {
+    .pg-stats-grid {
+        grid-template-columns: 1fr;
+    }
 }
