@@ -1,10 +1,14 @@
+// src/pages/auth/Login.jsx
+
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabase";
+
 import { FiEye, FiEyeOff, FiMail, FiLock, FiArrowLeft } from "react-icons/fi";
 import { AiOutlineCheck } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
+
 import logo from "../../assets/logo.svg";
 import "./Auth.css";
 
@@ -24,7 +28,7 @@ export default function Login() {
   useEffect(() => {
     if (!user || !userRole) return;
 
-    // 🔴 Não redirecionar se o utilizador está em fluxo de recuperação de password
+    // Não redireciona se o utilizador está em fluxo de recuperação de password
     if (window.location.pathname.includes("update-password")) return;
 
     if (userRole === "admin") {

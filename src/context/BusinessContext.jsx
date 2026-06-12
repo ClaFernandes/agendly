@@ -1,10 +1,11 @@
+// src/context/BusinessContext.jsx
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "./AuthContext";
 
 const BusinessContext = createContext();
 
-// Hook personalizado para consumir o contexto
 // eslint-disable-next-line react-refresh/only-export-components
 export function useBusiness() {
   return useContext(BusinessContext);

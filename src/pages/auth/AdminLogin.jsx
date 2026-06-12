@@ -1,7 +1,10 @@
+// src/pages/auth/AdminLogin.jsx
+
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabase";
+
 import {
   FiEye,
   FiEyeOff,
@@ -10,6 +13,7 @@ import {
   FiArrowLeft,
   FiCheck,
 } from "react-icons/fi";
+
 import logo from "../../assets/logo.svg";
 import "./Auth.css";
 
@@ -82,7 +86,7 @@ export default function AdminLogin() {
 
   return (
     <div className="auth-container admin-mode">
-      {/* Coluna esquerda — marketing */}
+      {/* Coluna esquerda */}
       <div className="auth-marketing">
         <Link to="/" className="auth-brand">
           <img src={logo} alt="Agendly" className="auth-logo" />
@@ -109,7 +113,7 @@ export default function AdminLogin() {
         </div>
       </div>
 
-      {/* Coluna direita — formulário */}
+      {/* Coluna direita */}
       <div className="auth-form-side">
         <div className="auth-card">
           <Link to="/" className="auth-brand">

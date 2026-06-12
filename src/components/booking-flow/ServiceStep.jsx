@@ -1,3 +1,5 @@
+// src/components/booking-flow/StepService.jsx
+
 export default function ServiceStep() {
   return (
     <>

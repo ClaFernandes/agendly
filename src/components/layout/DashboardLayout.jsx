@@ -1,4 +1,9 @@
+// src/components/layout/DashboardLayout.jsx
+
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { useBusiness } from "../../context/BusinessContext";
+
 import {
   RiHomeLine,
   RiCalendarLine,
@@ -7,9 +12,9 @@ import {
   RiScissorsCutLine,
   RiTimeLine,
   RiSettings4Line,
+  RiLogoutBoxLine,
 } from "react-icons/ri";
-import { useAuth } from "../../context/AuthContext";
-import { useBusiness } from "../../context/BusinessContext";
+
 import "./DashboardLayout.css";
 
 // Itens da navegação
@@ -31,7 +36,7 @@ export default function DashboardLayout() {
   async function handleLogout() {
     try {
       await logout();
-      navigate("/login");
+      navigate("/login", { replace: true });
     } catch (error) {
       console.error("Erro ao fazer logout:", error.message);
     }
@@ -51,9 +56,9 @@ export default function DashboardLayout() {
 
   return (
     <div className="dl-wrapper">
-      {/* SIDEBAR */}
+      {/* Sidebar */}
       <aside className="dl-sidebar">
-        {/* Avatar do negócio — inicial numa bolha roxa */}
+        {/* Avatar do negócio */}
         <div className="dl-brand">
           {business?.logo_url ? (
             <img
@@ -85,19 +90,20 @@ export default function DashboardLayout() {
           ))}
         </nav>
 
-        {/* Botão de logout no fundo da sidebar */}
+        {/* Logout */}
         <div className="dl-sidebar-footer">
           <button
             className="dl-logout-btn"
             onClick={handleLogout}
             title={`Sair (${user?.email})`}
           >
+            <RiLogoutBoxLine className="dl-nav-icon" aria-hidden="true" />
             <span className="dl-nav-label">Sair</span>
           </button>
         </div>
       </aside>
 
-      {/* CONTEÚDO PRINCIPAL */}
+      {/* Conteúdo principal */}
       <main className="dl-main">
         <Outlet />
       </main>

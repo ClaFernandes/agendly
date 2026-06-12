@@ -1,4 +1,4 @@
-// src/pages/notFound/NotFound.jsx
+// src/pages/NotFound.jsx
 
 import { useNavigate, Link } from "react-router-dom";
 import { FiHome, FiArrowLeft, FiSearch } from "react-icons/fi";

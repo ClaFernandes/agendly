@@ -1,10 +1,14 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
+import { FiGrid, FiBriefcase, FiShield, FiLogOut } from "react-icons/fi";
+
+import logo from "../../assets/logo.svg";
+import "./AdminLayout.css";
+
 export default function AdminLayout() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-
   const { user, logout } = useAuth();
 
   async function handleLogout() {
@@ -23,33 +27,45 @@ export default function AdminLayout() {
 
   return (
     <div className="admin-layout">
+      {/* Sidebar */}
       <aside className="admin-sidebar">
-        <h2>Agendly Admin</h2>
+        {/* Marca */}
+        <div className="admin-sidebar-brand">
+          <img src={logo} alt="Agendly" />
+          <span>Agendly</span>
+          <span className="admin-sidebar-badge">Admin</span>
+        </div>
 
+        {/* Navegação principal */}
         <nav>
           <Link to="/admin" className={isActive("/admin") ? "active" : ""}>
-            Dashboard
+            <FiGrid />
+            <span>Início</span>
           </Link>
 
           <Link
             to="/admin/businesses"
             className={isActive("/admin/businesses") ? "active" : ""}
           >
-            Negócios
+            <FiBriefcase />
+            <span>Negócios</span>
           </Link>
 
           <Link
             to="/admin/users"
             className={isActive("/admin/users") ? "active" : ""}
           >
-            Administradores
+            <FiShield />
+            <span>Admins</span>
           </Link>
         </nav>
 
-        <div className="sidebar-footer">
-          <span className="sidebar-user">{user?.email}</span>
-          <button onClick={handleLogout} className="logout-btn">
-            Sair
+        {/* Rodapé com email e logout */}
+        <div className="admin-sidebar-footer">
+          <span className="admin-sidebar-email">{user?.email}</span>
+          <button onClick={handleLogout} className="admin-sidebar-logout">
+            <FiLogOut />
+            <span>Sair</span>
           </button>
         </div>
       </aside>

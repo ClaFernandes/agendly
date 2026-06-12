@@ -1,4 +1,6 @@
-// Onboarding.jsx
+// src/pages/onboarding/Onboarding.jsx
+
+// src/pages/onboarding/Onboarding.jsx
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -21,7 +23,6 @@ import {
 import logo from "../../assets/logo.svg";
 import "./Onboarding.css";
 
-// Lista de dias da semana com id numérico (0 = Domingo, 6 = Sábado)
 const DAYS = [
   { id: 0, label: "Domingo" },
   { id: 1, label: "Segunda" },
@@ -32,7 +33,6 @@ const DAYS = [
   { id: 6, label: "Sábado" },
 ];
 
-// Estado inicial dos horários
 const initialHours = DAYS.map((day) => ({
   day_of_week: day.id,
   label: day.label,
@@ -40,24 +40,20 @@ const initialHours = DAYS.map((day) => ({
   intervals: [{ start_time: "09:00", end_time: "18:00" }],
 }));
 
-// Etiquetas da barra de progresso
 const STEP_LABELS = ["Dados", "Identidade", "Horários", "Confirmação"];
 
-// Domínio público da app — usado para gerar o link de agendamento
 const PUBLIC_BASE = "https://agendly.app/p";
 
-// * Gera um slug URL-friendly a partir de um texto livre.
 function generateSlug(value) {
   return value
     .toLowerCase()
-    .normalize("NFD") // separa letras de diacríticos
-    .replace(/[\u0300-\u036f]/g, "") // remove diacríticos (ã → a, é → e)
-    .replace(/[^a-z0-9\s-]/g, "") // remove caracteres inválidos
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
     .trim()
-    .replace(/\s+/g, "-"); // substitui espaços por hífens
+    .replace(/\s+/g, "-");
 }
 
-// Extrai as duas iniciais significativas do nome do negócio, ignorando palavras de ligação (artigos, preposições).
 function getInitials(businessName) {
   if (!businessName) return "?";
   const stopWords = new Set(["do", "da", "de", "dos", "das", "e", "o", "a"]);
@@ -70,13 +66,11 @@ function getInitials(businessName) {
   return (words[0][0] + words[1][0]).toUpperCase();
 }
 
-// Converte "HH:MM" em minutos totais
 function toMinutes(time) {
   const [h, m] = time.split(":").map(Number);
   return h * 60 + m;
 }
 
-// Verifica se um array de intervalos tem sobreposições
 function hasOverlappingIntervals(intervals) {
   const sorted = [...intervals].sort(
     (a, b) => toMinutes(a.start_time) - toMinutes(b.start_time),
@@ -89,7 +83,6 @@ function hasOverlappingIntervals(intervals) {
   return false;
 }
 
-// Mostra a logo se existir; caso contrário, as iniciais coloridas
 function BusinessAvatar({ url, businessName, className }) {
   if (url) {
     return <img src={url} alt={businessName} className={className} />;
@@ -103,49 +96,41 @@ function BusinessAvatar({ url, businessName, className }) {
 
 export default function Onboarding() {
   const navigate = useNavigate();
-  const { user } = useAuth(); // utilizador autenticado (precisa do user.id)
-  const { updateBusiness } = useBusiness(); // atualiza o contexto global do negócio
+  const { user } = useAuth();
+  const { updateBusiness } = useBusiness();
 
-  // Estado de navegação
-  const [step, setStep] = useState(1); // passo atual (1–4)
-  const [loading, setLoading] = useState(false); // a guardar no Supabase
-  const [error, setError] = useState(null); // mensagem de erro visível ao utilizador
-  const [copied, setCopied] = useState(false); // feedback do botão "Copiar link"
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [copied, setCopied] = useState(false);
 
-  // Passo 1: Dados do negócio
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [phone, setPhone] = useState("");
-  const [slugAvailable, setSlugAvailable] = useState(null); // null=desconhecido, true/false
-  const [checkingSlug, setCheckingSlug] = useState(false); // a consultar disponibilidade
+  const [slugAvailable, setSlugAvailable] = useState(null);
+  const [checkingSlug, setCheckingSlug] = useState(false);
 
-  // Passo 2: Identidade visual
   const [description, setDescription] = useState("");
-  const [logoFile, setLogoFile] = useState(null); // ficheiro File do input
-  const [logoPreview, setLogoPreview] = useState(null); // URL temporária para preview
-  const [savedLogoUrl, setSavedLogoUrl] = useState(null); // URL pública após upload
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
+  const [savedLogoUrl, setSavedLogoUrl] = useState(null);
 
-  // Passo 3: Horários
   const [workingHours, setWorkingHours] = useState(initialHours);
 
-  // URL pública do negócio, construída a partir do slug introduzido
   const publicUrl = `${PUBLIC_BASE}/${slug}`;
 
-  // Atualiza nome e gera slug automaticamente enquanto o utilizador escreve
   function handleNameChange(e) {
     const value = e.target.value;
     setName(value);
     setSlug(generateSlug(value));
-    setSlugAvailable(null); // invalida verificação anterior
+    setSlugAvailable(null);
   }
 
-  // Permite editar o slug manualmente (ex: encurtar ou personalizar)
   function handleSlugChange(e) {
     setSlug(generateSlug(e.target.value));
     setSlugAvailable(null);
   }
 
-  // Consulta o Supabase para verificar se o slug já está em uso.
   async function checkSlug(slugToCheck) {
     const target = slugToCheck ?? slug;
     if (!target) return true;
@@ -161,7 +146,6 @@ export default function Onboarding() {
     return available;
   }
 
-  // Valida o passo 1 e avança para o passo 2.
   async function handleStep1() {
     if (!name || !slug) {
       setError("Nome e URL são obrigatórios.");
@@ -180,7 +164,7 @@ export default function Onboarding() {
     setStep(2);
   }
 
-  // Valida e armazena o ficheiro de logo selecionado, rejeitando tamanho acima de 2 MB
+  // CORREÇÃO 1 — revogar o URL anterior antes de criar um novo, evitando memory leak
   function handleLogoChange(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -191,16 +175,15 @@ export default function Onboarding() {
     }
     setError(null);
     setLogoFile(file);
+    if (logoPreview) URL.revokeObjectURL(logoPreview);
     setLogoPreview(URL.createObjectURL(file));
   }
 
-  // Avança do passo 2 para o passo 3
   function handleStep2() {
     setError(null);
     setStep(3);
   }
 
-  // Upload da logo para o Supabase Storage
   async function uploadLogo() {
     if (!logoFile) return null;
     const ext = logoFile.name.split(".").pop().toLowerCase();
@@ -218,9 +201,7 @@ export default function Onboarding() {
     return data.publicUrl;
   }
 
-  // Valida os horários, faz upload da logo, insere o negócio e os horários no Supabase, e avança para a confirmação.
   async function handleFinish() {
-    // Garante que início < fim em cada intervalo
     for (const day of workingHours) {
       if (!day.is_active) continue;
       for (const interval of day.intervals) {
@@ -233,7 +214,6 @@ export default function Onboarding() {
       }
     }
 
-    // Garante que não há sobreposição entre intervalos do mesmo dia
     for (const day of workingHours) {
       if (!day.is_active || day.intervals.length < 2) continue;
       if (hasOverlappingIntervals(day.intervals)) {
@@ -248,10 +228,19 @@ export default function Onboarding() {
     setError(null);
 
     try {
-      // Faz upload da logo (pode ser null se o utilizador não carregou nenhuma)
       const logoUrl = await uploadLogo();
 
-      // Insere o negócio na tabela "business". O id é o mesmo do utilizador autenticado
+      // CORREÇÃO 2 — re-verificar o slug antes de inserir, para apanhar conflitos
+      // que possam ter surgido enquanto o utilizador percorria os passos anteriores
+      const stillAvailable = await checkSlug(slug);
+      if (!stillAvailable) {
+        setError(
+          "O slug já não está disponível. Volta ao primeiro passo e escolhe outro.",
+        );
+        setLoading(false);
+        return;
+      }
+
       const { error: bizError } = await supabase.from("business").insert({
         id: user.id,
         name,
@@ -263,7 +252,6 @@ export default function Onboarding() {
       });
       if (bizError) throw bizError;
 
-      // Cada intervalo de cada dia ativo gera uma linha em "working_hours"
       const hoursToInsert = [];
       workingHours.forEach((day) => {
         if (!day.is_active) return;
@@ -285,7 +273,6 @@ export default function Onboarding() {
         if (hoursError) throw hoursError;
       }
 
-      // Atualiza o contexto global para que o resto da app
       updateBusiness({
         id: user.id,
         name,
@@ -296,7 +283,6 @@ export default function Onboarding() {
         is_active: true,
       });
 
-      // Guarda a URL da logo antes de mudar de passo
       setSavedLogoUrl(logoUrl);
       setStep(4);
     } catch (err) {
@@ -307,7 +293,6 @@ export default function Onboarding() {
     }
   }
 
-  // Copiar link público
   async function handleCopyLink() {
     try {
       await navigator.clipboard.writeText(publicUrl);
@@ -323,7 +308,6 @@ export default function Onboarding() {
     setTimeout(() => setCopied(false), 2000);
   }
 
-  // Liga/desliga um dia da semana
   function toggleDay(dayId) {
     setWorkingHours((prev) =>
       prev.map((h) =>
@@ -332,7 +316,6 @@ export default function Onboarding() {
     );
   }
 
-  // Atualiza o valor de start_time ou end_time de um intervalo específico
   function updateInterval(dayId, idx, field, value) {
     setWorkingHours((prev) =>
       prev.map((h) => {
@@ -347,7 +330,6 @@ export default function Onboarding() {
     );
   }
 
-  // Adiciona um novo intervalo ao dia
   function addInterval(dayId) {
     setWorkingHours((prev) =>
       prev.map((h) =>
@@ -364,7 +346,6 @@ export default function Onboarding() {
     );
   }
 
-  // Remove um intervalo pelo índice — nunca remove se for o único
   function removeInterval(dayId, idx) {
     setWorkingHours((prev) =>
       prev.map((h) => {
@@ -376,13 +357,11 @@ export default function Onboarding() {
 
   return (
     <div className="onboarding-container">
-      {/* Cabeçalho com logo da aplicação */}
       <header className="onboarding-header">
         <img src={logo} alt="Agendly" className="onboarding-logo" />
         <span>Agendly</span>
       </header>
 
-      {/* Barra de progresso — 4 passos */}
       <div className="onboarding-progress">
         {[1, 2, 3, 4].map((n) => (
           <div
@@ -392,7 +371,6 @@ export default function Onboarding() {
               ${step > n ? "done" : ""}`}
           >
             <div className="onboarding-progress-dot">
-              {/* Mostra check nos passos completos e no passo 4 quando ativo */}
               {step > n || (step === 4 && n === 4) ? <FiCheck /> : n}
             </div>
             <span>{STEP_LABELS[n - 1]}</span>
@@ -401,10 +379,8 @@ export default function Onboarding() {
       </div>
 
       <div className="onboarding-card">
-        {/* Mensagem de erro global (aparece no topo do card) */}
         {error && <p className="onboarding-error">{error}</p>}
 
-        {/* Passo 1 — Dados do negócio */}
         {step === 1 && (
           <>
             <h2>Conta-nos sobre o teu negócio</h2>
@@ -412,7 +388,6 @@ export default function Onboarding() {
               Estes dados identificam o teu negócio na plataforma.
             </p>
 
-            {/* Nome do negócio — gera slug automaticamente */}
             <div className="onboarding-field">
               <label htmlFor="name">Nome do negócio *</label>
               <div className="onboarding-input-wrapper">
@@ -428,7 +403,6 @@ export default function Onboarding() {
               </div>
             </div>
 
-            {/* Slug / URL pública */}
             <div className="onboarding-field">
               <label htmlFor="slug">
                 URL pública *
@@ -445,7 +419,6 @@ export default function Onboarding() {
                   placeholder="barbearia-do-ze"
                   required
                 />
-                {/* Indicador de estado da verificação do slug */}
                 {checkingSlug && (
                   <span className="onboarding-slug-checking">
                     A verificar...
@@ -460,7 +433,6 @@ export default function Onboarding() {
                   <span className="onboarding-slug-error">Indisponível</span>
                 )}
               </div>
-              {/* Pré-visualização da URL completa */}
               {slug && (
                 <p className="onboarding-slug-preview">
                   agendly.app/p/<strong>{slug}</strong>
@@ -468,7 +440,6 @@ export default function Onboarding() {
               )}
             </div>
 
-            {/* Telefone — opcional, mas com formato validado */}
             <div className="onboarding-field">
               <label htmlFor="phone">Telefone</label>
               <div className="onboarding-input-wrapper">
@@ -480,7 +451,7 @@ export default function Onboarding() {
                   onChange={(e) =>
                     setPhone(e.target.value.replace(/[^\d\s+]/g, ""))
                   }
-                  placeholder="+351 000 000 000"
+                  placeholder="+351 123456789"
                 />
               </div>
               {phone && !/^\+?[\d\s\-()]{8,20}$/.test(phone) && (
@@ -506,7 +477,6 @@ export default function Onboarding() {
           </>
         )}
 
-        {/* Passo 2 — Identidade visual */}
         {step === 2 && (
           <>
             <h2>Personaliza o teu negócio</h2>
@@ -515,19 +485,16 @@ export default function Onboarding() {
               do nome.
             </p>
 
-            {/* Upload de logo */}
             <div className="onboarding-field">
               <label>Logo</label>
               <div className="onboarding-logo-upload">
                 {logoPreview ? (
-                  // Mostra preview da imagem selecionada
                   <img
                     src={logoPreview}
                     alt="Preview"
                     className="onboarding-logo-preview"
                   />
                 ) : (
-                  // Mostra as iniciais do nome já introduzido
                   <div className="onboarding-logo-placeholder onboarding-initials-avatar">
                     {name ? getInitials(name) : <FiImage />}
                   </div>
@@ -537,12 +504,13 @@ export default function Onboarding() {
                   <label htmlFor="logo-upload" className="onboarding-logo-btn">
                     {logoPreview ? "Alterar logo" : "Carregar logo"}
                   </label>
-                  {/* Botão de remover — só aparece se já há uma logo */}
                   {logoPreview && (
                     <button
                       type="button"
                       className="onboarding-logo-remove"
                       onClick={() => {
+                        // CORREÇÃO 1 (cont.) — revogar ao remover também
+                        URL.revokeObjectURL(logoPreview);
                         setLogoFile(null);
                         setLogoPreview(null);
                       }}
@@ -552,7 +520,6 @@ export default function Onboarding() {
                   )}
                 </div>
 
-                {/* Input de ficheiro oculto — acionado pelo label acima */}
                 <input
                   id="logo-upload"
                   type="file"
@@ -566,7 +533,6 @@ export default function Onboarding() {
               </p>
             </div>
 
-            {/* Descrição do negócio */}
             <div className="onboarding-field">
               <label htmlFor="description">Descrição</label>
               <textarea
@@ -593,7 +559,6 @@ export default function Onboarding() {
           </>
         )}
 
-        {/* Passo 3 — Horários de funcionamento */}
         {step === 3 && (
           <>
             <h2>Quando trabalhas?</h2>
@@ -608,13 +573,12 @@ export default function Onboarding() {
                   key={h.day_of_week}
                   className={`onboarding-day-block ${h.is_active ? "is-active" : ""}`}
                 >
-                  {/* Cabeçalho do dia: toggle + nome + botão adicionar */}
                   <div className="onboarding-day-header">
                     <button
                       type="button"
                       className={`onboarding-toggle ${h.is_active ? "on" : "off"}`}
                       onClick={() => !loading && toggleDay(h.day_of_week)}
-                      disabled={loading} // bloqueia interações durante o submit
+                      disabled={loading}
                       aria-label={`${h.is_active ? "Desativar" : "Ativar"} ${h.label}`}
                     >
                       <span className="onboarding-toggle-thumb" />
@@ -637,12 +601,10 @@ export default function Onboarding() {
                     )}
                   </div>
 
-                  {/* Intervalos de horário — só visíveis se o dia estiver ativo */}
                   {h.is_active && (
                     <div className="onboarding-intervals">
                       {h.intervals.map((interval, i) => (
                         <div key={i} className="onboarding-interval-row">
-                          {/* Hora de início */}
                           <input
                             type="time"
                             value={interval.start_time}
@@ -657,7 +619,6 @@ export default function Onboarding() {
                             }
                           />
                           <span className="onboarding-interval-sep">—</span>
-                          {/* Hora de fim */}
                           <input
                             type="time"
                             value={interval.end_time}
@@ -671,7 +632,6 @@ export default function Onboarding() {
                               )
                             }
                           />
-                          {/* Botão de remover — só aparece se houver mais de 1 intervalo */}
                           {h.intervals.length > 1 && (
                             <button
                               type="button"
@@ -718,7 +678,6 @@ export default function Onboarding() {
           </>
         )}
 
-        {/* Passo 4 — Confirmação */}
         {step === 4 && (
           <>
             <div className="onboarding-success-icon">
@@ -730,10 +689,8 @@ export default function Onboarding() {
               agendamentos.
             </p>
 
-            {/* Resumo do negócio criado */}
             <div className="onboarding-summary">
               <div className="onboarding-summary-business">
-                {/* Avatar: logo ou iniciais conforme o utilizador carregou ou não */}
                 <BusinessAvatar
                   url={savedLogoUrl}
                   businessName={name}
@@ -766,7 +723,6 @@ export default function Onboarding() {
               </div>
             </div>
 
-            {/* Link público com botão de copiar */}
             <div className="onboarding-link-box">
               <p className="onboarding-link-label">O teu link de agendamento</p>
               <div className="onboarding-link-row">
@@ -782,7 +738,6 @@ export default function Onboarding() {
               </div>
             </div>
 
-            {/* Navega para o dashboard — replace:true evita voltar ao onboarding */}
             <button
               className="onboarding-btn"
               onClick={() => navigate("/dashboard", { replace: true })}

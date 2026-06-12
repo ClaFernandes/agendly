@@ -1,3 +1,5 @@
+// src/context/BookingContext.jsx
+
 import { createContext, useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
@@ -10,7 +12,7 @@ export function useBooking() {
 }
 
 export function BookingProvider({ children }) {
-  const { slug } = useParams(); // Captura o ID/Slug da URL pública automaticamente
+  const { slug } = useParams();
 
   // Estados do Negócio
   const [business, setBusiness] = useState(null);
@@ -18,7 +20,7 @@ export function BookingProvider({ children }) {
   const [loadingBusiness, setLoadingBusiness] = useState(true);
   const [loadingError, setLoadingError] = useState(null);
 
-  // Estados do Fluxo de Agendamento (o que o cliente escolheu)
+  // Estados do Fluxo de Agendamento - o que o cliente escolheu
   const [selectedService, setSelectedService] = useState(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
@@ -55,12 +57,12 @@ export function BookingProvider({ children }) {
 
         setBusiness(bData);
 
-        // Busca os serviços desse negócio
+        // Busca os serviços do negócio
         const { data: sData, error: sError } = await supabase
           .from("services")
           .select("*")
           .eq("business_id", bData.id)
-          .eq("active", true); // usa a coluna correta do schema
+          .eq("active", true);
 
         if (sError) throw sError;
         setServices(sData || []);
@@ -92,7 +94,6 @@ export function BookingProvider({ children }) {
     });
   }
 
-  // O valor que será disponibilizado para os componentes filhos
   const value = {
     slug,
     business,
@@ -110,7 +111,6 @@ export function BookingProvider({ children }) {
     resetBooking,
   };
 
-  // Renderiza o provider com o valor e os filhos
   return (
     <BookingContext.Provider value={value}>{children}</BookingContext.Provider>
   );

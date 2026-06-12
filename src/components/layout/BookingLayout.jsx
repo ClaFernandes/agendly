@@ -1,3 +1,5 @@
+// src/components/layout/BookingLayout.jsx
+
 import { Outlet } from "react-router-dom"; //incluir depois: useParams
 import "../../pages/public-booking/PublicBooking.css";
 import StepProgress from "../booking-flow/StepProgress";
@@ -6,7 +8,7 @@ import { useBooking } from "../../context/BookingContext";
 export default function BookingLayout() {
   const bookingContext = useBooking();
 
-  // 🛡️ Segurança máxima: Se o contexto não existir, não quebra a página
+  // Se o contexto não existir, não quebra a página
   if (!bookingContext) {
     return <Outlet />;
   }
