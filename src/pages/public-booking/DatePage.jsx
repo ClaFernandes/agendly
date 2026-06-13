@@ -1,11 +1,13 @@
 // src/pages/public-booking/DatePage.jsx
 
-import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useBooking } from "../../context/BookingContext"; // 👈 IMPORTANTE: Adicionámos o contexto
 
 export default function DatePage() {
   const navigate = useNavigate();
-  const [selectedDate, setSelectedDate] = useState("");
+  
+  // 👈 SUBSTITUÍMOS o useState pelo useBooking para guardar a data globalmente
+  const { selectedDate, setSelectedDate } = useBooking();
 
   // Configuração de datas limite (Hoje até 30 dias para frente)
   const today = new Date();
@@ -18,11 +20,15 @@ export default function DatePage() {
     const tempDate = new Date(today);
 
     for (let i = 0; i < 14; i++) {
-      // Ignora domingos se o negócio fechar (exemplo rápido, controlável pelo banco depois)
-      // if (tempDate.getDay() === 0) { ... }
+      // 1. Extraímos Ano, Mês e Dia do fuso LOCAL (do cliente)
+      const year = tempDate.getFullYear();
+      const month = String(tempDate.getMonth() + 1).padStart(2, "0"); // +1 porque Janeiro é 0
+      const day = String(tempDate.getDate()).padStart(2, "0");
+      
+      const localIsoString = `${year}-${month}-${day}`;
 
       days.push({
-        isoString: tempDate.toISOString().split("T")[0],
+        isoString: localIsoString, // Usamos a nossa string formatada localmente
         dayNum: tempDate.getDate(),
         month: tempDate
           .toLocaleDateString("pt-BR", { month: "short" })
@@ -31,6 +37,7 @@ export default function DatePage() {
           .toLocaleDateString("pt-BR", { weekday: "short" })
           .split(",")[0],
       });
+      
       tempDate.setDate(tempDate.getDate() + 1);
     }
     return days;
@@ -39,8 +46,8 @@ export default function DatePage() {
   const quickDays = generateQuickDays();
 
   const handleSelectDate = (dateStr) => {
-    setSelectedDate(dateStr);
-    console.log("Data selecionada:", dateStr);
+    setSelectedDate(dateStr); // Agora guarda no contexto global!
+    console.log("Data guardada no Contexto:", dateStr);
 
     // Avança para a tela de horários
     navigate("../time");
@@ -53,7 +60,7 @@ export default function DatePage() {
         <p>Selecione o melhor dia para o seu atendimento.</p>
       </div>
 
-      {/* Opção 1: Seleção Rápida em Carrossel/Grid (Excelente para Mobile) */}
+      {/* Opção 1: Seleção Rápida em Carrossel/Grid */}
       <div className="quick-dates-grid">
         {quickDays.map((day) => {
           const isSelected = selectedDate === day.isoString;
@@ -72,7 +79,7 @@ export default function DatePage() {
         })}
       </div>
 
-      {/* Opção 2: Input de Data Tradicional para escolher mais à frente */}
+      {/* Opção 2: Input de Data Tradicional */}
       <div className="manual-date-picker">
         <label htmlFor="manual-date">Ou escolha outra data:</label>
         <input
@@ -80,7 +87,7 @@ export default function DatePage() {
           id="manual-date"
           min={today.toISOString().split("T")[0]}
           max={maxDate.toISOString().split("T")[0]}
-          value={selectedDate}
+          value={selectedDate || ""} // Garante que não dá erro se for null
           onChange={(e) => handleSelectDate(e.target.value)}
         />
       </div>

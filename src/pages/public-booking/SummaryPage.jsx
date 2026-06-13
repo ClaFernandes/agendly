@@ -1,7 +1,7 @@
 // src/pages/public-booking/SummaryPage.jsx
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useBooking } from "../../context/BookingContext";
 import { supabase } from "../../lib/supabase";
 
@@ -16,14 +16,18 @@ export default function SummaryPage() {
   const handleConfirmAppointment = async () => {
     setIsSubmitting(true);
 
-    // Une a Data ("YYYY-MM-DD") e Hora ("HH:MM") num formato Timestamptz legível para o Postgres
-    const startsAtTimestamp = `${selectedDate}T${selectedTime}:00Z`;
+    // 1. Cria a data de INÍCIO correta baseada no fuso local do navegador
+    const startsAtDate = new Date(`${selectedDate}T${selectedTime}:00`);
+
+    // 2. Calcula a data de FIM somando os minutos de duração do serviço
+    const endsAtDate = new Date(startsAtDate.getTime() + selectedService.duration_min * 60000);
 
     try {
       const { error } = await supabase.from("appointments").insert({
         business_id: business.id,
         service_id: selectedService.id,
-        starts_at: startsAtTimestamp,
+        starts_at: startsAtDate.toISOString(), // Envia UTC seguro para o Postgres
+        ends_at: endsAtDate.toISOString(),     // 👈 Fundamental para o filtro de colisão!
         client_name: clientData.client_name,
         client_email: clientData.client_email,
         client_phone: clientData.client_phone,
@@ -32,8 +36,6 @@ export default function SummaryPage() {
       });
 
       if (error) throw error;
-
-      // Sucesso! Avança para a página de parabéns
       navigate("../confirm");
     } catch (err) {
       alert("Falha ao salvar agendamento: " + err.message);
@@ -58,13 +60,19 @@ export default function SummaryPage() {
           <strong>Nome:</strong> {clientData.client_name}
         </p>
       </div>
-      <button
-        onClick={handleConfirmAppointment}
-        disabled={isSubmitting}
-        className="confirm-booking-btn"
-      >
-        {isSubmitting ? "A processar..." : "Confirmar Agendamento ✓"}
-      </button>
+      <div>
+        <Link to="../form" className="back-btn">
+          ← Voltar
+        </Link>
+
+        <button
+          onClick={handleConfirmAppointment}
+          disabled={isSubmitting}
+          className="confirm-booking-btn"
+        >
+          {isSubmitting ? "A processar..." : "Confirmar Agendamento ✓"}
+        </button>
+      </div>
     </div>
   );
 }

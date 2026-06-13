@@ -2,7 +2,7 @@
 
 import { Outlet } from "react-router-dom"; //incluir depois: useParams
 import "../../pages/public-booking/PublicBooking.css";
-import StepProgress from "../booking-flow/StepProgress";
+import StepProgress from "../../pages/public-booking/StepProgress";
 import { useBooking } from "../../context/BookingContext";
 
 export default function BookingLayout() {
@@ -33,12 +33,13 @@ export default function BookingLayout() {
       <header className="booking-header">
         <div className="business-logo">
           {business.logo_url ? (
-            <img src={business.logo_url} alt={business.name} />
+            <img src={business.logo_url} alt={business.name} /> && (
+              <h1>{business.name}</h1>
+            )
           ) : (
-            <div>Logo</div>
+            <h1>{business.name}</h1>
           )}
         </div>
-        <h1>{business.name}</h1>
         <p>
           {business.description ||
             "Selecione os dados para realizar o seu agendamento"}
