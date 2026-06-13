@@ -1,32 +1,29 @@
 // src/pages/public-booking/FormPage.jsx
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useBooking } from "../../context/BookingContext"; // 👈 Importar o contexto
 
 export default function FormPage() {
   const navigate = useNavigate();
+  const { clientData, setClientData } = useBooking(); // 👈 Puxar estado global
+
+  // Inicia o state local com os dados globais (útil se o cliente andar para trás e para a frente)
   const [formData, setFormData] = useState({
-    client_name: "",
-    client_email: "",
-    client_phone: "",
-    notes: "",
+    client_name: clientData.client_name || "",
+    client_email: clientData.client_email || "",
+    client_phone: clientData.client_phone || "",
+    notes: clientData.notes || "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Aqui salvaremos os dados do cliente no BookingContext futuramente
-    console.log("Dados do cliente coletados:", formData);
-
-    // Avança para a página de resumo/confirmação final
+    // 🎯 AQUI É A CHAVE: Gravar os dados no Contexto Global para o Summary usar
+    setClientData(formData);
     navigate("../summary");
   };
 

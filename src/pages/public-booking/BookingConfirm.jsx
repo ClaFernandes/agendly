@@ -3,7 +3,7 @@
 export default function BookingConfirm() {
   return (
     <>
-      <p>Booking Confirm</p>
+      <p>Foi enviado um email para (email)</p>
     </>
   );
 }

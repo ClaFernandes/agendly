@@ -13,6 +13,8 @@ export default function StepProgress() {
     { id: 2, name: "Data", path: "/date" },
     { id: 3, name: "Horário", path: "/time" },
     { id: 4, name: "Dados", path: "/form" },
+    { id: 5, name: "Confirmar", path: "/summary" },
+    { id: 6, name: "Confirmar", path: "/confirm" },
   ];
 
   // Função para descobrir qual etapa está ativa olhando o final da URL
@@ -23,7 +25,9 @@ export default function StepProgress() {
         return (
           !currentPath.endsWith("/date") &&
           !currentPath.endsWith("/time") &&
-          !currentPath.endsWith("/form")
+          !currentPath.endsWith("/form") &&
+          !currentPath.endsWith("summary") &&
+          !currentPath.endsWith("/confirm")
         );
       }
       return currentPath.endsWith(step.path);
