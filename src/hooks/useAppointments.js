@@ -6,11 +6,28 @@ import { useBusiness } from "../context/BusinessContext";
 
 // Estados possíveis de um agendamento
 export const APPOINTMENT_STATUS = {
-  PENDING: "pending",
-  CONFIRMED: "confirmed",
-  CANCELLED: "cancelled",
-  COMPLETED: "completed",
-  NO_SHOW: "no_show",
+  EM_ABERTO: "em_aberto", // Agendado mas ainda não realizado
+  CONCLUIDO: "concluido", // Serviço realizado com sucesso
+  CANCELADO: "cancelado", // Cancelado pelo cliente ou prestador
+};
+
+// Labels e cores para uso na UI
+export const STATUS_CONFIG = {
+  em_aberto: {
+    label: "Em aberto",
+    color: "var(--color-warning-600)",
+    bg: "var(--color-warning-50)",
+  },
+  concluido: {
+    label: "Concluído",
+    color: "var(--color-success-600)",
+    bg: "var(--color-success-50)",
+  },
+  cancelado: {
+    label: "Cancelado",
+    color: "var(--color-error)",
+    bg: "var(--color-error-subtle)",
+  },
 };
 
 export function useAppointments({
@@ -27,77 +44,37 @@ export function useAppointments({
 
   // Carrega os agendamentos sempre que o business, status ou datas mudarem
   useEffect(() => {
-    async function load() {
-      if (!business?.id) {
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-
-      let query = supabase
-        .from("appointments")
-        .select(
-          `*,
-          service:services (
-            id,
-            name,
-            duration_min,
-            price
-          )`,
-        )
-        .eq("business_id", business.id)
-        .order("starts_at", { ascending: true });
-
-      // Filtro por estado (ex: só pendentes, só confirmados)
-      if (status) {
-        query = query.eq("status", status);
-      }
-
-      // Filtro por intervalo de datas
-      if (dateFrom) {
-        query = query.gte("starts_at", dateFrom);
-      }
-      if (dateTo) {
-        query = query.lte("starts_at", dateTo);
-      }
-
-      const { data, error } = await query;
-
-      if (error) {
-        setError(error.message);
-      } else {
-        setAppointments(data || []);
-      }
-
-      setLoading(false);
-    }
-
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [business?.id, status, dateFrom, dateTo]);
 
-  // Fetch manual
-  async function fetchAppointments() {
-    if (!business?.id) return;
+  async function load() {
+    if (!business?.id) {
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
     setError(null);
 
+    // Faz join com services para ter nome, duração e preço disponíveis
     let query = supabase
       .from("appointments")
       .select(
-        `*,
+        `
+        *,
         service:services (
           id,
           name,
           duration_min,
           price
-        )`,
+        )
+      `,
       )
       .eq("business_id", business.id)
       .order("starts_at", { ascending: true });
 
+    // Filtros opcionais
     if (status) query = query.eq("status", status);
     if (dateFrom) query = query.gte("starts_at", dateFrom);
     if (dateTo) query = query.lte("starts_at", dateTo);
@@ -113,34 +90,14 @@ export function useAppointments({
     setLoading(false);
   }
 
-  // Confirmar agendamento (pending → confirmed)
-  async function confirmAppointment(id) {
-    return updateStatus(id, APPOINTMENT_STATUS.CONFIRMED);
-  }
-
-  // Cancelar agendamento
-  async function cancelAppointment(id) {
-    return updateStatus(id, APPOINTMENT_STATUS.CANCELLED);
-  }
-
-  // Marcar como concluído
-  async function completeAppointment(id) {
-    return updateStatus(id, APPOINTMENT_STATUS.COMPLETED);
-  }
-
-  // Marcar como não compareceu
-  async function markNoShow(id) {
-    return updateStatus(id, APPOINTMENT_STATUS.NO_SHOW);
-  }
-
-  // Função interna — atualiza o estado com optimistic update e reverte se falhar
+  // Função interna — actualiza status com optimistic update e reverte se falhar
   async function updateStatus(id, newStatus) {
     setSaving(true);
 
     // Guarda o estado anterior para possível reversão
     const previous = appointments.find((a) => a.id === id);
 
-    // Optimistic: aplica antes de confirmar na DB
+    // Aplica optimisticamente antes de confirmar na DB
     setAppointments((prev) =>
       prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a)),
     );
@@ -165,17 +122,29 @@ export function useAppointments({
     return { success: true };
   }
 
-  // Reagendar — atualiza starts_at e ends_at de um agendamento
+  // Marca como concluído
+  async function completeAppointment(id) {
+    return updateStatus(id, APPOINTMENT_STATUS.CONCLUIDO);
+  }
+
+  // Cancela um agendamento
+  async function cancelAppointment(id) {
+    return updateStatus(id, APPOINTMENT_STATUS.CANCELADO);
+  }
+
+  // Reabre um agendamento cancelado ou concluído
+  async function reopenAppointment(id) {
+    return updateStatus(id, APPOINTMENT_STATUS.EM_ABERTO);
+  }
+
+  // Reagenda — actualiza starts_at e ends_at
   async function rescheduleAppointment(id, startsAt, endsAt) {
     setSaving(true);
     setError(null);
 
     const { error } = await supabase
       .from("appointments")
-      .update({
-        starts_at: startsAt,
-        ends_at: endsAt,
-      })
+      .update({ starts_at: startsAt, ends_at: endsAt })
       .eq("id", id)
       .eq("business_id", business.id);
 
@@ -185,7 +154,7 @@ export function useAppointments({
       return { success: false, error: error.message };
     }
 
-    // Atualiza localmente sem recarregar tudo
+    // Actualiza localmente sem recarregar tudo
     setAppointments((prev) =>
       prev.map((a) =>
         a.id === id ? { ...a, starts_at: startsAt, ends_at: endsAt } : a,
@@ -197,13 +166,14 @@ export function useAppointments({
   }
 
   // Agrupamentos prontos a usar na UI
-
-  const pending = appointments.filter(
-    (a) => a.status === APPOINTMENT_STATUS.PENDING,
+  const emAberto = appointments.filter(
+    (a) => a.status === APPOINTMENT_STATUS.EM_ABERTO,
   );
-
-  const confirmed = appointments.filter(
-    (a) => a.status === APPOINTMENT_STATUS.CONFIRMED,
+  const concluidos = appointments.filter(
+    (a) => a.status === APPOINTMENT_STATUS.CONCLUIDO,
+  );
+  const cancelados = appointments.filter(
+    (a) => a.status === APPOINTMENT_STATUS.CANCELADO,
   );
 
   // Agendamentos de hoje — compara pela data local do utilizador
@@ -216,15 +186,14 @@ export function useAppointments({
     loading,
     error,
     saving,
-    // Ações
-    confirmAppointment,
-    cancelAppointment,
     completeAppointment,
-    markNoShow,
+    cancelAppointment,
+    reopenAppointment,
     rescheduleAppointment,
-    refetch: fetchAppointments,
-    pending,
-    confirmed,
+    refetch: load,
+    emAberto,
+    concluidos,
+    cancelados,
     today,
   };
 }
