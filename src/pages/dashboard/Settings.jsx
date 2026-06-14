@@ -65,6 +65,7 @@ export default function Settings() {
   // Preenche o formulário com os dados atuais do negócio
   useEffect(() => {
     if (!business) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setName(business.name ?? "");
     setSlug(business.slug ?? "");
     setPhone(business.phone ?? "");
