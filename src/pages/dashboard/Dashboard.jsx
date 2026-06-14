@@ -17,11 +17,14 @@ import { useServices } from "../../hooks/useServices";
 
 import "./Dashboard.css";
 
-// Extrai iniciais do nome do negócio, ignorando palavras de ligação 
+// Extrai iniciais do nome do negócio, ignorando palavras de ligação
 function getInitials(name) {
   if (!name) return "?";
   const stopWords = new Set(["do", "da", "de", "dos", "das", "e", "o", "a"]);
-  const words = name.trim().split(/\s+/).filter((w) => !stopWords.has(w.toLowerCase()));
+  const words = name
+    .trim()
+    .split(/\s+/)
+    .filter((w) => !stopWords.has(w.toLowerCase()));
   if (words.length === 0) return name.slice(0, 2).toUpperCase();
   if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
   return (words[0][0] + words[1][0]).toUpperCase();
@@ -70,6 +73,7 @@ export default function Dashboard() {
     try {
       await navigator.clipboard.writeText(publicUrl);
     } catch {
+      // Fallback para browsers sem suporte à Clipboard API
       const el = document.createElement("textarea");
       el.value = publicUrl;
       document.body.appendChild(el);
@@ -99,11 +103,10 @@ export default function Dashboard() {
 
   return (
     <div className="db-page">
-
-      {/* Cabeçalho */}
+      {/* Cabeçalho com avatar, saudação e link público */}
       <div className="db-welcome">
         <div className="db-welcome-info">
-          {/* Avatar */}
+          {/* Avatar: usa logo do negócio ou iniciais como fallback */}
           <div className="db-welcome-avatar">
             {business?.logo_url ? (
               <img
@@ -118,20 +121,17 @@ export default function Dashboard() {
             )}
           </div>
           <div>
-            <h1 className="pg-title">
-              Olá, {business?.name ?? "bem-vindo"}!
-            </h1>
-            <p className="pg-subtitle">
-              Aqui tens um resumo do teu negócio.
-            </p>
+            <h1 className="pg-title">Olá, {business?.name ?? "bem-vindo"}!</h1>
+            <p className="pg-subtitle">Aqui tens um resumo do teu negócio.</p>
           </div>
         </div>
 
-        {/* Link público */}
+        {/* Link público do negócio — só aparece se o slug estiver definido */}
         {publicUrl && (
           <div className="db-public-link">
             <span className="db-public-link-url">{publicUrl}</span>
-            {/* Botão copiar */}
+
+            {/* Botão copiar — muda de estado visual após cópia bem-sucedida */}
             <button
               className={`db-public-link-btn ${copied ? "db-public-link-btn--copied" : ""}`}
               onClick={handleCopy}
@@ -140,8 +140,8 @@ export default function Dashboard() {
               <RiFileCopyLine aria-hidden="true" />
               {copied ? "Copiado!" : "Copiar"}
             </button>
-            {/* Link para abrir a página pública */}
 
+            {/* Link externo para abrir a página pública num novo separador */}
             <a
               href={publicUrl}
               target="_blank"
@@ -155,47 +155,58 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Cards de estatísticas */}
+      {/* Grelha de estatísticas do negócio */}
       <div className="pg-stats-grid">
-        {/* Receita mensal */}
+        {/* Receita mensal — placeholder até integração com pagamentos */}
         <div className="pg-stat-card">
           <p className="pg-stat-label">Receita mensal</p>
           <p className="pg-stat-value db-stat-placeholder">
-            {new Intl.NumberFormat('pt-PT', {
-              style: 'currency',
-              currency: 'EUR',
+            {new Intl.NumberFormat("pt-PT", {
+              style: "currency",
+              currency: "EUR",
             }).format(0)}
           </p>
           <p className="pg-stat-meta">Em breve</p>
         </div>
 
-        {/* Agendamentos hoje */}
+        {/* Agendamentos hoje — placeholder até integração com appointments */}
         <div className="pg-stat-card">
           <p className="pg-stat-label">Agendamentos hoje</p>
           <p className="pg-stat-value db-stat-placeholder">—</p>
           <p className="pg-stat-meta">Em breve</p>
         </div>
 
-        {/* Agendamentos esta semana */}
+        {/* Agendamentos esta semana — placeholder */}
         <div className="pg-stat-card">
           <p className="pg-stat-label">Agendamentos semana</p>
           <p className="pg-stat-value db-stat-placeholder">—</p>
           <p className="pg-stat-meta">Em breve</p>
         </div>
 
-        {/* Serviços ativos */}
+        {/* Serviços ativos — calculado em tempo real a partir do hook useServices */}
         <div className="pg-stat-card">
           <p className="pg-stat-label">Serviços ativos</p>
-          <p className="pg-stat-value">
-            {svcLoading ? "—" : activeServices}
-          </p>
+          <p className="pg-stat-value">{svcLoading ? "—" : activeServices}</p>
+          {/* Meta só aparece depois de os serviços estarem carregados */}
           {!svcLoading && (
             <p className="pg-stat-meta">{totalServices} no total</p>
           )}
         </div>
+
+        {/* Serviços em destaque — filtra por is_featured === true */}
+        <div className="pg-stat-card">
+          <p className="pg-stat-label">Serviços em destaque</p>
+          <p className="pg-stat-value">{svcLoading ? "—" : featuredServices}</p>
+          {/* Indica quantos dos serviços ativos estão marcados como destaque */}
+          {!svcLoading && (
+            <p className="pg-stat-meta">
+              {activeServices} {activeServices === 1 ? "ativo" : "ativos"}
+            </p>
+          )}
+        </div>
       </div>
 
-      {/* Próximos agendamentos (placeholder) */}
+      {/* Próximos agendamentos — secção placeholder até os dados estarem disponíveis */}
       <div className="pg-section" style={{ marginBottom: 24 }}>
         <div className="pg-section-header">
           <h2 className="pg-section-title">Próximos agendamentos</h2>
@@ -214,7 +225,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Acesso rápido às secções principais */}
+      {/* Acesso rápido às secções principais do dashboard */}
       <div className="pg-section">
         <div className="pg-section-header">
           <h2 className="pg-section-title">Acesso rápido</h2>
@@ -233,7 +244,6 @@ export default function Dashboard() {
           ))}
         </div>
       </div>
-
-    </div >
+    </div>
   );
 }

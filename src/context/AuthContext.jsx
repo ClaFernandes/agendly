@@ -21,40 +21,45 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [userStatus, setUserStatus] = useState(null); // 'active' | 'pending' | 'rejected'
   const [loading, setLoading] = useState(true);
   const isRegistering = useRef(false);
   const justSignedOut = useRef(false);
 
-  async function fetchRole(userId) {
+  const APP_BASE = `${window.location.origin}/agendly`;
+
+  // Vai buscar o role e o status do utilizador à tabela profiles
+  async function fetchProfile(userId) {
     const { data, error } = await supabase
       .from("profiles")
-      .select("role")
+      .select("role, status")
       .eq("id", userId)
       .maybeSingle();
 
     if (error) {
-      console.error("fetchRole:", error.message);
+      console.error("fetchProfile:", error.message);
       return null;
     }
 
-    return data?.role ?? null;
+    return data ?? null;
   }
 
-  async function ensureProfileRole(userId) {
-    const role = await fetchRole(userId);
-    if (role) return role;
+  // Garante que o perfil existe — cria com role "provider" e status "active" se não existir
+  async function ensureProfile(userId) {
+    const profile = await fetchProfile(userId);
+    if (profile) return profile;
 
     const { data, error } = await supabase
       .from("profiles")
-      .insert({ id: userId, role: "provider" })
-      .select("role")
+      .insert({ id: userId, role: "provider", status: "active" })
+      .select("role, status")
       .single();
 
     if (error) {
-      return "provider";
+      return { role: "provider", status: "active" };
     }
 
-    return data?.role ?? "provider";
+    return data ?? { role: "provider", status: "active" };
   }
 
   useEffect(() => {
@@ -66,9 +71,10 @@ export function AuthProvider({ children }) {
 
       try {
         if (session?.user) {
-          const role = await ensureProfileRole(session.user.id);
+          const profile = await ensureProfile(session.user.id);
           setUser(session.user);
-          setUserRole(role || "provider");
+          setUserRole(profile?.role ?? "provider");
+          setUserStatus(profile?.status ?? "active");
         }
       } catch (error) {
         console.error("Erro ao inicializar sessão:", error);
@@ -86,6 +92,7 @@ export function AuthProvider({ children }) {
         justSignedOut.current = true;
         setUser(null);
         setUserRole(null);
+        setUserStatus(null);
         setLoading(false);
         return;
       }
@@ -101,12 +108,14 @@ export function AuthProvider({ children }) {
 
       try {
         if (session?.user) {
-          const role = await ensureProfileRole(session.user.id);
+          const profile = await ensureProfile(session.user.id);
           setUser(session.user);
-          setUserRole(role || "provider");
+          setUserRole(profile?.role ?? "provider");
+          setUserStatus(profile?.status ?? "active");
         } else {
           setUser(null);
           setUserRole(null);
+          setUserStatus(null);
         }
       } catch (error) {
         console.error("Erro no onAuthStateChange:", error);
@@ -116,6 +125,7 @@ export function AuthProvider({ children }) {
     });
 
     return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function login(email, password) {
@@ -145,9 +155,10 @@ export function AuthProvider({ children }) {
       const sessionUser = loginData?.user;
 
       if (sessionUser) {
-        const role = await ensureProfileRole(sessionUser.id);
+        const profile = await ensureProfile(sessionUser.id);
         setUser(sessionUser);
-        setUserRole(role ?? "provider");
+        setUserRole(profile?.role ?? "provider");
+        setUserStatus(profile?.status ?? "active");
         setLoading(false);
       }
 
@@ -161,9 +172,6 @@ export function AuthProvider({ children }) {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      setUser(null);
-      setUserRole(null);
-      justSignedOut.current = true;
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
       throw error;
@@ -172,7 +180,7 @@ export function AuthProvider({ children }) {
 
   async function recoverPassword(email) {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/agendly/update-password`,
+      redirectTo: `${APP_BASE}/update-password`,
     });
     if (error) throw error;
   }
@@ -191,6 +199,7 @@ export function AuthProvider({ children }) {
     () => ({
       user,
       userRole,
+      userStatus,
       loading,
       login,
       register,
@@ -198,7 +207,8 @@ export function AuthProvider({ children }) {
       recoverPassword,
       loginWithGoogle,
     }),
-    [user, userRole, loading],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user, userRole, userStatus, loading],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

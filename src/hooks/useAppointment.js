@@ -1,7 +1,6 @@
 // src/hooks/useAppointments.js
-// Hook personalizado para gestão de agendamentos
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import { useBusiness } from "../context/BusinessContext";
 
@@ -26,8 +25,60 @@ export function useAppointments({
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  // Carrega os agendamentos com filtros opcionais
-  const fetchAppointments = useCallback(async () => {
+  // Carrega os agendamentos sempre que o business, status ou datas mudarem
+  useEffect(() => {
+    async function load() {
+      if (!business?.id) {
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+
+      let query = supabase
+        .from("appointments")
+        .select(
+          `*,
+          service:services (
+            id,
+            name,
+            duration_min,
+            price
+          )`,
+        )
+        .eq("business_id", business.id)
+        .order("starts_at", { ascending: true });
+
+      // Filtro por estado (ex: só pendentes, só confirmados)
+      if (status) {
+        query = query.eq("status", status);
+      }
+
+      // Filtro por intervalo de datas
+      if (dateFrom) {
+        query = query.gte("starts_at", dateFrom);
+      }
+      if (dateTo) {
+        query = query.lte("starts_at", dateTo);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        setError(error.message);
+      } else {
+        setAppointments(data || []);
+      }
+
+      setLoading(false);
+    }
+
+    load();
+  }, [business?.id, status, dateFrom, dateTo]);
+
+  // Fetch manual
+  async function fetchAppointments() {
     if (!business?.id) return;
 
     setLoading(true);
@@ -36,31 +87,20 @@ export function useAppointments({
     let query = supabase
       .from("appointments")
       .select(
-        `
-        *,
+        `*,
         service:services (
           id,
           name,
           duration_min,
           price
-        )
-      `,
+        )`,
       )
       .eq("business_id", business.id)
-      .order("start_at", { ascending: true });
+      .order("starts_at", { ascending: true });
 
-    // Filtro por estado (ex: só pendentes, só confirmados)
-    if (status) {
-      query = query.eq("status", status);
-    }
-
-    // Filtro por intervalo de datas
-    if (dateFrom) {
-      query = query.gte("start_at", dateFrom);
-    }
-    if (dateTo) {
-      query = query.lte("start_at", dateTo);
-    }
+    if (status) query = query.eq("status", status);
+    if (dateFrom) query = query.gte("starts_at", dateFrom);
+    if (dateTo) query = query.lte("starts_at", dateTo);
 
     const { data, error } = await query;
 
@@ -71,12 +111,7 @@ export function useAppointments({
     }
 
     setLoading(false);
-  }, [business?.id, status, dateFrom, dateTo]);
-
-  // Carrega quando o business ou os filtros mudarem
-  useEffect(() => {
-    fetchAppointments();
-  }, [fetchAppointments]);
+  }
 
   // Confirmar agendamento (pending → confirmed)
   async function confirmAppointment(id) {
@@ -98,14 +133,14 @@ export function useAppointments({
     return updateStatus(id, APPOINTMENT_STATUS.NO_SHOW);
   }
 
-  // Função interna que atualiza o estado de um agendamento
+  // Função interna — atualiza o estado com optimistic update e reverte se falhar
   async function updateStatus(id, newStatus) {
     setSaving(true);
 
     // Guarda o estado anterior para possível reversão
     const previous = appointments.find((a) => a.id === id);
 
-    // Optimistic update
+    // Optimistic: aplica antes de confirmar na DB
     setAppointments((prev) =>
       prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a)),
     );
@@ -130,16 +165,16 @@ export function useAppointments({
     return { success: true };
   }
 
-  // Reagendar — atualiza start_at e end_at de um agendamento
-  async function rescheduleAppointment(id, startAt, endAt) {
+  // Reagendar — atualiza starts_at e ends_at de um agendamento
+  async function rescheduleAppointment(id, startsAt, endsAt) {
     setSaving(true);
     setError(null);
 
     const { error } = await supabase
       .from("appointments")
       .update({
-        start_at: startAt,
-        end_at: endAt,
+        starts_at: startsAt,
+        ends_at: endsAt,
       })
       .eq("id", id)
       .eq("business_id", business.id);
@@ -153,7 +188,7 @@ export function useAppointments({
     // Atualiza localmente sem recarregar tudo
     setAppointments((prev) =>
       prev.map((a) =>
-        a.id === id ? { ...a, start_at: startAt, end_at: endAt } : a,
+        a.id === id ? { ...a, starts_at: startsAt, ends_at: endsAt } : a,
       ),
     );
 
@@ -161,17 +196,20 @@ export function useAppointments({
     return { success: true };
   }
 
-  // Agendamentos filtrados por estado — úteis para contagens na UI
+  // Agrupamentos prontos a usar na UI
+
   const pending = appointments.filter(
     (a) => a.status === APPOINTMENT_STATUS.PENDING,
   );
+
   const confirmed = appointments.filter(
     (a) => a.status === APPOINTMENT_STATUS.CONFIRMED,
   );
-  const today = appointments.filter((a) => {
-    const date = new Date(a.start_at).toDateString();
-    return date === new Date().toDateString();
-  });
+
+  // Agendamentos de hoje — compara pela data local do utilizador
+  const today = appointments.filter(
+    (a) => new Date(a.starts_at).toDateString() === new Date().toDateString(),
+  );
 
   return {
     appointments,
@@ -185,7 +223,6 @@ export function useAppointments({
     markNoShow,
     rescheduleAppointment,
     refetch: fetchAppointments,
-    // Agrupamentos prontos a usar
     pending,
     confirmed,
     today,

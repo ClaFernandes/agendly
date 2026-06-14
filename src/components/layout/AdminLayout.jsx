@@ -1,3 +1,5 @@
+// src/components/layout/AdminLayout.jsx
+
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
@@ -14,12 +16,13 @@ export default function AdminLayout() {
   async function handleLogout() {
     try {
       await logout();
-      navigate("/login");
-    } catch (error) {
-      console.error("Erro ao fazer logout:", error.message);
+      navigate("/admin/login");
+    } catch (err) {
+      console.error("Erro ao fazer logout:", err.message);
     }
   }
 
+  // Ativo para /admin
   const isActive = (path) => {
     if (path === "/admin") return pathname === "/admin";
     return pathname.startsWith(path);
@@ -70,6 +73,7 @@ export default function AdminLayout() {
         </div>
       </aside>
 
+      {/* Conteúdo das páginas */}
       <main className="admin-content">
         <Outlet />
       </main>

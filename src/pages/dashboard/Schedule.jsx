@@ -1,7 +1,7 @@
 // src/pages/dashboard/Schedule.jsx
 
 import { useState, useEffect } from "react";
-import { RiTimeLine, RiAddLine, RiDeleteBinLine, RiSaveLine } from "react-icons/ri";
+import { RiAddLine, RiDeleteBinLine, RiSaveLine } from "react-icons/ri";
 import { supabase } from "../../lib/supabase";
 import { useBusiness } from "../../context/BusinessContext";
 import "./Dashboard.css";
@@ -26,7 +26,7 @@ function toMinutes(time) {
 // Verifica se há sobreposição entre intervalos de um dia
 function hasOverlap(intervals) {
   const sorted = [...intervals].sort(
-    (a, b) => toMinutes(a.start_time) - toMinutes(b.start_time)
+    (a, b) => toMinutes(a.start_time) - toMinutes(b.start_time),
   );
   for (let i = 0; i < sorted.length - 1; i++) {
     if (toMinutes(sorted[i].end_time) > toMinutes(sorted[i + 1].start_time)) {
@@ -73,10 +73,10 @@ export default function Schedule() {
             intervals:
               dayRows.length > 0
                 ? dayRows.map((r) => ({
-                  id: r.id,
-                  start_time: r.start_time.slice(0, 5), // "HH:MM:SS" → "HH:MM"
-                  end_time: r.end_time.slice(0, 5),
-                }))
+                    id: r.id,
+                    start_time: r.start_time.slice(0, 5), // "HH:MM:SS" → "HH:MM"
+                    end_time: r.end_time.slice(0, 5),
+                  }))
                 : [{ id: null, start_time: "09:00", end_time: "18:00" }],
           };
         });
@@ -97,8 +97,8 @@ export default function Schedule() {
   function toggleDay(dayId) {
     setHours((prev) =>
       prev.map((h) =>
-        h.day_of_week === dayId ? { ...h, is_active: !h.is_active } : h
-      )
+        h.day_of_week === dayId ? { ...h, is_active: !h.is_active } : h,
+      ),
     );
   }
 
@@ -110,10 +110,10 @@ export default function Schedule() {
         return {
           ...h,
           intervals: h.intervals.map((interval, i) =>
-            i === idx ? { ...interval, [field]: value } : interval
+            i === idx ? { ...interval, [field]: value } : interval,
           ),
         };
-      })
+      }),
     );
   }
 
@@ -129,7 +129,7 @@ export default function Schedule() {
             { id: null, start_time: "09:00", end_time: "18:00" },
           ],
         };
-      })
+      }),
     );
   }
 
@@ -142,7 +142,7 @@ export default function Schedule() {
           ...h,
           intervals: h.intervals.filter((_, i) => i !== idx),
         };
-      })
+      }),
     );
   }
 
@@ -156,7 +156,9 @@ export default function Schedule() {
       if (!day.is_active) continue;
       for (const interval of day.intervals) {
         if (toMinutes(interval.start_time) >= toMinutes(interval.end_time)) {
-          setError(`Em ${day.label}, o horário de início tem de ser anterior ao de fim.`);
+          setError(
+            `Em ${day.label}, o horário de início tem de ser anterior ao de fim.`,
+          );
           return;
         }
       }
@@ -228,7 +230,9 @@ export default function Schedule() {
       <div className="pg-header">
         <div>
           <h1 className="pg-title">Horários</h1>
-          <p className="pg-subtitle">Define os dias e horas em que o teu negócio está disponível.</p>
+          <p className="pg-subtitle">
+            Define os dias e horas em que o teu negócio está disponível.
+          </p>
         </div>
         <button className="btn-primary" onClick={handleSave} disabled={saving}>
           <RiSaveLine aria-hidden="true" />
@@ -237,7 +241,9 @@ export default function Schedule() {
       </div>
 
       {error && <p className="sch-error">{error}</p>}
-      {success && <p className="sch-success">Horários guardados com sucesso!</p>}
+      {success && (
+        <p className="sch-success">Horários guardados com sucesso!</p>
+      )}
 
       <div className="pg-section" style={{ padding: 0, overflow: "hidden" }}>
         {hours.map((h, dayIdx) => (
@@ -256,7 +262,12 @@ export default function Schedule() {
               </button>
               <span className="sch-day-label">{h.label}</span>
               {h.is_active ? (
-                <button type="button" className="sch-add-btn" onClick={() => addInterval(h.day_of_week)} disabled={saving}>
+                <button
+                  type="button"
+                  className="sch-add-btn"
+                  onClick={() => addInterval(h.day_of_week)}
+                  disabled={saving}
+                >
                   <RiAddLine aria-hidden="true" /> Adicionar
                 </button>
               ) : (
@@ -268,11 +279,42 @@ export default function Schedule() {
               <div className="sch-intervals">
                 {h.intervals.map((interval, i) => (
                   <div key={i} className="sch-interval-row">
-                    <input type="time" value={interval.start_time} disabled={saving} onChange={(e) => updateInterval(h.day_of_week, i, "start_time", e.target.value)} className="sch-time-input" />
+                    <input
+                      type="time"
+                      value={interval.start_time}
+                      disabled={saving}
+                      onChange={(e) =>
+                        updateInterval(
+                          h.day_of_week,
+                          i,
+                          "start_time",
+                          e.target.value,
+                        )
+                      }
+                      className="sch-time-input"
+                    />
                     <span className="sch-sep">—</span>
-                    <input type="time" value={interval.end_time} disabled={saving} onChange={(e) => updateInterval(h.day_of_week, i, "end_time", e.target.value)} className="sch-time-input" />
+                    <input
+                      type="time"
+                      value={interval.end_time}
+                      disabled={saving}
+                      onChange={(e) =>
+                        updateInterval(
+                          h.day_of_week,
+                          i,
+                          "end_time",
+                          e.target.value,
+                        )
+                      }
+                      className="sch-time-input"
+                    />
                     {h.intervals.length > 1 && (
-                      <button type="button" className="sch-remove-btn" onClick={() => removeInterval(h.day_of_week, i)} disabled={saving}>
+                      <button
+                        type="button"
+                        className="sch-remove-btn"
+                        onClick={() => removeInterval(h.day_of_week, i)}
+                        disabled={saving}
+                      >
                         <RiDeleteBinLine />
                       </button>
                     )}
