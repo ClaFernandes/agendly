@@ -4,41 +4,74 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f8f9fa;
-  font-family: system-ui, -apple-system, sans-serif;
-  color: #212529;
 }
 
-/* Header */
 .booking-header {
   background-color: #ffffff;
-  padding: 1rem;
+  padding: 2rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.booking-logo-placeholder {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #4f46e5;
-  /* Roxo moderno */
-  letter-spacing: -0.05em;
+.business {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem
 }
 
-/* Conteúdo Principal (Onde entram as páginas) */
+.business-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.business-logo img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.business-initials {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-md);
+  background: var(--color-brand-subtle);
+  color: var(--color-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-lg);
+  font-weight: var(--font-semi);
+}
+
+.business-description {
+  margin: 0 auto;
+  padding-top: 1rem;
+}
+
+.business-logo h1 {
+  font-size: 2.7rem;
+}
+
+.business-description {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+}
+
 .booking-content {
   flex: 1;
   width: 100%;
   max-width: 600px;
-  /* Largura máxima ideal para fluxo de agendamento */
   margin: 0 auto;
   padding: 1.5rem;
   box-sizing: border-box;
 }
 
-/* Rodapé */
 .booking-footer {
   text-align: center;
   padding: 1rem;
@@ -79,88 +112,110 @@
 }
 
 .back-btn {
-  display: inline-block;
-  background-color: #e5e7eb;
-  color: #374151;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 20px;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm) 13px;
+  font-weight: var(--font-medium);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s;
 }
 
 /* Barra de Progresso em Etapas */
 .step-progress-container {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: white;
-  padding: 1rem;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  align-items: flex-start;
+  justify-content: center;
+  padding: 16px 24px;
+  /* Mesmos paddings do container do onboarding */
+  border-radius: var(--radius-lg, 12px);
   margin-bottom: 1.5rem;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .step-item {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 6px;
+  /* Gap exato entre a bola e o texto do onboarding */
   position: relative;
   z-index: 1;
+  min-width: 100px;
+  /* Largura mínima do passo do onboarding */
 }
 
+/* O Círculo da Etapa (Equivalente ao .onboarding-progress-dot) */
 .step-circle {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: #e5e7eb;
-  color: #6b7280;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full, 50%);
+  border: 2px solid var(--color-border, #e5e7eb);
+  background: var(--color-surface, #ffffff);
+  color: var(--color-text-muted, #6b7280);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--font-semi, 600);
+  transition: all 0.2s ease;
 }
 
 .step-name {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #6b7280;
-  margin-top: 0.5rem;
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--color-text-subtle, #9ca3af);
+  white-space: nowrap;
+  text-align: center;
+  transition: color 0.2s ease;
 }
 
-/* Linha que liga os círculos */
+/* Linha conectora manual entre os círculos */
 .step-line {
   flex: 1;
   height: 2px;
-  background-color: #e5e7eb;
-  margin: 0 -10px;
-  transform: translateY(-12px);
-  /* Alinha com o centro dos círculos */
-  transition: background-color 0.3s ease;
+  background: var(--color-border, #e5e7eb);
+  margin: 0 -32px;
+  /* Ajuste fino para compensar as margens dos botões */
+  transform: translateY(15px);
+  /* Alinha perfeitamente ao centro vertical do círculo (32px / 2) */
+  transition: background 0.3s ease;
 }
 
 /* Estados: Ativo (Onde o cliente está agora) */
 .step-item.active .step-circle {
-  background-color: #4f46e5;
-  color: white;
-  box-shadow: 0 0 0 4px #e0e7ff;
+  border-color: var(--color-brand, #4f46e5);
+  background: var(--color-brand, #4f46e5);
+  color: #ffffff;
+  /* Adiciona o foco sutil se a variável existir, senão usa o padrão */
+  box-shadow: 0 0 0 4px var(--color-brand-subtle, #e0e7ff);
 }
 
 .step-item.active .step-name {
-  color: #4f46e5;
-  font-weight: 600;
+  color: var(--color-brand, #4f46e5);
+  font-weight: var(--font-medium, 500);
 }
 
-/* Estados: Completado (Etapas que já passaram) */
+/* ESTADO: COMPLETADO (Etapas que já passaram) */
 .step-item.completed .step-circle {
-  background-color: #10b981;
-  /* Verde */
-  color: white;
+  border-color: var(--color-brand, #4f46e5);
+  background: var(--color-brand, #4f46e5);
+  color: #ffffff;
 }
 
+.step-item.completed .step-name {
+  color: var(--color-brand, #4f46e5);
+  font-weight: var(--font-medium, 500);
+}
+
+/* A linha fica ativa quando passa pelo passo corrente */
 .step-line.active {
-  background-color: #10b981;
+  background: var(--color-brand, #4f46e5);
 }
 
 /* Tela de Seleção de Serviços */
@@ -170,15 +225,25 @@
   gap: 1.5rem;
 }
 
+.page-header {
+  text-align: center;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 24px 0;
+  width: 100%;
+}
+
 .page-header h2 {
-  font-size: 1.25rem;
+  font-size: var(--text-xl);
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text);
 }
 
 .page-header p {
-  font-size: 0.9rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
   margin-top: 0.25rem;
 }
 
@@ -259,21 +324,27 @@
 }
 
 .select-service-btn {
-  background-color: #4f46e5;
-  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--color-brand);
+  color: #fff;
   border: none;
-  padding: 0.5rem 1.25rem;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.9rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semi);
   cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
 }
 
 /* Lista de serviços comuns (Linhas mais simples) */
 .services-list {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
 }
 
@@ -281,9 +352,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.25rem;
+  gap: 10px;
+  padding: 16px;
   cursor: pointer;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 2px solid var(--color-primary-50);
   transition: background-color 0.15s;
 }
 
@@ -292,7 +364,7 @@
 }
 
 .service-row:hover {
-  background-color: #f9fafb;
+  background-color: var(--color-primary-50);
 }
 
 .service-row .service-price-action {
@@ -328,6 +400,14 @@
   .quick-dates-grid {
     grid-template-columns: repeat(3, 1fr);
     /* 3 colunas em telas muito pequenas */
+  }
+
+  .step-item {
+    min-width: 72px;
+  }
+
+  .step-name {
+    font-size: 10px;
   }
 }
 
@@ -430,29 +510,33 @@
 .time-page-container {
   display: flex;
   flex-direction: column;
+  box-shadow: var(--shadow-md);
   gap: 1.5rem;
 }
 
-.time-section {
-  background: white;
-  padding: 1.25rem;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
+.time-page-container h2 {
+  margin-bottom: 30px;
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-text);
 }
 
-.turno-title {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #4b5563;
-  margin-bottom: 0.75rem;
+.time-section {
+  text-align: center;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 24px;
 }
 
 /* Grid de Horários */
 .time-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   /* 4 colunas de horários */
   gap: 0.5rem;
+  margin-bottom: 48px;
 }
 
 @media (max-width: 400px) {
@@ -464,28 +548,26 @@
 
 .time-slot-btn {
   padding: 0.6rem 0;
-  background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #111827;
+  background-color: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-base);
+  font-weight: 600;
   cursor: pointer;
   text-align: center;
   transition: all 0.15s ease;
 }
 
 .time-slot-btn:hover:not(:disabled) {
-  border-color: #4f46e5;
-  background-color: #f5f3ff;
-  color: #4f46e5;
+  border-color: var(--color-primary-600);
+  background-color: var(--color-primary-50);
+  color: var(--color-primary-600);
 }
 
 .time-slot-btn.selected {
-  background-color: #4f46e5;
-  border-color: #4f46e5;
-  color: white;
-  font-weight: 600;
+  background-color: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+  color: var(--color-primary-50);
 }
 
 /* Estado Desabilitado (Horário já agendado/indisponível) */
@@ -559,68 +641,39 @@
 }
 
 .submit-form-btn {
-  background-color: #4f46e5;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  border: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 20px;
+  color: var(--color-primary-50);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-primary-600);
   cursor: pointer;
-  font-size: 0.95rem;
-  transition: background-color 0.15s;
+  transition: background 0.15s;
 }
 
 .submit-form-btn:hover {
   background-color: #4338ca;
 }
 
-/* Tela de Resumo Final */
-.summary-page-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
 .summary-card {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
+  margin: 30px 0;
+  font-size: var(--text-lg);
 }
 
-.summary-section {
-  padding: 1.25rem;
-  border-bottom: 1px solid #f3f4f6;
+.summary-card p{
+  font-size: var(--text-base);
 }
 
-.summary-section:last-child {
-  border-bottom: none;
-}
-
-.summary-section h4 {
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #6b7280;
-  margin-bottom: 0.75rem;
-  font-weight: 600;
-}
-
-.summary-business-tag {
-  font-size: 0.8rem;
-  color: #6b7280;
-}
-
-.text-center {
-  text-align: center;
-  background-color: #fcfcff;
-}
-
-.summary-row-item {
+.summary-btns {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  gap: 15px;
+  padding: 0 24px;
 }
 
 .item-title {
@@ -681,21 +734,21 @@
 }
 
 .confirm-booking-btn {
-  background-color: #10b981;
-  /* Verde Sucesso */
-  color: white;
-  padding: 0.85rem 1.75rem;
-  border-radius: 8px;
-  font-weight: 700;
-  border: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 20px;
+  color: var(--color-primary-50);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  border-radius: var(--radius-md);
+  background: var(--color-success-600);
   cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.15s;
-  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+  transition: background 0.15s;
 }
 
 .confirm-booking-btn:hover:not(:disabled) {
-  background-color: #059669;
+  background-color: var(--color-success-700);
 }
 
 .confirm-booking-btn:disabled,

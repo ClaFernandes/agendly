@@ -40,7 +40,6 @@ export default function ServicePage() {
                   currency: "EUR",
                 })}
               </span>
-              <button className="select-service-btn">Escolher</button>
             </div>
           </div>
         ))}

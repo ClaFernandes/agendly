@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useBooking } from "../../context/BookingContext";
 import { supabase } from "../../lib/supabase";
+import { FiArrowLeft, FiCheck } from "react-icons/fi";
 
 export default function SummaryPage() {
   const navigate = useNavigate();
@@ -45,8 +46,8 @@ export default function SummaryPage() {
   };
 
   return (
-    <div className="summary-page-container">
-      <h2>Confirme seu Agendamento</h2>
+    <div className="page-header">
+      <h2>Revisa o teu Agendamento</h2>
       <div className="summary-card">
         <h3>{business?.name}</h3>
         <p>
@@ -60,17 +61,21 @@ export default function SummaryPage() {
           <strong>Nome:</strong> {clientData.client_name}
         </p>
       </div>
-      <div>
-        <Link to="../form" className="back-btn">
-          ← Voltar
-        </Link>
+      <div className="summary-btns">
+        <button 
+            type="button"
+            className="onboarding-btn-back"
+            onClick={()=> navigate("../form")}
+          >
+            <FiArrowLeft/> Voltar
+          </button>
 
         <button
           onClick={handleConfirmAppointment}
           disabled={isSubmitting}
           className="confirm-booking-btn"
         >
-          {isSubmitting ? "A processar..." : "Confirmar Agendamento ✓"}
+          {isSubmitting ? "A processar..." : "Confirmar Agendamento"} {<FiCheck/> } 
         </button>
       </div>
     </div>
