@@ -1,0 +1,135 @@
+/* ==========================================================================
+   TELA DE SELEÇÃO DE DATA - CALENDÁRIO PERSONALIZADO
+   ========================================================================== */
+
+.custom-calendar-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 1.25rem;
+}
+
+/* Topo do calendário */
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.calendar-month-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text);
+  text-transform: capitalize;
+}
+
+.calendar-nav-btn {
+  border: none;
+  color: #374151;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.calendar-nav-btn:hover:not(:disabled) {
+  color: #111827;
+}
+
+.calendar-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Linha dos cabeçalhos dos dias (Seg a Dom) */
+.calendar-weekdays-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.calendar-weekdays-grid span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  padding: 0.5rem 0;
+}
+
+/* Grade de Células dos Dias */
+.calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 48px;
+}
+
+/* Célula Base (Quadradinho) */
+.calendar-cell {
+  aspect-ratio: 1 / 1; /* Garante quadradinhos perfeitos */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.blank-cell {
+  background: transparent;
+}
+
+.day-btn {
+  background-color: var(--color-primary-50);
+  border: 1px solid var(--color-primary-400);
+  color: var(--color-primary-700);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+/* Efeito Hover em dias válidos */
+.day-btn:hover:not(:disabled) {
+  background-color: var(--color-primary-400);
+  color:var(--color-primary-50);
+}
+
+/* REQUISITO: Dia Selecionado ativo */
+.selected-day {
+  background-color: var(--color-primary-400) !important;
+  color: var(--color-primary-50) !important;
+  font-weight: 700;
+}
+
+/* REQUISITO: Dias já passados */
+.past-day:disabled {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-subtle); 
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* REQUISITO: Dias sem horários na tabela (Fechado) */
+.no-hours-day:disabled {
+  background-color: var(--color-warning-50); /* Vermelho/Rosa sutil de indisponível */
+  border-color: var(--color-warning-400);;
+  color: var(--color-warning-600);; /* Texto em tom vermelho muted */
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.loading-calendar {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  font-size: 0.95rem;
+}

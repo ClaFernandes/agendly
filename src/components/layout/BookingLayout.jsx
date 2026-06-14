@@ -2,8 +2,10 @@
 
 import { Outlet } from "react-router-dom"; //incluir depois: useParams
 import "../../pages/public-booking/PublicBooking.css";
+import "../../pages/public-booking/DateCalendar.css";
 import StepProgress from "../../pages/public-booking/StepProgress";
 import { useBooking } from "../../context/BookingContext";
+import logo from "../../assets/logo.svg";
 
 export default function BookingLayout() {
   const bookingContext = useBooking();
@@ -28,34 +30,44 @@ export default function BookingLayout() {
       </div>
     );
 
+  let nameInitials = business.name;
+
+  function getInitials(nameInitials) {
+    if (!nameInitials) return "?";
+    const stopWords = new Set(["do", "da", "de", "dos", "das", "e", "o", "a"]);
+    const words = nameInitials
+      .trim()
+      .split(/\s+/)
+      .filter((w) => !stopWords.has(w.toLowerCase()));
+    if (words.length === 0) return nameInitials.slice(0, 2).toUpperCase();
+    if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+    return (words[0][0] + words[1][0]).toUpperCase();
+  }
+  nameInitials = (getInitials(nameInitials))
+
   return (
     <div className="booking-container">
       <header className="booking-header">
-        <div className="business-logo">
-          {business.logo_url ? (
-            <img src={business.logo_url} alt={business.name} /> && (
-              <h1>{business.name}</h1>
-            )
-          ) : (
-            <h1>{business.name}</h1>
-          )}
+        <div className="business">
+          <div className="business-logo">
+            {business.logo_url !== null ? (
+              <img src={business.logo_url} alt={business.name} />
+            ) : (
+              <div className="business-initials">{nameInitials}</div>
+            )}
+          </div>
+          <h1>{business.name}</h1>
         </div>
-        <p>
-          {business.description ||
-            "Selecione os dados para realizar o seu agendamento"}
-        </p>
+
+        <div className="business-description">
+          {business.description || ""}
+        </div>
       </header>
 
       <main className="booking-content">
         <StepProgress />
         <Outlet />
-      </main>
-
-      <footer className="booking-footer">
-        <p>
-          Desenvolvido por <strong>Agendly</strong>
-        </p>
-      </footer>
+      </main>      
     </div>
   );
 }

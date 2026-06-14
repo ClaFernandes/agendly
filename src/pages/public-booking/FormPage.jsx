@@ -1,11 +1,12 @@
 // src/pages/public-booking/FormPage.jsx
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useBooking } from "../../context/BookingContext"; // 👈 Importar o contexto
+import { useBooking } from "../../context/BookingContext";
+import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
 
 export default function FormPage() {
   const navigate = useNavigate();
-  const { clientData, setClientData } = useBooking(); // 👈 Puxar estado global
+  const { clientData, setClientData } = useBooking(); 
 
   // Inicia o state local com os dados globais (útil se o cliente andar para trás e para a frente)
   const [formData, setFormData] = useState({
@@ -22,7 +23,6 @@ export default function FormPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // 🎯 AQUI É A CHAVE: Gravar os dados no Contexto Global para o Summary usar
     setClientData(formData);
     navigate("../summary");
   };
@@ -87,11 +87,19 @@ export default function FormPage() {
         </div>
 
         <div className="form-actions-row">
-          <Link to="../time" className="back-btn">
-            ← Voltar
-          </Link>
-          <button type="submit" className="submit-form-btn">
-            Ver Resumo →
+          <button 
+            type="button"
+            className="onboarding-btn-back"
+            onClick={()=> navigate("../time")}
+          >
+            <FiArrowLeft/> Voltar
+          </button>
+          
+          <button 
+            type="submit" 
+            className="submit-form-btn"
+          >
+            Ver Resumo <FiArrowRight/>
           </button>
         </div>
       </form>

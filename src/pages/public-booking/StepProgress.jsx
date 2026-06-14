@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useLocation } from "react-router-dom";
+import { FiCheck } from "react-icons/fi";
 
 export default function StepProgress() {
   const location = useLocation();
@@ -12,9 +13,9 @@ export default function StepProgress() {
     { id: 1, name: "Serviço", path: "" }, // Rota index (/:slug)
     { id: 2, name: "Data", path: "/date" },
     { id: 3, name: "Horário", path: "/time" },
-    { id: 4, name: "Dados", path: "/form" },
-    { id: 5, name: "Confirmar", path: "/summary" },
-    { id: 6, name: "Confirmar", path: "/confirm" },
+    { id: 4, name: "Informações", path: "/form" },
+    { id: 5, name: "Resumo", path: "/summary" },
+    { id: 6, name: "Concluído", path: "/confirm" },
   ];
 
   // Função para descobrir qual etapa está ativa olhando o final da URL
@@ -26,7 +27,7 @@ export default function StepProgress() {
           !currentPath.endsWith("/date") &&
           !currentPath.endsWith("/time") &&
           !currentPath.endsWith("/form") &&
-          !currentPath.endsWith("summary") &&
+          !currentPath.endsWith("/summary") &&
           !currentPath.endsWith("/confirm")
         );
       }
@@ -55,7 +56,7 @@ export default function StepProgress() {
             <div
               className={`step-item ${isActive ? "active" : ""} ${isCompleted ? "completed" : ""}`}
             >
-              <div className="step-circle">{isCompleted ? "✓" : step.id}</div>
+              <div className="step-circle">{isCompleted ? <FiCheck/> : step.id}</div>
               <span className="step-name">{step.name}</span>
             </div>
           </React.Fragment>

@@ -245,7 +245,7 @@ export default function Onboarding() {
         id: user.id,
         name,
         slug,
-        phone: phone || null,
+        phone: phone,
         description: description || null,
         logo_url: logoUrl,
         is_active: true,
@@ -441,7 +441,7 @@ export default function Onboarding() {
             </div>
 
             <div className="onboarding-field">
-              <label htmlFor="phone">Telefone</label>
+              <label htmlFor="phone">Telefone *</label>
               <div className="onboarding-input-wrapper">
                 <FiPhone className="onboarding-input-icon" />
                 <input
@@ -452,6 +452,7 @@ export default function Onboarding() {
                     setPhone(e.target.value.replace(/[^\d\s+]/g, ""))
                   }
                   placeholder="+351 123456789"
+                  required
                 />
               </div>
               {phone && !/^\+?[\d\s\-()]{8,20}$/.test(phone) && (

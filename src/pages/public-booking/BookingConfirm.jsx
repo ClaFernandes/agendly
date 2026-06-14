@@ -3,7 +3,12 @@
 export default function BookingConfirm() {
   return (
     <>
-      <p>Foi enviado um email para (email)</p>
+      <div className="page-header">
+        <h2>Agendamento feito com sucesso!</h2>
+        <div>
+          <p>Um resumo foi enviado para: (email)</p>
+        </div>
+      </div>
     </>
   );
 }

@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useBooking } from "../../context/BookingContext";
 import { generateSlots, filterAvailableSlots } from "../../lib/slots";
 import { supabase } from "../../lib/supabase";
+import { FiArrowLeft } from "react-icons/fi";
 
 export default function TimePage() {
   const navigate = useNavigate();
@@ -20,13 +21,13 @@ export default function TimePage() {
         const dateObj = new Date(`${selectedDate}T00:00:00`);
         const dayOfWeek = dateObj.getDay();
 
-        // 1. Agora buscamos TODOS os turnos para aquele dia (sem o maybeSingle)
+        // 1. Buscamos TODOS os turnos para aquele dia
         const { data: hoursData, error: hoursError } = await supabase
           .from("working_hours")
           .select("start_time, end_time")
           .eq("business_id", business.id)
           .eq("day_of_week", dayOfWeek)
-          .eq("is_active", true); // Filtra apenas os ativos
+          .eq("is_active", true);
 
         if (hoursError) throw hoursError;
 
@@ -46,7 +47,7 @@ export default function TimePage() {
           allPossibleSlots = [...allPossibleSlots, ...turnoSlots];
         });
 
-        // 3. Buscar agendamentos (igual ao que já tinhas)
+        // 3. Buscar agendamentos existentes
         const startOfDay = new Date(`${selectedDate}T00:00:00`).toISOString();
         const endOfDay = new Date(`${selectedDate}T23:59:59`).toISOString();
 
@@ -84,54 +85,39 @@ export default function TimePage() {
     navigate("../form");
   };
 
-  const morningSlots = slots.filter((s) => s.time < "12:00");
-  const afternoonSlots = slots.filter((s) => s.time >= "12:00");
-
   if (loadingSlots) return <div>A procurar horários disponíveis...</div>;
 
   return (
     <div className="time-page-container">
-      <h2>Escolha o Horário</h2>
-
       {slots.length === 0 && !loadingSlots ? (
         <div className="closed-message">Sem horários disponíveis. Seleciona outra data.</div>
       ) : (
-        <>
-          <div className="time-section">
-            <h3>🌅 Manhã</h3>
-            <div className="time-grid">
-              {morningSlots.map((slot) => (
-                <button
-                  key={slot.time}
-                  className={`time-slot-btn ${selectedTime === slot.time ? "selected" : ""}`}
-                  disabled={!slot.available}
-                  onClick={() => handleSelectTime(slot.time)}
-                >
-                  {slot.time}
-                </button>
-              ))}
-            </div>
+        <div className="time-section">
+          <h2>Horários Disponíveis</h2>
+          <div className="time-grid">
+            {slots.map((slot) => (
+              <button
+                key={slot.time}
+                className={`time-slot-btn ${selectedTime === slot.time ? "selected" : ""}`}
+                disabled={!slot.available}
+                onClick={() => handleSelectTime(slot.time)}
+              >
+                {slot.time}
+              </button>
+            ))}
           </div>
-
-          <div className="time-section">
-            <h3>☀️ Tarde</h3>
-            <div className="time-grid">
-              {afternoonSlots.map((slot) => (
-                <button
-                  key={slot.time}
-                  className={`time-slot-btn ${selectedTime === slot.time ? "selected" : ""}`}
-                  disabled={!slot.available}
-                  onClick={() => handleSelectTime(slot.time)}
-                >
-                  {slot.time}
-                </button>
-              ))}
-            </div>
+          <div className="page-actions">
+            <button
+              type="button"
+              className="onboarding-btn-back"
+              onClick={() => navigate("../date")}
+            >
+              <FiArrowLeft /> Voltar
+            </button>
           </div>
-        </>
+        </div>
       )}
 
-      <Link to="../date" className="back-btn">← Voltar</Link>
     </div>
   );
 }
