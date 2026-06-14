@@ -1,7 +1,7 @@
 // src/pages/auth/AdminLogin.jsx
 
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabase";
 
@@ -12,6 +12,7 @@ import {
   FiLock,
   FiArrowLeft,
   FiCheck,
+  FiUserPlus,
 } from "react-icons/fi";
 
 import logo from "../../assets/logo.svg";
@@ -19,7 +20,8 @@ import "./Auth.css";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
-  const { login, recoverPassword, user, userRole } = useAuth();
+  const location = useLocation();
+  const { login, user, userRole, userStatus, recoverPassword } = useAuth();
 
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
@@ -29,13 +31,16 @@ export default function AdminLogin() {
   const [success, setSuccess] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Redireciona se detetar sessão de admin ativa
+  const successMessage = location.state?.success;
+
+  // Redireciona se detetar sessão de admin ativa e aprovada
   useEffect(() => {
-    if (user && userRole === "admin") {
+    if (user && userRole === "admin" && userStatus === "active") {
       navigate("/admin", { replace: true });
     }
-  }, [user, userRole, navigate]);
+  }, [user, userRole, userStatus, navigate]);
 
+  // Submete o login de admin
   async function handleAdminLogin(e) {
     e.preventDefault();
     setError(null);
@@ -43,29 +48,47 @@ export default function AdminLogin() {
 
     try {
       await login(email, password);
-      // Verifica se o utilizador é admin
+
+      // Verifica role e status do utilizador após login
       const { data: userData } = await supabase.auth.getUser();
       const { data: profile } = await supabase
         .from("profiles")
-        .select("role")
+        .select("role, status")
         .eq("id", userData.user.id)
         .single();
 
+      // Bloqueia se não for admin
       if (profile?.role !== "admin") {
-        // Faz logout imediato — não deixa provider ficar autenticado aqui
         await supabase.auth.signOut();
         setError("Acesso restrito a administradores.");
+        return;
       }
-      // Se for admin, o useEffect acima trata do redirect
+
+      // Bloqueia se ainda não foi aprovado
+      if (profile?.status === "pending") {
+        await supabase.auth.signOut();
+        setError(
+          "A tua conta está a aguardar aprovação pelo administrador principal.",
+        );
+        return;
+      }
+
+      // Bloqueia se foi rejeitado
+      if (profile?.status === "rejected") {
+        await supabase.auth.signOut();
+        setError(
+          "O teu pedido de acesso foi rejeitado. Contacta o administrador.",
+        );
+        return;
+      }
     } catch {
-      setError(
-        "Credenciais administrativas inválidas ou acesso não autorizado.",
-      );
+      setError("Credenciais inválidas ou acesso não autorizado.");
     } finally {
       setLoading(false);
     }
   }
 
+  // Submete o pedido de recuperação de password
   async function handleRecover(e) {
     e.preventDefault();
     setError(null);
@@ -82,6 +105,14 @@ export default function AdminLogin() {
     } finally {
       setLoading(false);
     }
+  }
+
+  // Volta ao modo login e limpa estado
+  function backToLogin() {
+    setMode("login");
+    setError(null);
+    setSuccess(null);
+    setEmail("");
   }
 
   return (
@@ -107,13 +138,13 @@ export default function AdminLogin() {
               <FiCheck /> Gestão e suporte de prestadores
             </li>
             <li>
-              <FiCheck /> Acesso controlado por convite
+              <FiCheck /> Acesso controlado por aprovação
             </li>
           </ul>
         </div>
       </div>
 
-      {/* Coluna direita */}
+      {/* Coluna direita — formulário */}
       <div className="auth-form-side">
         <div className="auth-card">
           <Link to="/" className="auth-brand">
@@ -121,7 +152,7 @@ export default function AdminLogin() {
             <span>Agendly</span>
           </Link>
 
-          {/* Formulário de login */}
+          {/* Login */}
           {mode === "login" && (
             <>
               <h2>Autenticação Segura</h2>
@@ -130,6 +161,13 @@ export default function AdminLogin() {
               </p>
 
               {error && <p className="auth-error">{error}</p>}
+
+              {/* Mensagem de sucesso vinda do registo ou recuperação */}
+              {successMessage && (
+                <div className="auth-success-box">
+                  <p>{successMessage}</p>
+                </div>
+              )}
 
               <form onSubmit={handleAdminLogin}>
                 <div className="auth-field">
@@ -172,7 +210,7 @@ export default function AdminLogin() {
                   </div>
                 </div>
 
-                {/* Link para recuperar password */}
+                {/* Link para recuperação de password */}
                 <button
                   type="button"
                   className="auth-link"
@@ -189,6 +227,14 @@ export default function AdminLogin() {
                 </button>
               </form>
 
+              {/* Link para pedir acesso */}
+              <p className="auth-footer">
+                Queres ser administrador?{" "}
+                <Link to="/admin/register" className="auth-link">
+                  <FiUserPlus /> Pedir acesso
+                </Link>
+              </p>
+
               <p className="auth-footer">
                 <Link to="/" className="auth-link">
                   <FiArrowLeft /> Voltar à Página Inicial
@@ -197,7 +243,7 @@ export default function AdminLogin() {
             </>
           )}
 
-          {/* Formulário de recuperação */}
+          {/* Modo Recuperação */}
           {mode === "recover" && (
             <>
               <div className="auth-lock-icon">
@@ -205,9 +251,10 @@ export default function AdminLogin() {
               </div>
               <h2>Recuperar acesso</h2>
               <p className="auth-subtitle">
-                Introduz o email da tua conta e enviamos-te um link
+                Introduz o email da tua conta de administrador
               </p>
 
+              {/* Confirmação de envio */}
               {success ? (
                 <div className="auth-success-box">
                   <FiMail className="auth-success-icon" />
@@ -221,47 +268,39 @@ export default function AdminLogin() {
                   <div className="auth-info">
                     <FiMail />
                     <p>
-                      Receberás um email com um link para criar uma nova
-                      palavra-passe. O link expira em 1 hora.
+                      Receberás um link para criar uma nova palavra-passe. O
+                      link expira em 1 hora.
                     </p>
                   </div>
                 </>
               )}
 
-              <form onSubmit={handleRecover}>
-                <div className="auth-field">
-                  <label htmlFor="recover-email">Email da conta</label>
-                  <div className="auth-input-wrapper">
-                    <FiMail className="auth-input-icon" />
-                    <input
-                      id="recover-email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="admin@mail.com"
-                      required
-                      disabled={!!success}
-                    />
+              {/* Formulário de recuperação */}
+              {!success && (
+                <form onSubmit={handleRecover}>
+                  <div className="auth-field">
+                    <label htmlFor="recover-email">Email da conta</label>
+                    <div className="auth-input-wrapper">
+                      <FiMail className="auth-input-icon" />
+                      <input
+                        id="recover-email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="admin@mail.com"
+                        required
+                        autoFocus
+                      />
+                    </div>
                   </div>
-                </div>
 
-                {!success && (
                   <button type="submit" className="auth-btn" disabled={loading}>
                     {loading ? "A enviar..." : "Enviar link de recuperação"}
                   </button>
-                )}
-              </form>
+                </form>
+              )}
 
-              <button
-                type="button"
-                className="auth-link"
-                onClick={() => {
-                  setMode("login");
-                  setError(null);
-                  setSuccess(null);
-                  setEmail("");
-                }}
-              >
+              <button type="button" className="auth-link" onClick={backToLogin}>
                 <FiArrowLeft /> Voltar ao Login
               </button>
             </>

@@ -1,3 +1,5 @@
+// src/routes/AppRoutes.jsx
+
 import { Routes, Route } from "react-router-dom";
 
 import ProtectedRoute from "./ProtectedRoute";
@@ -7,6 +9,7 @@ import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import AdminLogin from "../pages/auth/AdminLogin";
 import UpdatePassword from "../pages/auth/UpdatePassword";
+import AdminRegister from "../pages/auth/AdminRegister";
 
 import Onboarding from "../pages/onboarding/Onboarding";
 
@@ -42,8 +45,9 @@ function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="login" element={<Login />} />
       <Route path="register" element={<Register />} />
-      <Route path="admin/login" element={<AdminLogin />} />
       <Route path="update-password" element={<UpdatePassword />} />
+      <Route path="admin/login" element={<AdminLogin />} />
+      <Route path="admin/register" element={<AdminRegister />} />
 
       <Route
         path="onboarding"

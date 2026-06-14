@@ -1,7 +1,5 @@
 // src/pages/onboarding/Onboarding.jsx
 
-// src/pages/onboarding/Onboarding.jsx
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -335,12 +333,12 @@ export default function Onboarding() {
       prev.map((h) =>
         h.day_of_week === dayId
           ? {
-            ...h,
-            intervals: [
-              ...h.intervals,
-              { start_time: "09:00", end_time: "18:00" },
-            ],
-          }
+              ...h,
+              intervals: [
+                ...h.intervals,
+                { start_time: "09:00", end_time: "18:00" },
+              ],
+            }
           : h,
       ),
     );

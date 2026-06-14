@@ -197,8 +197,7 @@ textarea::placeholder {
 
 /* Utilitários */
 
-/* texto cortado com reticências (...)
-   Texto maior que o espaço disponível. Ex: <p class="truncate">Nome muito longo...</p> */
+/* texto cortado com reticências (...) - para texto maior que o espaço disponível*/
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;

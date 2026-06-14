@@ -29,7 +29,10 @@ function generateSlug(value) {
 function getInitials(name) {
   if (!name) return "?";
   const stopWords = new Set(["do", "da", "de", "dos", "das", "e", "o", "a"]);
-  const words = name.trim().split(/\s+/).filter((w) => !stopWords.has(w.toLowerCase()));
+  const words = name
+    .trim()
+    .split(/\s+/)
+    .filter((w) => !stopWords.has(w.toLowerCase()));
   if (words.length === 0) return name.slice(0, 2).toUpperCase();
   if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
   return (words[0][0] + words[1][0]).toUpperCase();
@@ -62,6 +65,7 @@ export default function Settings() {
   // Preenche o formulário com os dados atuais do negócio
   useEffect(() => {
     if (!business) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setName(business.name ?? "");
     setSlug(business.slug ?? "");
     setPhone(business.phone ?? "");
@@ -140,7 +144,9 @@ export default function Settings() {
       .from("business-assets")
       .upload(path, logoFile, { upsert: true, contentType: logoFile.type });
     if (uploadError) throw uploadError;
-    const { data } = supabase.storage.from("business-assets").getPublicUrl(path);
+    const { data } = supabase.storage
+      .from("business-assets")
+      .getPublicUrl(path);
     return data.publicUrl;
   }
 
@@ -218,7 +224,6 @@ export default function Settings() {
 
   return (
     <div className="db-page">
-
       {/* Cabeçalho */}
       <div className="pg-header">
         <div>
@@ -235,7 +240,9 @@ export default function Settings() {
 
       {/* Feedback de erro e sucesso */}
       {error && <p className="set-error">{error}</p>}
-      {success && <p className="set-success">Alterações guardadas com sucesso!</p>}
+      {success && (
+        <p className="set-success">Alterações guardadas com sucesso!</p>
+      )}
 
       {/* Link público com botão de abrir */}
       {publicUrl && (
@@ -255,8 +262,7 @@ export default function Settings() {
             </a>
           </div>
         </div>
-      )
-      }
+      )}
 
       {/* Identidade visual — logo */}
       <div className="pg-section">
@@ -274,9 +280,7 @@ export default function Settings() {
                 className="set-logo-img"
               />
             ) : (
-              <div className="set-logo-initials">
-                {getInitials(name)}
-              </div>
+              <div className="set-logo-initials">{getInitials(name)}</div>
             )}
           </div>
 
@@ -316,7 +320,6 @@ export default function Settings() {
         </div>
 
         <div className="set-form">
-
           {/* Nome */}
           <div className="set-field">
             <label htmlFor="set-name" className="set-label">
@@ -406,7 +409,6 @@ export default function Settings() {
               className="set-textarea"
             />
           </div>
-
         </div>
       </div>
 
@@ -417,7 +419,6 @@ export default function Settings() {
           {saving ? "A guardar..." : "Guardar alterações"}
         </button>
       </div>
-
-    </div >
+    </div>
   );
 }

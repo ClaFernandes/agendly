@@ -5,7 +5,6 @@ import { FiCalendar, FiUsers, FiBarChart2, FiCheck } from "react-icons/fi";
 import logo from "../assets/logo.svg";
 import "./Home.css";
 
-// Funcionalidades principais
 const features = [
   {
     icon: <FiCalendar />,

@@ -1,15 +1,12 @@
 /* src/components/layout/AdminLayout.css */
-/* Estilos do layout base do painel de administração.
-   Sidebar fixa à esquerda + área de conteúdo com scroll. */
 
-/* ─── Wrapper geral ─────────────────────────────────────────────────────── */
 .admin-layout {
     display: flex;
     min-height: 100vh;
     background-color: var(--color-page-bg);
 }
 
-/* ─── Sidebar ───────────────────────────────────────────────────────────── */
+/* Sidebar */
 .admin-sidebar {
     width: 220px;
     flex-shrink: 0;
@@ -25,7 +22,7 @@
     overflow: hidden;
 }
 
-/* Logo / título */
+/* Logo + título */
 .admin-sidebar-brand {
     display: flex;
     align-items: center;
@@ -155,7 +152,7 @@
     flex-shrink: 0;
 }
 
-/* ─── Área de conteúdo ──────────────────────────────────────────────────── */
+/* Área de conteúdo */
 .admin-content {
     margin-left: 220px;
     flex: 1;
@@ -164,7 +161,7 @@
     max-width: 1200px;
 }
 
-/* ─── Responsividade básica ─────────────────────────────────────────────── */
+/* Responsividade básica */
 @media (max-width: 900px) {
     .admin-sidebar {
         width: 64px;

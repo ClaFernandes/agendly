@@ -1,6 +1,12 @@
 // src/context/BusinessContext.jsx
 
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "./AuthContext";
 
@@ -19,7 +25,7 @@ export function BusinessProvider({ children }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    async function fetchBusiness() {
+    async function load() {
       if (!user || userRole !== "provider") {
         setBusiness(null);
         setLoading(false);
@@ -49,22 +55,42 @@ export function BusinessProvider({ children }) {
       setLoading(false);
     }
 
-    fetchBusiness();
+    load();
+  }, [user, userRole]);
+
+  const refresh = useCallback(async () => {
+    if (!user || userRole !== "provider") return;
+
+    setLoading(true);
+    setError(null);
+
+    const { data, error } = await supabase
+      .from("business")
+      .select("*")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (error) {
+      if (error.code === "PGRST116") {
+        setBusiness(null);
+      } else {
+        setError(error.message);
+      }
+    } else {
+      setBusiness(data);
+    }
+
+    setLoading(false);
   }, [user, userRole]);
 
   function updateBusiness(updatedFields) {
     setBusiness((prev) => ({ ...prev, ...updatedFields }));
   }
 
-  const value = {
-    business,
-    loading,
-    error,
-    updateBusiness,
-  };
-
   return (
-    <BusinessContext.Provider value={value}>
+    <BusinessContext.Provider
+      value={{ business, loading, error, updateBusiness, refresh }}
+    >
       {children}
     </BusinessContext.Provider>
   );
