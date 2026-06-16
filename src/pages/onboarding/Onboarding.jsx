@@ -22,13 +22,13 @@ import logo from "../../assets/logo.svg";
 import "./Onboarding.css";
 
 const DAYS = [
-  { id: 0, label: "Domingo" },
   { id: 1, label: "Segunda" },
   { id: 2, label: "Terça" },
   { id: 3, label: "Quarta" },
   { id: 4, label: "Quinta" },
   { id: 5, label: "Sexta" },
   { id: 6, label: "Sábado" },
+  { id: 0, label: "Domingo" },
 ];
 
 const initialHours = DAYS.map((day) => ({
@@ -333,12 +333,12 @@ export default function Onboarding() {
       prev.map((h) =>
         h.day_of_week === dayId
           ? {
-              ...h,
-              intervals: [
-                ...h.intervals,
-                { start_time: "09:00", end_time: "18:00" },
-              ],
-            }
+            ...h,
+            intervals: [
+              ...h.intervals,
+              { start_time: "09:00", end_time: "18:00" },
+            ],
+          }
           : h,
       ),
     );

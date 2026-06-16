@@ -196,57 +196,6 @@
     width: 100%;
 }
 
-/* Google */
-.auth-google-btn {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 11px 16px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border-strong);
-    border-radius: var(--radius-md);
-    font-size: var(--text-sm);
-    font-weight: var(--font-medium);
-    color: var(--color-text);
-    cursor: pointer;
-    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
-    margin-bottom: 16px;
-}
-
-.auth-google-btn:hover {
-    background: var(--color-surface-2);
-    box-shadow: var(--shadow-sm);
-}
-
-.auth-google-icon {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-}
-
-/* Divisor ou */
-.auth-divider {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    color: var(--color-text-subtle);
-    font-size: var(--text-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.auth-divider::before,
-.auth-divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--color-border);
-}
-
 /* Inputs */
 form {
     width: 100%;

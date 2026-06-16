@@ -8,6 +8,7 @@ import {
   RiStarLine,
   RiStarFill,
   RiScissorsCutLine,
+  RiAlertLine,
 } from "react-icons/ri";
 import { useServices } from "../../hooks/useServices";
 import "./Dashboard.css";
@@ -20,28 +21,27 @@ const EMPTY_FORM = {
   active: true,
 };
 
+// ── Modal de criar/editar serviço ─────────────────────────────────
+
 function ServiceModal({ service, saving, onClose, onSubmit }) {
   const isEditing = Boolean(service);
 
   const [form, setForm] = useState(
     isEditing
       ? {
-        name: service.name,
-        description: service.description || "",
-        duration_min: service.duration_min,
-        price: service.price,
-        active: service.active,
-      }
+          name: service.name,
+          description: service.description || "",
+          duration_min: service.duration_min,
+          price: service.price,
+          active: service.active,
+        }
       : EMPTY_FORM,
   );
   const [formError, setFormError] = useState(null);
 
   function handleChange(e) {
     const { name, value, type, checked } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    setForm(prev => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
   }
 
   async function handleSubmit(e) {
@@ -71,7 +71,7 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
     <div className="modal-overlay" onClick={onClose}>
       <div
         className="modal"
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
@@ -80,13 +80,7 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
           <h2 id="modal-title" className="modal-title">
             {isEditing ? "Editar serviço" : "Novo serviço"}
           </h2>
-          <button
-            className="modal-close"
-            onClick={onClose}
-            aria-label="Fechar modal"
-          >
-            ×
-          </button>
+          <button className="modal-close" onClick={onClose} aria-label="Fechar modal">×</button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
@@ -166,10 +160,7 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
                 onChange={handleChange}
                 className="form-checkbox"
               />
-              <label
-                htmlFor="svc-active"
-                className="form-label form-label--inline"
-              >
+              <label htmlFor="svc-active" className="form-label form-label--inline">
                 Serviço ativo
               </label>
             </div>
@@ -178,20 +169,11 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
           {formError && <p className="form-error">{formError}</p>}
 
           <div className="modal-actions">
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={onClose}
-              disabled={saving}
-            >
+            <button type="button" className="btn-secondary" onClick={onClose} disabled={saving}>
               Cancelar
             </button>
             <button type="submit" className="btn-primary" disabled={saving}>
-              {saving
-                ? "A guardar..."
-                : isEditing
-                  ? "Guardar alterações"
-                  : "Criar serviço"}
+              {saving ? "A guardar..." : isEditing ? "Guardar alterações" : "Criar serviço"}
             </button>
           </div>
         </form>
@@ -199,6 +181,51 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
     </div>
   );
 }
+
+// ── Modal de confirmação de apagar ────────────────────────────────
+
+function DeleteConfirmModal({ serviceName, saving, onConfirm, onCancel }) {
+  return (
+    <div className="modal-overlay" onClick={onCancel}>
+      <div
+        className="modal modal--sm"
+        onClick={e => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-modal-title"
+      >
+        <div className="modal-header">
+          <h2 id="delete-modal-title" className="modal-title">Apagar serviço</h2>
+          <button className="modal-close" onClick={onCancel} aria-label="Fechar">×</button>
+        </div>
+
+        <div className="delete-modal-body">
+          <div className="delete-modal-icon">
+            <RiAlertLine aria-hidden="true" />
+          </div>
+          <p className="delete-modal-text">
+            Tens a certeza que queres apagar <strong>"{serviceName}"</strong>?
+          </p>
+          <p className="delete-modal-subtext">
+            Esta acção é irreversível e irá remover o serviço permanentemente.
+          </p>
+        </div>
+
+        <div className="modal-actions">
+          <button className="btn-secondary" onClick={onCancel} disabled={saving}>
+            Cancelar
+          </button>
+          <button className="btn-danger" onClick={onConfirm} disabled={saving}>
+            <RiDeleteBinLine aria-hidden="true" />
+            {saving ? "A apagar..." : "Apagar"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Página principal ──────────────────────────────────────────────
 
 export default function Services() {
   const {
@@ -213,8 +240,8 @@ export default function Services() {
     toggleActive,
   } = useServices();
 
-  const [modalMode, setModalMode] = useState(null);
-  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [modalMode, setModalMode]           = useState(null); // null | "new" | serviceObj
+  const [deleteTarget, setDeleteTarget]     = useState(null); // null | serviceObj
 
   async function handleCreate(fields) {
     const result = await createService(fields);
@@ -228,13 +255,14 @@ export default function Services() {
     return result;
   }
 
-  async function handleDelete(id) {
-    await deleteService(id);
-    setConfirmDeleteId(null);
+  async function handleDeleteConfirm() {
+    if (!deleteTarget) return;
+    await deleteService(deleteTarget.id);
+    setDeleteTarget(null);
   }
 
-  const totalServices = services.length;
-  const activeServices = services.filter((s) => s.active).length;
+  const totalServices  = services.length;
+  const activeServices = services.filter(s => s.active).length;
 
   return (
     <div className="db-page">
@@ -270,9 +298,7 @@ export default function Services() {
           <div className="pg-empty">
             <RiScissorsCutLine className="pg-empty-icon" aria-hidden="true" />
             <p className="pg-empty-text">Ainda não tens serviços criados</p>
-            <p className="pg-empty-subtext">
-              Começa por criar o teu primeiro serviço.
-            </p>
+            <p className="pg-empty-subtext">Começa por criar o teu primeiro serviço.</p>
             <button
               className="btn-primary"
               style={{ marginTop: "12px" }}
@@ -298,7 +324,7 @@ export default function Services() {
               </tr>
             </thead>
             <tbody>
-              {services.map((service) => (
+              {services.map(service => (
                 <tr key={service.id} className="svc-row">
                   {/* Nome + duração */}
                   <td className="svc-td-name">
@@ -322,7 +348,7 @@ export default function Services() {
                     €{Number(service.price).toFixed(2)}
                   </td>
 
-                  {/* Estrela */}
+                  {/* Estrela — maior */}
                   <td className="svc-td-center">
                     <button
                       className={`svc-star ${service.is_featured ? "svc-star--on" : "svc-star--off"}`}
@@ -330,53 +356,30 @@ export default function Services() {
                       title={service.is_featured ? "Remover destaque" : "Marcar como destaque"}
                       aria-label={service.is_featured ? "Remover destaque" : "Marcar como destaque"}
                     >
-                      {service.is_featured ? (
-                        <RiStarFill aria-hidden="true" />
-                      ) : (
-                        <RiStarLine aria-hidden="true" />
-                      )}
+                      {service.is_featured
+                        ? <RiStarFill aria-hidden="true" />
+                        : <RiStarLine aria-hidden="true" />}
                     </button>
                   </td>
 
-                  {/* Ações */}
+                  {/* Ações — alinhadas com o th */}
                   <td className="svc-td-actions">
-                    {confirmDeleteId === service.id ? (
-                      <div className="svc-confirm-delete">
-                        <span className="svc-confirm-text">Tens a certeza?</span>
-                        <button
-                          className="svc-action-btn svc-action-btn--danger"
-                          onClick={() => handleDelete(service.id)}
-                          disabled={saving}
-                        >
-                          Apagar
-                        </button>
-                        <button
-                          className="svc-action-btn"
-                          onClick={() => setConfirmDeleteId(null)}
-                        >
-                          Cancelar
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        <button
-                          className="svc-action-btn"
-                          onClick={() => setModalMode(service)}
-                          title="Editar serviço"
-                          aria-label={`Editar ${service.name}`}
-                        >
-                          <RiPencilLine aria-hidden="true" />
-                        </button>
-                        <button
-                          className="svc-action-btn svc-action-btn--danger"
-                          onClick={() => setConfirmDeleteId(service.id)}
-                          title="Apagar serviço"
-                          aria-label={`Apagar ${service.name}`}
-                        >
-                          <RiDeleteBinLine aria-hidden="true" />
-                        </button>
-                      </>
-                    )}
+                    <button
+                      className="svc-action-btn"
+                      onClick={() => setModalMode(service)}
+                      title="Editar serviço"
+                      aria-label={`Editar ${service.name}`}
+                    >
+                      <RiPencilLine aria-hidden="true" />
+                    </button>
+                    <button
+                      className="svc-action-btn svc-action-btn--danger"
+                      onClick={() => setDeleteTarget(service)}
+                      title="Apagar serviço"
+                      aria-label={`Apagar ${service.name}`}
+                    >
+                      <RiDeleteBinLine aria-hidden="true" />
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -385,12 +388,23 @@ export default function Services() {
         </div>
       )}
 
+      {/* Modal criar/editar */}
       {modalMode !== null && (
         <ServiceModal
           service={modalMode === "new" ? null : modalMode}
           saving={saving}
           onClose={() => setModalMode(null)}
           onSubmit={modalMode === "new" ? handleCreate : handleUpdate}
+        />
+      )}
+
+      {/* Modal de confirmação de apagar */}
+      {deleteTarget !== null && (
+        <DeleteConfirmModal
+          serviceName={deleteTarget.name}
+          saving={saving}
+          onConfirm={handleDeleteConfirm}
+          onCancel={() => setDeleteTarget(null)}
         />
       )}
     </div>

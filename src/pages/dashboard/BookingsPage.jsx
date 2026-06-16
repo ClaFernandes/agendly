@@ -1,0 +1,396 @@
+// src/pages/dashboard/BookingsPage.jsx
+
+import { useState, useMemo } from "react";
+import {
+  RiAddLine,
+  RiCheckLine,
+  RiCloseLine,
+  RiArrowGoBackLine,
+  RiPencilLine,
+  RiSearchLine,
+  RiTimeLine,
+  RiTimerLine,
+  RiToolsLine,
+  RiMoneyDollarCircleLine,
+  RiCalendarLine,
+} from "react-icons/ri";
+import { useAppointments, resolveStatus, STATUS_CONFIG, APPOINTMENT_STATUS } from "../../hooks/useAppointments";
+import { useServices } from "../../hooks/useServices";
+import AppointmentFormModal from "../../components/service-panel/AppointmentFormModal";
+import "./Dashboard.css";
+
+const MONTH_NAMES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+
+const AVATAR_COLORS = [
+  { bg: "#EEEDFE", color: "#534AB7" },
+  { bg: "#E1F5EE", color: "#0F6E56" },
+  { bg: "#FAECE7", color: "#993C1D" },
+  { bg: "#E6F1FB", color: "#185FA5" },
+  { bg: "#FBEAF0", color: "#993556" },
+  { bg: "#EAF3DE", color: "#3B6D11" },
+];
+const TIME_BAR_COLORS = ["#7F77DD", "#1D9E75", "#D85A30", "#378ADD", "#D4537E", "#639922"];
+
+function getInitials(name = "") {
+  return name.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase();
+}
+function getColorIndex(name = "") {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash += name.charCodeAt(i);
+  return hash % AVATAR_COLORS.length;
+}
+function formatTime(iso) {
+  return new Date(iso).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+}
+function formatDateLabel(iso) {
+  return new Date(iso).toLocaleDateString("pt-PT", { weekday: "short", day: "2-digit", month: "2-digit" });
+}
+function getDurationMinutes(start, end) {
+  return Math.round((new Date(end) - new Date(start)) / 60000);
+}
+
+const PILL_STYLES = {
+  em_aberto: { background: "#FEF9EC", color: "#92620A" },
+  concluido: { background: "#E1F5EE", color: "#0F6E56" },
+  cancelado: { background: "#FCEBEB", color: "#A32D2D" },
+};
+
+function StatusPill({ status }) {
+  const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.em_aberto;
+  return (
+    <span className="appt-status-pill" style={PILL_STYLES[status] ?? PILL_STYLES.em_aberto}>
+      {config.label}
+    </span>
+  );
+}
+
+function BookingCard({ appt, saving, onComplete, onCancel, onReopen, onEdit }) {
+  const [open, setOpen] = useState(false);
+  const derived = resolveStatus(appt);
+  const idx = getColorIndex(appt.client_name || appt.id);
+  const avatarStyle = AVATAR_COLORS[idx];
+  const barColor = TIME_BAR_COLORS[idx];
+  const startTime = formatTime(appt.starts_at);
+  const endTime = formatTime(appt.ends_at);
+  const duration = getDurationMinutes(appt.starts_at, appt.ends_at);
+  const dateLabel = formatDateLabel(appt.starts_at);
+  const price = appt.service?.price != null
+    ? Number(appt.service.price).toLocaleString("pt-PT", { style: "currency", currency: "EUR" })
+    : "—";
+
+  return (
+    <div
+      className={`appt-item-v2${open ? " appt-item-v2--open" : ""}`}
+      style={{ opacity: derived === APPOINTMENT_STATUS.CANCELADO ? 0.65 : 1 }}
+      onClick={() => setOpen((o) => !o)}
+    >
+      <div className="appt-item-v2-body">
+        <div className="appt-avatar" style={avatarStyle}>{getInitials(appt.client_name)}</div>
+        <div className="appt-item-info">
+          <div className="appt-item-name">{appt.client_name}</div>
+          <div className="appt-time-block">
+            <div className="appt-time-bar" style={{ background: barColor }} />
+            <div>
+              <div className="appt-time-text">{startTime} – {endTime}</div>
+              <div className="appt-time-sub">{appt.service?.name} · {dateLabel} · {duration} min</div>
+            </div>
+          </div>
+        </div>
+        <div className="appt-item-v2-right">
+          <span className="appt-item-price">{price}</span>
+          <StatusPill status={derived} />
+        </div>
+      </div>
+
+      {open && (
+        <div className="appt-item-details" onClick={(e) => e.stopPropagation()}>
+          <div className="appt-detail-grid">
+            <div className="appt-detail-item">
+              <RiTimeLine aria-hidden="true" />
+              <div><span className="appt-detail-label">Início</span>{startTime}</div>
+            </div>
+            <div className="appt-detail-item">
+              <RiTimerLine aria-hidden="true" />
+              <div><span className="appt-detail-label">Fim</span>{endTime}</div>
+            </div>
+            <div className="appt-detail-item">
+              <RiToolsLine aria-hidden="true" />
+              <div><span className="appt-detail-label">Serviço</span>{appt.service?.name}</div>
+            </div>
+            <div className="appt-detail-item">
+              <RiMoneyDollarCircleLine aria-hidden="true" />
+              <div><span className="appt-detail-label">Valor</span>{price}</div>
+            </div>
+            {appt.client_email && (
+              <div className="appt-detail-item">
+                <RiCalendarLine aria-hidden="true" />
+                <div><span className="appt-detail-label">Email</span>{appt.client_email}</div>
+              </div>
+            )}
+            {appt.client_phone && (
+              <div className="appt-detail-item">
+                <RiCalendarLine aria-hidden="true" />
+                <div><span className="appt-detail-label">Telefone</span>{appt.client_phone}</div>
+              </div>
+            )}
+            {appt.notes && (
+              <div className="appt-detail-item appt-detail-item--full">
+                <div><span className="appt-detail-label">Notas</span>{appt.notes}</div>
+              </div>
+            )}
+          </div>
+
+          <div className="appt-item-actions">
+            {/* Editar — sempre disponível */}
+            <button
+              className="appt-action-btn"
+              disabled={saving}
+              onClick={() => onEdit(appt)}
+            >
+              <RiPencilLine aria-hidden="true" />
+              Editar
+            </button>
+
+            {/* Cancelar — sempre disponível exceto se já cancelado */}
+            {derived !== APPOINTMENT_STATUS.CANCELADO && (
+              <button
+                className="appt-action-btn appt-action-btn--cancel"
+                disabled={saving}
+                onClick={() => onCancel(appt.id)}
+              >
+                <RiCloseLine aria-hidden="true" />
+                Cancelar
+              </button>
+            )}
+
+            {/* Concluir — só se em aberto */}
+            {derived === APPOINTMENT_STATUS.EM_ABERTO && (
+              <button
+                className="appt-action-btn appt-action-btn--complete"
+                disabled={saving}
+                onClick={() => onComplete(appt.id)}
+              >
+                <RiCheckLine aria-hidden="true" />
+                Concluir
+              </button>
+            )}
+
+            {/* Reabrir — se cancelado ou concluído */}
+            {derived !== APPOINTMENT_STATUS.EM_ABERTO && (
+              <button
+                className="appt-action-btn appt-action-btn--reopen"
+                disabled={saving}
+                onClick={() => onReopen(appt.id)}
+              >
+                <RiArrowGoBackLine aria-hidden="true" />
+                Reabrir
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const FILTERS = [
+  { key: "all", label: "Todos" },
+  { key: "em_aberto", label: "Em aberto" },
+  { key: "concluido", label: "Concluído" },
+  { key: "cancelado", label: "Cancelado" },
+];
+
+export default function BookingsPage() {
+  const {
+    appointments,
+    loading,
+    error,
+    saving,
+    completeAppointment,
+    cancelAppointment,
+    reopenAppointment,
+    createAppointment,
+    updateAppointment,
+  } = useAppointments();
+
+  const { services = [] } = useServices();
+
+  const now = new Date();
+  const [selectedMonth, setSelectedMonth] = useState(now.getMonth());
+  const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const [modalState, setModalState] = useState(null);
+
+  const activeServices = useMemo(() => services.filter((s) => s.active), [services]);
+
+  const clientSuggestions = useMemo(() => {
+    const map = new Map();
+    appointments.forEach((a) => {
+      if (!a.client_email || map.has(a.client_email)) return;
+      map.set(a.client_email, {
+        client_name: a.client_name,
+        client_email: a.client_email,
+        client_phone: a.client_phone,
+      });
+    });
+    return Array.from(map.values());
+  }, [appointments]);
+
+  const years = useMemo(() => {
+    const set = new Set(appointments.map((a) => new Date(a.starts_at).getFullYear()));
+    set.add(now.getFullYear());
+    return Array.from(set).sort((a, b) => b - a);
+  }, [appointments]);
+
+  // Filtra por mês/ano → estado → pesquisa
+  const filtered = useMemo(() => {
+    return appointments.filter((a) => {
+      const d = new Date(a.starts_at);
+      if (d.getFullYear() !== selectedYear || d.getMonth() !== selectedMonth) return false;
+      if (activeFilter !== "all" && resolveStatus(a) !== activeFilter) return false;
+      if (search.trim()) {
+        const q = search.toLowerCase();
+        if (
+          !a.client_name?.toLowerCase().includes(q) &&
+          !a.client_email?.toLowerCase().includes(q) &&
+          !a.service?.name?.toLowerCase().includes(q)
+        ) return false;
+      }
+      return true;
+    });
+  }, [appointments, selectedMonth, selectedYear, activeFilter, search]);
+
+  const counts = useMemo(() => {
+    const base = appointments.filter((a) => {
+      const d = new Date(a.starts_at);
+      return d.getFullYear() === selectedYear && d.getMonth() === selectedMonth;
+    });
+    const c = { all: base.length };
+    base.forEach((a) => {
+      const s = resolveStatus(a);
+      c[s] = (c[s] || 0) + 1;
+    });
+    return c;
+  }, [appointments, selectedMonth, selectedYear]);
+
+  async function handleModalSubmit(payload) {
+    if (modalState?.mode === "edit") {
+      const result = await updateAppointment(modalState.appointment.id, payload);
+      if (result.success) setModalState(null);
+      return result;
+    }
+    const result = await createAppointment(payload);
+    if (result.success) setModalState(null);
+    return result;
+  }
+
+  return (
+    <div className="db-page">
+      <div className="pg-header">
+        <div>
+          <h1 className="pg-title">Gestão de agendamentos</h1>
+          <p className="pg-subtitle">Cria, edita e gere todos os teus agendamentos.</p>
+        </div>
+        <button
+          className="btn-primary"
+          onClick={() => setModalState({ mode: "create", initialDate: new Date() })}
+        >
+          <RiAddLine aria-hidden="true" />
+          Novo agendamento
+        </button>
+      </div>
+
+      {error && <p className="sch-error">{error}</p>}
+
+      {/* Filtros de período + pesquisa */}
+      <div className="bkg-toolbar">
+        <div className="bkg-period">
+          <select
+            className="fin-select"
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(Number(e.target.value))}
+          >
+            {MONTH_NAMES.map((name, i) => (
+              <option key={i} value={i}>{name}</option>
+            ))}
+          </select>
+          <select
+            className="fin-select"
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+          >
+            {years.map((y) => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="bkg-search">
+          <RiSearchLine className="bkg-search-icon" aria-hidden="true" />
+          <input
+            type="text"
+            className="bkg-search-input"
+            placeholder="Pesquisar cliente, serviço..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* Filtros de estado */}
+      <div className="appt-filters" style={{ marginBottom: 16 }}>
+        {FILTERS.map(({ key, label }) => (
+          <button
+            key={key}
+            className={`appt-filter-btn${activeFilter === key ? " appt-filter-btn--active" : ""}`}
+            onClick={() => setActiveFilter(key)}
+          >
+            {label}
+            <span className="appt-filter-count">{counts[key] ?? 0}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Lista */}
+      <div className="pg-section" style={{ padding: 16 }}>
+        {loading ? (
+          <div className="appt-loading">A carregar agendamentos...</div>
+        ) : filtered.length === 0 ? (
+          <div className="pg-empty">
+            <RiCalendarLine className="pg-empty-icon" aria-hidden="true" />
+            <p className="pg-empty-text">Sem agendamentos para este período.</p>
+            <p className="pg-empty-subtext">Tenta mudar o filtro ou o período.</p>
+          </div>
+        ) : (
+          <div className="appt-list">
+            {filtered.map((appt) => (
+              <BookingCard
+                key={appt.id}
+                appt={appt}
+                saving={saving}
+                onComplete={completeAppointment}
+                onCancel={cancelAppointment}
+                onReopen={reopenAppointment}
+                onEdit={(appt) => setModalState({ mode: "edit", appointment: appt })}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {modalState && (
+        <AppointmentFormModal
+          mode={modalState.mode}
+          appointment={modalState.appointment}
+          initialDate={modalState.initialDate}
+          services={activeServices}
+          clients={clientSuggestions}
+          saving={saving}
+          onClose={() => setModalState(null)}
+          onSubmit={handleModalSubmit}
+        />
+      )}
+    </div>
+  );
+}

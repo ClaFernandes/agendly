@@ -59,7 +59,7 @@ export default function AdminLayout() {
             className={isActive("/admin/users") ? "active" : ""}
           >
             <FiShield />
-            <span>Admins</span>
+            <span>Administradores</span>
           </Link>
         </nav>
 

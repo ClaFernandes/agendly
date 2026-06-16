@@ -6,8 +6,8 @@ import { supabase } from "../lib/supabase";
 export function useAdmin() {
   const [stats, setStats] = useState({
     totalBusinesses: 0,
+    activeBusinesses: 0,
     totalAppointments: 0,
-    totalRevenue: 0,
   });
 
   const [businesses, setBusinesses] = useState([]);
@@ -43,25 +43,19 @@ export function useAdmin() {
         if (appointmentRes.error) throw appointmentRes.error;
         setStats({
           totalBusinesses: allBusinesses.length,
+          activeBusinesses: allBusinesses.filter((b) => b.is_active).length,
           totalAppointments: (appointmentRes.data || []).length,
-          totalRevenue: 0,
         });
 
         if (adminRes.error) {
-          console.warn(
-            "RPC get_admin_list não encontrada:",
-            adminRes.error.message,
-          );
+          console.warn("RPC get_admin_list não encontrada:", adminRes.error.message);
           setAdmins([]);
         } else {
           setAdmins(adminRes.data || []);
         }
 
         if (pendingRes.error) {
-          console.warn(
-            "RPC get_pending_admins não encontrada:",
-            pendingRes.error.message,
-          );
+          console.warn("RPC get_pending_admins não encontrada:", pendingRes.error.message);
           setPendingAdmins([]);
         } else {
           setPendingAdmins(pendingRes.data || []);
@@ -76,7 +70,6 @@ export function useAdmin() {
     load();
   }, []);
 
-  // Negócios
   async function toggleBusinessActive(id, currentValue) {
     setSaving(true);
 
@@ -101,23 +94,36 @@ export function useAdmin() {
       return { success: false, error: error.message };
     }
 
+    // Atualiza activeBusinesses após toggle
+    setStats((prev) => ({
+      ...prev,
+      activeBusinesses: prev.activeBusinesses + (currentValue ? -1 : 1),
+    }));
+
     setSaving(false);
     return { success: true };
   }
 
-  // Admins
-
   async function removeAdmin(userId) {
     setSaving(true);
 
-    const { error } = await supabase.rpc("delete_user_by_id", {
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .delete()
+      .eq("id", userId);
+
+    if (profileError) {
+      console.warn("Erro ao apagar profile:", profileError.message);
+    }
+
+    const { error: rpcError } = await supabase.rpc("delete_user_by_id", {
       user_id: userId,
     });
 
-    if (error) {
-      setError(error.message);
+    if (rpcError) {
+      setError(rpcError.message);
       setSaving(false);
-      return { success: false, error: error.message };
+      return { success: false, error: rpcError.message };
     }
 
     setAdmins((prev) => prev.filter((a) => a.id !== userId));
@@ -138,10 +144,8 @@ export function useAdmin() {
       return { success: false, error: error.message };
     }
 
-    // Remove da lista de pendentes localmente
     setPendingAdmins((prev) => prev.filter((a) => a.id !== userId));
 
-    // Recarrega lista de ativos
     const { data: adminData } = await supabase.rpc("get_admin_list");
     if (adminData) setAdmins(adminData);
 
@@ -149,21 +153,28 @@ export function useAdmin() {
     return { success: true };
   }
 
-  // Rejeita um admin pendente — apaga o utilizador completamente
   async function rejectAdmin(userId) {
     setSaving(true);
 
-    const { error } = await supabase.rpc("delete_user_by_id", {
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .delete()
+      .eq("id", userId);
+
+    if (profileError) {
+      console.warn("Erro ao apagar profile:", profileError.message);
+    }
+
+    const { error: rpcError } = await supabase.rpc("delete_user_by_id", {
       user_id: userId,
     });
 
-    if (error) {
-      setError(error.message);
+    if (rpcError) {
+      setError(rpcError.message);
       setSaving(false);
-      return { success: false, error: error.message };
+      return { success: false, error: rpcError.message };
     }
 
-    // Remove da lista de pendentes localmente
     setPendingAdmins((prev) => prev.filter((a) => a.id !== userId));
     setSaving(false);
     return { success: true };

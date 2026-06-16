@@ -5,7 +5,6 @@ import { useAppointments } from "../../hooks/useAppointments";
 import { useFavorites } from "../../hooks/useFavorites";
 import { exportClientsCSV } from "../../lib/exportCsv";
 import ClientTable from "../../components/service-panel/ClientTable";
-
 import { RiDownloadLine, RiHeartLine } from "react-icons/ri";
 import "./Dashboard.css";
 

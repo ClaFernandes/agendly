@@ -1,0 +1,751 @@
+/* src/pages/dashboard/css/dashboard-appointments.css */
+
+/* Layout principal */
+.appt-layout {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 24px;
+    align-items: start;
+}
+
+/* Navegação do calendário */
+.appt-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.appt-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    border: 0.5px solid var(--color-border-strong);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    transition: background 0.15s, color 0.15s;
+}
+
+.appt-nav-btn:hover {
+    background: var(--color-surface-2);
+    color: var(--color-text);
+}
+
+.appt-nav-label {
+    font-size: var(--text-base);
+    font-weight: var(--font-semi);
+    color: var(--color-text);
+    min-width: 140px;
+    text-align: center;
+}
+
+.appt-nav .btn-secondary {
+    height: 32px;
+    padding: 0 14px;
+}
+
+/* Painéis */
+.appt-calendar-panel {
+    background-color: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 16px;
+}
+
+.calendar-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.appt-sidebar-panel {
+    background-color: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 20px;
+    max-height: 760px;
+    overflow-y: auto;
+}
+
+.appt-sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.appt-sidebar-title {
+    font-size: var(--text-base);
+    font-weight: var(--font-semi);
+    color: var(--color-text);
+}
+
+/* Loading / empty */
+.appt-loading,
+.appt-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}
+
+/* Lista */
+.appt-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Filtros */
+.appt-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.appt-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    color: var(--color-text-muted);
+    background: var(--color-surface-2);
+    border: 0.5px solid var(--color-border);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.appt-filter-btn:hover {
+    background: var(--color-brand-subtle);
+    color: var(--color-brand);
+}
+
+.appt-filter-btn--active {
+    background: var(--color-brand-subtle);
+    color: var(--color-brand);
+    border-color: var(--color-primary-400);
+}
+
+.appt-filter-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: var(--radius-full);
+    background: rgba(0, 0, 0, 0.06);
+    font-size: 11px;
+    font-weight: var(--font-semi);
+}
+
+.appt-filter-btn--active .appt-filter-count {
+    background: var(--color-primary-100, rgba(79, 70, 229, 0.15));
+}
+
+/* Card v2 */
+.appt-item-v2 {
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.15s;
+}
+
+.appt-item-v2:hover {
+    border-color: var(--color-border-strong);
+}
+
+.appt-item-v2-body {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    transition: background-color 0.1s;
+}
+
+.appt-item-v2:hover .appt-item-v2-body {
+    background-color: var(--color-surface-2);
+}
+
+/* Avatar */
+.appt-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: var(--font-semi);
+    flex-shrink: 0;
+    user-select: none;
+}
+
+/* Bloco de tempo */
+.appt-time-block {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.appt-time-bar {
+    width: 3px;
+    height: 28px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.appt-time-text {
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    color: var(--color-text);
+    line-height: 1.4;
+}
+
+.appt-time-sub {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin-top: 1px;
+}
+
+/* Nome do cliente */
+.appt-item-name {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Right side */
+.appt-item-v2-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.appt-item-price {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semi);
+    color: var(--color-text);
+    white-space: nowrap;
+}
+
+/* Status pill */
+.appt-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: var(--font-medium);
+    white-space: nowrap;
+}
+
+/* Detalhes expandidos */
+.appt-item-details {
+    padding: 12px 14px;
+    border-top: 0.5px solid var(--color-border);
+    background-color: var(--color-surface-2);
+}
+
+.appt-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 12px;
+    margin-bottom: 12px;
+}
+
+.appt-detail-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    font-size: var(--text-xs);
+    color: var(--color-text);
+}
+
+.appt-detail-item svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--color-text-subtle);
+    font-size: 15px;
+}
+
+.appt-detail-label {
+    display: block;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin-bottom: 1px;
+}
+
+.appt-detail-item--full {
+    grid-column: 1 / -1;
+}
+
+/* Acções */
+.appt-item-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.appt-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 11px;
+    border-radius: var(--radius-md);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    border: 0.5px solid var(--color-border-strong);
+    background: var(--color-surface);
+    color: var(--color-text);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.appt-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.appt-action-btn--complete {
+    border-color: #5DCAA5;
+    color: #0F6E56;
+    background: #E1F5EE;
+}
+
+.appt-action-btn--complete:hover:not(:disabled) {
+    background: #5DCAA5;
+    color: #fff;
+    border-color: #5DCAA5;
+}
+
+.appt-action-btn--cancel {
+    border-color: #F09595;
+    color: #A32D2D;
+    background: #FCEBEB;
+}
+
+.appt-action-btn--cancel:hover:not(:disabled) {
+    background: #E24B4A;
+    color: #fff;
+    border-color: #E24B4A;
+}
+
+.appt-action-btn--reopen {
+    border-color: var(--color-primary-400);
+    color: var(--color-brand);
+    background: var(--color-brand-subtle);
+}
+
+.appt-action-btn--reopen:hover:not(:disabled) {
+    background: var(--color-primary-400);
+    color: #fff;
+}
+
+/* ─── react-big-calendar overrides ───────────────────────────────────────── */
+
+/* Base */
+.calendar-wrapper .rbc-calendar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    font-family: inherit;
+}
+
+/* ── Month view ── */
+.calendar-wrapper .rbc-month-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.calendar-wrapper .rbc-header {
+    padding: 10px 4px;
+    font-size: var(--text-xs);
+    font-weight: var(--font-semi);
+    color: var(--color-text-muted);
+    background: var(--color-surface-2);
+    border-bottom: 0.5px solid var(--color-border);
+    text-align: center;
+}
+
+.calendar-wrapper .rbc-month-row {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border-bottom: 0.5px solid var(--color-border) !important;
+    overflow: hidden;
+}
+
+.calendar-wrapper .rbc-row-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.calendar-wrapper .rbc-month-view .rbc-event {
+    border-radius: var(--radius-md) !important;
+    padding: 2px 6px !important;
+    margin-bottom: 2px;
+    border: 0.5px solid var(--color-primary-400);
+}
+
+.calendar-wrapper .rbc-month-view .rbc-event-content {
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.calendar-wrapper .rbc-date-cell {
+    padding: 16px;
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    text-align: right;
+}
+
+.calendar-wrapper .rbc-date-cell.rbc-now {
+    font-weight: var(--font-semi);
+    color: var(--color-brand);
+}
+
+.calendar-wrapper .rbc-today {
+    background-color: var(--color-primary-50);
+}
+
+.calendar-wrapper .rbc-day-bg,
+.calendar-wrapper .rbc-off-range-bg {
+    background-color: var(--color-surface) !important;
+}
+
+.calendar-wrapper .rbc-off-range {
+    color: var(--color-text-subtle) !important;
+    background-color: transparent !important;
+}
+
+.calendar-wrapper .rbc-show-more {
+    font-size: var(--text-xs);
+    color: var(--color-brand);
+    background: transparent;
+    cursor: pointer;
+}
+
+/* ── Day / Time views (shared) ── */
+.calendar-wrapper .rbc-time-view {
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+/* Remove default header — toolbar is off, but the all-day row still renders */
+.calendar-wrapper .rbc-time-view .rbc-time-header {
+    display: none;
+}
+
+/* Gutter (hour labels column) */
+.calendar-wrapper .rbc-time-gutter {
+    background: var(--color-surface-2);
+    border-right: 0.5px solid var(--color-border);
+    min-width: 56px;
+}
+
+.calendar-wrapper .rbc-timeslot-group {
+    border-bottom: 0.5px solid var(--color-border);
+    min-height: 80px;
+}
+
+.calendar-wrapper .rbc-time-slot {
+    display: flex;
+    align-items: flex-start;
+    padding-top: 4px;
+}
+
+.calendar-wrapper .rbc-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    padding: 0 10px;
+    white-space: nowrap;
+}
+
+/* Content area */
+.calendar-wrapper .rbc-time-content {
+    flex: 1;
+    display: flex;
+    overflow-y: auto;
+    border-top: 0.5px solid var(--color-border);
+    background: var(--color-surface);
+}
+
+.calendar-wrapper .rbc-day-slot {
+    position: relative;
+}
+
+/* Slot lines inside the day column */
+.calendar-wrapper .rbc-day-slot .rbc-timeslot-group {
+    border-bottom: 0.5px solid var(--color-border);
+}
+
+.calendar-wrapper .rbc-day-slot .rbc-time-slot {
+    border-top: 0.5px dashed var(--color-border);
+}
+
+/* ── Day view events ── */
+.calendar-wrapper .rbc-day-slot .rbc-event {
+    border-radius: var(--radius-md) !important;
+    border-width: 0 0 0 3px !important;
+    border-style: solid !important;
+    padding: 4px 8px !important;
+    min-height: 28px;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow: hidden;
+    cursor: pointer;
+    transition: filter 0.15s;
+}
+
+.calendar-wrapper .rbc-day-slot .rbc-event:hover {
+    filter: brightness(0.95);
+}
+
+/* Oculta o label padrão do RBC — usamos o componente customizado */
+.calendar-wrapper .rbc-day-slot .rbc-event-label {
+    display: none;
+}
+
+.calendar-wrapper .rbc-day-slot .rbc-event-content {
+    font-size: 12px;
+    font-weight: 500;
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+}
+
+/* Current time indicator */
+.calendar-wrapper .rbc-current-time-indicator {
+    height: 2px;
+    background: var(--color-brand);
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 3;
+}
+
+.calendar-wrapper .rbc-current-time-indicator::before {
+    content: "";
+    position: absolute;
+    left: -4px;
+    top: -4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-brand);
+}
+
+/* Selected slot highlight */
+.calendar-wrapper .rbc-slot-selection {
+    background: var(--color-brand-subtle);
+    border: 1px solid var(--color-primary-400);
+    border-radius: var(--radius-sm);
+    opacity: 0.6;
+}
+
+/* ── Componente de evento customizado (dia/semana) ── */
+.rbc-day-event-custom {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    height: 100%;
+    overflow: hidden;
+    justify-content: center;
+}
+
+.rbc-day-event-name {
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+}
+
+.rbc-day-event-time {
+    font-size: 11px;
+    opacity: 0.75;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+}
+
+.rbc-day-event-service {
+    font-size: 11px;
+    opacity: 0.75;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Responsividade */
+@media (max-width: 900px) {
+    .appt-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .appt-sidebar-panel {
+        max-height: none;
+    }
+
+    .calendar-wrapper {
+        height: 560px;
+    }
+}
+
+@media (max-width: 640px) {
+    .appt-nav-label {
+        min-width: unset;
+        font-size: var(--text-sm);
+    }
+
+    .appt-calendar-panel {
+        display: none;
+    }
+
+    .appt-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .appt-sidebar-panel {
+        padding: 12px;
+        max-height: none;
+    }
+
+    .appt-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .appt-item-actions {
+        justify-content: stretch;
+    }
+
+    .appt-action-btn {
+        flex: 1;
+        justify-content: center;
+    }
+}
+
+/* ── Gestão de agendamentos (BookingsPage) ── */
+
+.bkg-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.bkg-period {
+    display: flex;
+    gap: 8px;
+}
+
+.bkg-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 200px;
+}
+
+.bkg-search-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--color-text-subtle);
+    font-size: 16px;
+    pointer-events: none;
+}
+
+.bkg-search-input {
+    width: 100%;
+    padding: 9px 12px 9px 38px;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border-strong);
+    color: var(--color-text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.bkg-search-input:focus {
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 3px var(--color-brand-subtle);
+}
+
+.bkg-search-input::placeholder {
+    color: var(--color-text-subtle);
+}
+
+/* Card de dia na sidebar do calendário (sem ações) */
+.appt-day-card {
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: border-color 0.15s;
+}
+
+.appt-day-card:hover {
+    border-color: var(--color-border-strong);
+}
+
+.appt-day-card-body {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+}
+
+@media (max-width: 640px) {
+    .bkg-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .bkg-period {
+        width: 100%;
+    }
+
+    .bkg-period .fin-select {
+        flex: 1;
+    }
+}

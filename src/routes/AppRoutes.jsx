@@ -16,11 +16,12 @@ import Onboarding from "../pages/onboarding/Onboarding";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import Dashboard from "../pages/dashboard/Dashboard";
 import Appointments from "../pages/dashboard/Appointments";
+import BookingsPage from "../pages/dashboard/BookingsPage";
 import Services from "../pages/dashboard/Services";
 import Schedule from "../pages/dashboard/Schedule";
 import Clients from "../pages/dashboard/Clients";
 import Financial from "../pages/dashboard/Financial";
-import Settings from "../pages/dashboard/Settings";
+import Profile from "../pages/dashboard/Profile";
 
 import AdminLayout from "../components/layout/AdminLayout";
 import AdminDashboard from "../pages/admin/AdminDashboard";
@@ -57,6 +58,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
       {/* Área do Prestador */}
       <Route
         path="dashboard"
@@ -68,12 +70,14 @@ function AppRoutes() {
       >
         <Route index element={<Dashboard />} />
         <Route path="appointments" element={<Appointments />} />
+        <Route path="bookings" element={<BookingsPage />} />
         <Route path="services" element={<Services />} />
         <Route path="schedule" element={<Schedule />} />
         <Route path="clients" element={<Clients />} />
         <Route path="financial" element={<Financial />} />
-        <Route path="settings" element={<Settings />} />
+        <Route path="settings" element={<Profile />} />
       </Route>
+
       {/* Área do Admin */}
       <Route
         path="admin"
@@ -87,6 +91,7 @@ function AppRoutes() {
         <Route path="businesses" element={<AdminBusiness />} />
         <Route path="users" element={<AdminUsers />} />
       </Route>
+
       {/* Área do Cliente */}
       <Route
         path="p/:slug"
@@ -103,6 +108,7 @@ function AppRoutes() {
         <Route path="summary" element={<SummaryPage />} />
         <Route path="confirm" element={<BookingConfirm />} />
       </Route>
+
       {/* Not Found */}
       <Route path="*" element={<NotFound />} />
     </Routes>

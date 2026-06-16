@@ -33,7 +33,7 @@ export default function SummaryPage() {
         client_email: clientData.client_email,
         client_phone: clientData.client_phone,
         notes: clientData.notes,
-        status: "confirmed",
+        status: "em_aberto",
       });
 
       if (error) throw error;
@@ -62,20 +62,20 @@ export default function SummaryPage() {
         </p>
       </div>
       <div className="summary-btns">
-        <button 
-            type="button"
-            className="onboarding-btn-back"
-            onClick={()=> navigate("../form")}
-          >
-            <FiArrowLeft/> Voltar
-          </button>
+        <button
+          type="button"
+          className="onboarding-btn-back"
+          onClick={() => navigate("../form")}
+        >
+          <FiArrowLeft /> Voltar
+        </button>
 
         <button
           onClick={handleConfirmAppointment}
           disabled={isSubmitting}
           className="confirm-booking-btn"
         >
-          {isSubmitting ? "A processar..." : "Confirmar Agendamento"} {<FiCheck/> } 
+          {isSubmitting ? "A processar..." : "Confirmar Agendamento"} {<FiCheck />}
         </button>
       </div>
     </div>

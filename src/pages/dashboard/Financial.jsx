@@ -49,10 +49,22 @@ export default function Financial() {
   const [selectedYear, setSelectedYear] = useState(now.getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(now.getMonth()); // 0-indexed
 
-  // Filtra apenas agendamentos concluídos do período seleccionado
+  // Filtra apenas agendamentos concluídos do período seleccionado — receita já confirmada
   const periodAppointments = useMemo(() => {
     return appointments.filter((a) => {
       if (a.status !== "concluido") return false;
+      const date = new Date(a.starts_at);
+      return (
+        date.getFullYear() === selectedYear && date.getMonth() === selectedMonth
+      );
+    });
+  }, [appointments, selectedYear, selectedMonth]);
+
+  // Agendamentos ainda em aberto dentro do período seleccionado — receita ainda
+  // não confirmada, mas que se espera entrar se tudo correr como agendado
+  const periodOpenAppointments = useMemo(() => {
+    return appointments.filter((a) => {
+      if (a.status !== "em_aberto") return false;
       const date = new Date(a.starts_at);
       return (
         date.getFullYear() === selectedYear && date.getMonth() === selectedMonth
@@ -87,6 +99,16 @@ export default function Financial() {
 
     return { revenue, count, avg, topService };
   }, [periodAppointments]);
+
+  // Receita prevista — soma do que está em aberto no período, ainda não confirmado
+  const projectedRevenue = useMemo(
+    () =>
+      periodOpenAppointments.reduce(
+        (sum, a) => sum + Number(a.service?.price ?? 0),
+        0,
+      ),
+    [periodOpenAppointments],
+  );
 
   // Total acumulado (todos os tempos)
   const totalRevenue = useMemo(
@@ -184,11 +206,22 @@ export default function Financial() {
       {/* Cards de métricas */}
       <div className="pg-stats-grid">
         <div className="pg-stat-card">
-          <p className="pg-stat-label">Receita do mês</p>
+          <p className="pg-stat-label">Receita confirmada</p>
           <p className="pg-stat-value">
             {loading ? "—" : formatPrice(metrics.revenue)}
           </p>
           <p className="pg-stat-meta">{metrics.count} serviços concluídos</p>
+        </div>
+
+        {/* Receita prevista — agendamentos em aberto no período, ainda não confirmados */}
+        <div className="pg-stat-card">
+          <p className="pg-stat-label">Receita prevista</p>
+          <p className="pg-stat-value">
+            {loading ? "—" : formatPrice(projectedRevenue)}
+          </p>
+          <p className="pg-stat-meta">
+            {periodOpenAppointments.length} agendamentos em aberto
+          </p>
         </div>
 
         <div className="pg-stat-card">

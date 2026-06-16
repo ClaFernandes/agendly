@@ -4,17 +4,20 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabase";
-
-import { FiEye, FiEyeOff, FiMail, FiLock, FiArrowLeft } from "react-icons/fi";
+import {
+  FiEye,
+  FiEyeOff,
+  FiMail,
+  FiLock,
+  FiArrowLeft,
+} from "react-icons/fi";
 import { AiOutlineCheck } from "react-icons/ai";
-import { FcGoogle } from "react-icons/fc";
-
 import logo from "../../assets/logo.svg";
 import "./Auth.css";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login, recoverPassword, loginWithGoogle, user, userRole } = useAuth();
+  const { login, recoverPassword, user, userRole } = useAuth();
 
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
@@ -24,11 +27,9 @@ export default function Login() {
   const [success, setSuccess] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Redireciona após login — não atua se vier de fluxo de recovery
+  // Redireciona após login
   useEffect(() => {
     if (!user || !userRole) return;
-
-    // Não redireciona se o utilizador está em fluxo de recuperação de password
     if (window.location.pathname.includes("update-password")) return;
 
     if (userRole === "admin") {
@@ -57,7 +58,6 @@ export default function Login() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-
     try {
       await login(email, password);
     } catch {
@@ -72,53 +72,36 @@ export default function Login() {
     setError(null);
     setSuccess(null);
     setLoading(true);
-
     try {
       await recoverPassword(email);
       setSuccess(email);
     } catch {
-      setError(
-        "Não foi possível enviar o email. Verifica o endereço introduzido.",
-      );
+      setError("Não foi possível enviar o email. Verifica o endereço introduzido.");
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleGoogle() {
-    setError(null);
-    try {
-      await loginWithGoogle();
-    } catch {
-      setError("Erro ao entrar com Google. Tenta novamente.");
-    }
-  }
-
   return (
     <div className="auth-container">
+      {/* Coluna esquerda — marketing */}
       <div className="auth-marketing">
         <Link to="/" className="auth-brand">
           <img src={logo} alt="Agendly" className="auth-logo" />
           <span>Agendly</span>
         </Link>
-
         <div className="auth-marketing-body">
           <h2>Gere o teu negócio com clareza</h2>
           <p>CRM, agenda e financeiro num único painel.</p>
           <ul className="auth-features">
-            <li>
-              <AiOutlineCheck /> Página pública de agendamento
-            </li>
-            <li>
-              <AiOutlineCheck /> Histórico, valor gasto e visitas por cliente
-            </li>
-            <li>
-              <AiOutlineCheck /> Relatório financeiro e CSV
-            </li>
+            <li><AiOutlineCheck /> Página pública de agendamento</li>
+            <li><AiOutlineCheck /> Histórico, valor gasto e visitas por cliente</li>
+            <li><AiOutlineCheck /> Relatório financeiro e CSV</li>
           </ul>
         </div>
       </div>
 
+      {/* Coluna direita — formulário */}
       <div className="auth-form-side">
         <div className="auth-card">
           <Link to="/" className="auth-brand">
@@ -126,25 +109,13 @@ export default function Login() {
             <span>Agendly</span>
           </Link>
 
+          {/* Modo login */}
           {mode === "login" && (
             <>
               <h2>Bem-vindo de volta</h2>
               <p className="auth-subtitle">Acede ao teu painel de gestão</p>
 
               {error && <p className="auth-error">{error}</p>}
-
-              <button
-                type="button"
-                className="auth-google-btn"
-                onClick={handleGoogle}
-              >
-                <FcGoogle className="auth-google-icon" />
-                Continuar com Google
-              </button>
-
-              <div className="auth-divider">
-                <span>ou</span>
-              </div>
 
               <form onSubmit={handleLogin}>
                 <div className="auth-field">
@@ -158,6 +129,7 @@ export default function Login() {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="email@email.com"
                       required
+                      disabled={loading}
                     />
                   </div>
                 </div>
@@ -173,6 +145,7 @@ export default function Login() {
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
                       required
+                      disabled={loading}
                     />
                     <button
                       type="button"
@@ -187,11 +160,7 @@ export default function Login() {
                 <button
                   type="button"
                   className="auth-link"
-                  onClick={() => {
-                    setMode("recover");
-                    setError(null);
-                    setSuccess(null);
-                  }}
+                  onClick={() => { setMode("recover"); setError(null); setSuccess(null); }}
                 >
                   Esqueceste a palavra-passe?
                 </button>
@@ -208,6 +177,7 @@ export default function Login() {
             </>
           )}
 
+          {/* Modo recuperação */}
           {mode === "recover" && (
             <>
               <div className="auth-lock-icon">
@@ -231,8 +201,7 @@ export default function Login() {
                   <div className="auth-info">
                     <FiMail />
                     <p>
-                      Receberás um email com um link para criar uma nova
-                      password. O link expira em 1 hora.
+                      Receberás um email com um link para criar uma nova password. O link expira em 1 hora.
                     </p>
                   </div>
                 </>
@@ -254,7 +223,6 @@ export default function Login() {
                     />
                   </div>
                 </div>
-
                 {!success && (
                   <button type="submit" className="auth-btn" disabled={loading}>
                     {loading ? "A enviar..." : "Enviar link de recuperação"}
@@ -265,12 +233,7 @@ export default function Login() {
               <button
                 type="button"
                 className="auth-link"
-                onClick={() => {
-                  setMode("login");
-                  setError(null);
-                  setSuccess(null);
-                  setEmail("");
-                }}
+                onClick={() => { setMode("login"); setError(null); setSuccess(null); setEmail(""); }}
               >
                 <FiArrowLeft /> Voltar ao Login
               </button>

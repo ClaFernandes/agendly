@@ -1,4 +1,5 @@
-// src/pages/dashboard/Settings.jsx
+// src/pages/dashboard/Profile.jsx
+// (anteriormente Settings.jsx — rota: /dashboard/profile)
 
 import { useState, useEffect } from "react";
 import {
@@ -9,12 +10,15 @@ import {
   RiSaveLine,
   RiDeleteBinLine,
   RiExternalLinkLine,
+  RiAlertLine,
 } from "react-icons/ri";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 import { useBusiness } from "../../context/BusinessContext";
+import { useAuth } from "../../context/AuthContext";
 import "./Dashboard.css";
 
-// Gera slug URL-friendly a partir de texto livre
+// Utilitários 
 function generateSlug(value) {
   return value
     .toLowerCase()
@@ -25,21 +29,81 @@ function generateSlug(value) {
     .replace(/\s+/g, "-");
 }
 
-// Extrai iniciais significativas ignorando artigos e preposições
 function getInitials(name) {
   if (!name) return "?";
   const stopWords = new Set(["do", "da", "de", "dos", "das", "e", "o", "a"]);
-  const words = name
-    .trim()
-    .split(/\s+/)
-    .filter((w) => !stopWords.has(w.toLowerCase()));
+  const words = name.trim().split(/\s+/).filter(w => !stopWords.has(w.toLowerCase()));
   if (words.length === 0) return name.slice(0, 2).toUpperCase();
   if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
   return (words[0][0] + words[1][0]).toUpperCase();
 }
 
-export default function Settings() {
+// Modal de confirmação de apagar conta 
+
+function DeleteAccountModal({ onConfirm, onCancel, deleting }) {
+  const [confirmed, setConfirmed] = useState(false);
+
+  return (
+    <div className="modal-overlay" onClick={onCancel}>
+      <div
+        className="modal modal--sm"
+        onClick={e => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-account-title"
+      >
+        <div className="modal-header">
+          <h2 id="delete-account-title" className="modal-title">Apagar conta</h2>
+          <button className="modal-close" onClick={onCancel} aria-label="Fechar">×</button>
+        </div>
+
+        <div className="delete-modal-body">
+          <div className="delete-modal-icon delete-modal-icon--danger">
+            <RiAlertLine aria-hidden="true" />
+          </div>
+          <p className="delete-modal-text">
+            Esta acção é <strong>irreversível</strong>.
+          </p>
+          <p className="delete-modal-subtext">
+            Ao confirmar, todos os dados do teu negócio serão apagados permanentemente —
+            serviços, horários, agendamentos, clientes favoritos e a tua conta.
+          </p>
+
+          {/* Checkbox de confirmação extra */}
+          <label className="delete-account-check">
+            <input
+              type="checkbox"
+              checked={confirmed}
+              onChange={e => setConfirmed(e.target.checked)}
+            />
+            Confirmo que quero apagar a minha conta e todos os dados associados.
+          </label>
+        </div>
+
+        <div className="modal-actions">
+          <button className="btn-secondary" onClick={onCancel} disabled={deleting}>
+            Cancelar
+          </button>
+          <button
+            className="btn-danger"
+            onClick={onConfirm}
+            disabled={!confirmed || deleting}
+          >
+            <RiDeleteBinLine aria-hidden="true" />
+            {deleting ? "A apagar..." : "Apagar conta definitivamente"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Página principal 
+
+export default function Profile() {
   const { business, updateBusiness } = useBusiness();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   // Campos do formulário
   const [name, setName] = useState("");
@@ -47,25 +111,29 @@ export default function Settings() {
   const [phone, setPhone] = useState("");
   const [description, setDescription] = useState("");
 
-  // Estado da logo
+  // Logo
   const [logoFile, setLogoFile] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
   const [currentLogoUrl, setCurrentLogoUrl] = useState(null);
   const [removeLogo, setRemoveLogo] = useState(false);
 
-  // Verificação de slug
+  // Slug
   const [slugAvailable, setSlugAvailable] = useState(null);
   const [checkingSlug, setCheckingSlug] = useState(false);
 
-  // Estado de UI
+  // UI
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  // Preenche o formulário com os dados atuais do negócio
+  // Apagar conta
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
+
+  // Preenche o formulário com os dados actuais
   useEffect(() => {
     if (!business) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setName(business.name ?? "");
     setSlug(business.slug ?? "");
     setPhone(business.phone ?? "");
@@ -74,7 +142,8 @@ export default function Settings() {
     setRemoveLogo(false);
   }, [business]);
 
-  // Verifica disponibilidade do slug na DB
+  // Slug 
+
   async function checkSlug(value) {
     if (!value || value === business?.slug) {
       setSlugAvailable(null);
@@ -95,7 +164,6 @@ export default function Settings() {
     }
   }
 
-  // Atualiza o slug automaticamente quando o nome muda
   function handleNameChange(e) {
     const value = e.target.value;
     setName(value);
@@ -110,7 +178,8 @@ export default function Settings() {
     setSlugAvailable(null);
   }
 
-  // Valida e armazena o ficheiro de logo (máx. 2 MB)
+  // Logo 
+
   function handleLogoChange(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -125,7 +194,6 @@ export default function Settings() {
     setRemoveLogo(false);
   }
 
-  // Remove a logo — marca flag para apagar na DB ao guardar
   function handleRemoveLogo() {
     setLogoFile(null);
     setLogoPreview(null);
@@ -133,8 +201,6 @@ export default function Settings() {
     setRemoveLogo(true);
   }
 
-  // Faz upload da logo para o Supabase Storage
-  // Retorna URL pública, URL atual, ou null se removida
   async function uploadLogo() {
     if (removeLogo) return null;
     if (!logoFile) return currentLogoUrl;
@@ -144,40 +210,29 @@ export default function Settings() {
       .from("business-assets")
       .upload(path, logoFile, { upsert: true, contentType: logoFile.type });
     if (uploadError) throw uploadError;
-    const { data } = supabase.storage
-      .from("business-assets")
-      .getPublicUrl(path);
+    const { data } = supabase.storage.from("business-assets").getPublicUrl(path);
     return data.publicUrl;
   }
+
+  // Guardar alterações 
 
   async function handleSave() {
     setError(null);
     setSuccess(false);
 
-    if (!name.trim()) {
-      setError("O nome do negócio é obrigatório.");
-      return;
-    }
-    if (!slug.trim()) {
-      setError("O URL público é obrigatório.");
-      return;
-    }
+    if (!name.trim()) { setError("O nome do negócio é obrigatório."); return; }
+    if (!slug.trim()) { setError("O URL público é obrigatório."); return; }
     if (phone && !/^\+?[\d\s\-()]{8,20}$/.test(phone)) {
       setError("Formato de telefone inválido.");
       return;
     }
 
-    // Verifica slug só se mudou em relação ao atual
     if (slug !== business?.slug) {
       const available = await checkSlug(slug);
-      if (!available) {
-        setError("Este URL já está a ser usado. Escolhe outro.");
-        return;
-      }
+      if (!available) { setError("Este URL já está a ser usado. Escolhe outro."); return; }
     }
 
     setSaving(true);
-
     try {
       const logoUrl = await uploadLogo();
 
@@ -194,7 +249,6 @@ export default function Settings() {
 
       if (updateError) throw updateError;
 
-      // Atualiza o contexto global com os novos dados
       updateBusiness({
         name: name.trim(),
         slug: slug.trim(),
@@ -207,7 +261,6 @@ export default function Settings() {
       setLogoFile(null);
       setLogoPreview(null);
       setRemoveLogo(false);
-
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
@@ -218,7 +271,56 @@ export default function Settings() {
     }
   }
 
-  // URL pública usando domínio fixo de produção
+  // Apagar conta 
+  // Ordem: logo no Storage → tabelas (cascade via FK ou manual) → auth user
+
+  async function handleDeleteAccount() {
+    if (!user?.id) return;
+    setDeleting(true);
+    setDeleteError(null);
+
+    try {
+      // 1. Remove a logo do Storage se existir
+      if (business?.logo_url) {
+        // Extrai o path relativo a partir da URL pública
+        const url = new URL(business.logo_url);
+        const pathParts = url.pathname.split("/business-assets/");
+        if (pathParts[1]) {
+          await supabase.storage
+            .from("business-assets")
+            .remove([decodeURIComponent(pathParts[1])]);
+        }
+      }
+
+      // Apaga dados associados 
+      if (business?.id) {
+        await supabase.from("client_favorites").delete().eq("business_id", business.id);
+        await supabase.from("appointments").delete().eq("business_id", business.id);
+        await supabase.from("working_hours").delete().eq("business_id", business.id);
+        await supabase.from("services").delete().eq("business_id", business.id);
+        await supabase.from("business").delete().eq("id", business.id);
+      }
+
+      // Apaga o profile (tabela profiles)
+      await supabase.from("profiles").delete().eq("id", user.id);
+
+      // Apaga o utilizador do Auth via RPC 
+      const { error: rpcError } = await supabase.rpc("delete_user_by_id", {
+        user_id: user.id,
+      });
+      if (rpcError) throw rpcError;
+
+      // 5. Faz logout local e redireciona
+      await logout();
+      navigate("/login", { replace: true });
+
+    } catch (err) {
+      console.error("Erro ao apagar conta:", err);
+      setDeleteError("Ocorreu um erro ao apagar a conta. Tenta novamente ou contacta o suporte.");
+      setDeleting(false);
+    }
+  }
+
   const PUBLIC_BASE = "https://agendly.app/p";
   const publicUrl = business?.slug ? `${PUBLIC_BASE}/${business.slug}` : null;
 
@@ -227,10 +329,8 @@ export default function Settings() {
       {/* Cabeçalho */}
       <div className="pg-header">
         <div>
-          <h1 className="pg-title">Negócio</h1>
-          <p className="pg-subtitle">
-            Edita os dados públicos e de identificação do teu negócio.
-          </p>
+          <h1 className="pg-title">Perfil</h1>
+          <p className="pg-subtitle">Edita os dados públicos e de identificação do teu negócio.</p>
         </div>
         <button className="btn-primary" onClick={handleSave} disabled={saving}>
           <RiSaveLine aria-hidden="true" />
@@ -238,25 +338,18 @@ export default function Settings() {
         </button>
       </div>
 
-      {/* Feedback de erro e sucesso */}
+      {/* Feedback */}
       {error && <p className="set-error">{error}</p>}
-      {success && (
-        <p className="set-success">Alterações guardadas com sucesso!</p>
-      )}
+      {success && <p className="set-success">Alterações guardadas com sucesso!</p>}
+      {deleteError && <p className="set-error">{deleteError}</p>}
 
-      {/* Link público com botão de abrir */}
+      {/* Link público */}
       {publicUrl && (
         <div className="set-public-link pg-section">
           <p className="set-public-label">O teu link de agendamento</p>
           <div className="set-public-row">
             <span className="set-public-url">{publicUrl}</span>
-
-            <a
-              href={publicUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-secondary"
-            >
+            <a href={publicUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary">
               <RiExternalLinkLine aria-hidden="true" />
               Abrir
             </a>
@@ -264,28 +357,20 @@ export default function Settings() {
         </div>
       )}
 
-      {/* Identidade visual — logo */}
+      {/* Identidade visual */}
       <div className="pg-section">
         <div className="pg-section-header">
           <h2 className="pg-section-title">Identidade visual</h2>
         </div>
-
         <div className="set-logo-field">
-          {/* Preview da logo ou iniciais como fallback */}
           <div className="set-logo-preview">
             {logoPreview || currentLogoUrl ? (
-              <img
-                src={logoPreview ?? currentLogoUrl}
-                alt="Logo"
-                className="set-logo-img"
-              />
+              <img src={logoPreview ?? currentLogoUrl} alt="Logo" className="set-logo-img" />
             ) : (
               <div className="set-logo-initials">{getInitials(name)}</div>
             )}
           </div>
-
           <div className="set-logo-actions">
-            {/* Label sobre input oculto — abre o seletor de ficheiro */}
             <label htmlFor="logo-upload" className="btn-secondary set-logo-btn">
               <RiImageLine aria-hidden="true" />
               {logoPreview || currentLogoUrl ? "Alterar logo" : "Carregar logo"}
@@ -297,13 +382,8 @@ export default function Settings() {
               onChange={handleLogoChange}
               style={{ display: "none" }}
             />
-            {/* Botão remover — só aparece se houver logo */}
             {(logoPreview || currentLogoUrl) && (
-              <button
-                type="button"
-                className="set-logo-remove"
-                onClick={handleRemoveLogo}
-              >
+              <button type="button" className="set-logo-remove" onClick={handleRemoveLogo}>
                 <RiDeleteBinLine aria-hidden="true" />
                 Remover logo
               </button>
@@ -318,7 +398,6 @@ export default function Settings() {
         <div className="pg-section-header">
           <h2 className="pg-section-title">Dados do negócio</h2>
         </div>
-
         <div className="set-form">
           {/* Nome */}
           <div className="set-field">
@@ -338,7 +417,7 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* Slug / URL pública */}
+          {/* Slug */}
           <div className="set-field">
             <label htmlFor="set-slug" className="set-label">
               URL pública <span className="set-required">*</span>
@@ -355,37 +434,25 @@ export default function Settings() {
                 placeholder="barbearia-do-ze"
                 className="set-input"
               />
-              {checkingSlug && (
-                <span className="set-slug-checking">A verificar...</span>
-              )}
-              {!checkingSlug && slugAvailable === true && (
-                <span className="set-slug-ok">Disponível</span>
-              )}
-              {!checkingSlug && slugAvailable === false && (
-                <span className="set-slug-error">Indisponível</span>
-              )}
+              {checkingSlug && <span className="set-slug-checking">A verificar...</span>}
+              {!checkingSlug && slugAvailable === true && <span className="set-slug-ok">Disponível</span>}
+              {!checkingSlug && slugAvailable === false && <span className="set-slug-error">Indisponível</span>}
             </div>
             {slug && (
-              <p className="set-slug-preview">
-                agendly.app/p/<strong>{slug}</strong>
-              </p>
+              <p className="set-slug-preview">agendly.app/p/<strong>{slug}</strong></p>
             )}
           </div>
 
           {/* Telefone */}
           <div className="set-field">
-            <label htmlFor="set-phone" className="set-label">
-              Telefone
-            </label>
+            <label htmlFor="set-phone" className="set-label">Telefone</label>
             <div className="set-input-wrapper">
               <RiPhoneLine className="set-input-icon" aria-hidden="true" />
               <input
                 id="set-phone"
                 type="tel"
                 value={phone}
-                onChange={(e) =>
-                  setPhone(e.target.value.replace(/[^\d\s+\-()]/g, ""))
-                }
+                onChange={e => setPhone(e.target.value.replace(/[^\d\s+\-()]/g, ""))}
                 placeholder="+351 911 111 111"
                 className="set-input"
               />
@@ -397,13 +464,11 @@ export default function Settings() {
 
           {/* Descrição */}
           <div className="set-field">
-            <label htmlFor="set-description" className="set-label">
-              Descrição
-            </label>
+            <label htmlFor="set-description" className="set-label">Descrição</label>
             <textarea
               id="set-description"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={e => setDescription(e.target.value)}
               placeholder="Breve descrição do teu negócio..."
               rows={3}
               className="set-textarea"
@@ -412,13 +477,41 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Botão guardar no fundo da página */}
-      <div className="sch-footer-actions">
+      {/* Botão guardar no rodapé */}
+      <div className="sch-footer-actions" style={{ marginBottom: "32px" }}>
         <button className="btn-primary" onClick={handleSave} disabled={saving}>
           <RiSaveLine aria-hidden="true" />
           {saving ? "A guardar..." : "Guardar alterações"}
         </button>
       </div>
+
+      {/* Zona de perigo */}
+      <div className="pg-section danger-zone">
+        <div className="danger-zone-body">
+          <div>
+            <p className="danger-zone-label">Apagar conta</p>
+            <p className="danger-zone-desc">
+              Remove permanentemente a tua conta e todos os dados associados. Esta acção não pode ser desfeita.
+            </p>
+          </div>
+          <button
+            className="btn-danger"
+            onClick={() => setShowDeleteModal(true)}
+          >
+            <RiDeleteBinLine aria-hidden="true" />
+            Apagar conta
+          </button>
+        </div>
+      </div>
+
+      {/* Modal de confirmação */}
+      {showDeleteModal && (
+        <DeleteAccountModal
+          onConfirm={handleDeleteAccount}
+          onCancel={() => { setShowDeleteModal(false); setDeleteError(null); }}
+          deleting={deleting}
+        />
+      )}
     </div>
   );
 }

@@ -8,16 +8,6 @@ import "./AdminPanel.css";
 export default function AdminDashboard() {
   const { stats, recentBusinesses, loading, error } = useAdmin();
 
-  // Formata receita em euros
-  function formatCurrency(value) {
-    return new Intl.NumberFormat("pt-PT", {
-      style: "currency",
-      currency: "EUR",
-      minimumFractionDigits: 0,
-    }).format(value);
-  }
-
-  // Formata data de registo
   function formatDate(dateStr) {
     return new Date(dateStr).toLocaleDateString("pt-PT", {
       day: "2-digit",
@@ -36,7 +26,6 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      {/* Cabeçalho */}
       <div className="admin-page-header">
         <div>
           <h1>Painel de administração</h1>
@@ -50,7 +39,6 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Erro */}
       {error && (
         <div className="admin-error-banner">
           <FiAlertCircle />
@@ -58,16 +46,13 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Cards de estatísticas */}
       <div className="admin-stats-grid">
-        {/* Negócios */}
         <div className="admin-stat-card accent">
           <div className="admin-stat-label">Negócios registados</div>
           <div className="admin-stat-value">{stats.totalBusinesses}</div>
           <div className="admin-stat-sub">na plataforma</div>
         </div>
 
-        {/* Agendamentos */}
         <div className="admin-stat-card">
           <div className="admin-stat-label">Agendamentos totais</div>
           <div className="admin-stat-value">
@@ -76,21 +61,18 @@ export default function AdminDashboard() {
           <div className="admin-stat-sub">todos os negócios</div>
         </div>
 
-        {/* Receita */}
         <div className="admin-stat-card">
-          <div className="admin-stat-label">Receita global estimada</div>
-          <div className="admin-stat-value">
-            {formatCurrency(stats.totalRevenue)}
+          <div className="admin-stat-label">Negócios ativos</div>
+          <div className="admin-stat-value">{stats.activeBusinesses}</div>
+          <div className="admin-stat-sub">
+            de {stats.totalBusinesses} registados
           </div>
-          <div className="admin-stat-sub">agendamentos concluídos</div>
         </div>
       </div>
 
-      {/* Negócios recentes */}
       <div className="admin-section">
         <div className="admin-section-header">
           <h2>Negócios recentes</h2>
-          {/* Atalho para a lista completa */}
           <Link to="/admin/businesses" className="admin-shortcut-link">
             Ver todos <FiArrowRight />
           </Link>
@@ -138,7 +120,6 @@ export default function AdminDashboard() {
         )}
       </div>
 
-      {/* Atalho para gestão de administradores */}
       <div className="admin-section">
         <div className="admin-section-header">
           <div>
