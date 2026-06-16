@@ -1,6 +1,6 @@
 // src/components/layout/BookingLayout.jsx
 
-import { Outlet } from "react-router-dom"; //incluir depois: useParams
+import { Outlet } from "react-router-dom";
 import "../../pages/public-booking/PublicBooking.css";
 import "../../pages/public-booking/DateCalendar.css";
 import StepProgress from "../../pages/public-booking/StepProgress";
@@ -67,7 +67,7 @@ export default function BookingLayout() {
       <main className="booking-content">
         <StepProgress />
         <Outlet />
-      </main>      
+      </main>
     </div>
   );
 }

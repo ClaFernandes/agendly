@@ -1,7 +1,6 @@
 /* src/components/layout/DashboardLayout.css */
 
 /* Layout base */
-
 .dl-wrapper {
     display: flex;
     height: 100vh;
@@ -10,7 +9,6 @@
 }
 
 /* Sidebar */
-
 .dl-sidebar {
     width: 120px;
     min-height: 100vh;
@@ -53,7 +51,6 @@
 }
 
 /* Navegação */
-
 .dl-nav {
     display: flex;
     flex-direction: column;
@@ -130,7 +127,6 @@
 }
 
 /* Área do conteúdo */
-
 .dl-main {
     flex: 1;
     overflow-y: auto;
@@ -138,7 +134,6 @@
 }
 
 /* Utilitários */
-
 .pg-header {
     display: flex;
     align-items: center;
@@ -195,8 +190,6 @@
     color: var(--color-text-subtle);
     margin-top: 4px;
 }
-
-
 
 .pg-stat-meta--up {
     color: var(--color-ok);

@@ -132,7 +132,6 @@
   align-items: flex-start;
   justify-content: center;
   padding: 16px 24px;
-  /* Mesmos paddings do container do onboarding */
   border-radius: var(--radius-lg, 12px);
   margin-bottom: 1.5rem;
   box-sizing: border-box;
@@ -144,14 +143,12 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  /* Gap exato entre a bola e o texto do onboarding */
   position: relative;
   z-index: 1;
   min-width: 100px;
-  /* Largura mínima do passo do onboarding */
 }
 
-/* O Círculo da Etapa (Equivalente ao .onboarding-progress-dot) */
+/* Círculo da Etapa */
 .step-circle {
   display: flex;
   align-items: center;
@@ -181,9 +178,7 @@
   height: 2px;
   background: var(--color-border, #e5e7eb);
   margin: 0 -32px;
-  /* Ajuste fino para compensar as margens dos botões */
   transform: translateY(15px);
-  /* Alinha perfeitamente ao centro vertical do círculo (32px / 2) */
   transition: background 0.3s ease;
 }
 
@@ -192,7 +187,6 @@
   border-color: var(--color-brand, #4f46e5);
   background: var(--color-brand, #4f46e5);
   color: #ffffff;
-  /* Adiciona o foco sutil se a variável existir, senão usa o padrão */
   box-shadow: 0 0 0 4px var(--color-brand-subtle, #e0e7ff);
 }
 
@@ -270,7 +264,6 @@
 .service-card {
   background: white;
   border: 2px solid #e0e7ff;
-  /* Borda sutil roxa para destaque */
   border-radius: 12px;
   padding: 1.25rem;
   cursor: pointer;
@@ -339,7 +332,7 @@
   transition: background 0.15s, box-shadow 0.15s;
 }
 
-/* Lista de serviços comuns (Linhas mais simples) */
+/* Lista de serviços comuns */
 .services-list {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -391,7 +384,6 @@
 .quick-dates-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  /* 4 colunas por linha */
   gap: 0.75rem;
   margin-top: 0.5rem;
 }
@@ -399,7 +391,6 @@
 @media (max-width: 480px) {
   .quick-dates-grid {
     grid-template-columns: repeat(3, 1fr);
-    /* 3 colunas em telas muito pequenas */
   }
 
   .step-item {
@@ -534,7 +525,6 @@
 .time-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  /* 4 colunas de horários */
   gap: 0.5rem;
   margin-bottom: 48px;
 }
@@ -542,7 +532,6 @@
 @media (max-width: 400px) {
   .time-grid {
     grid-template-columns: repeat(3, 1fr);
-    /* 3 colunas em telas minúsculas */
   }
 }
 
@@ -664,7 +653,7 @@
   font-size: var(--text-lg);
 }
 
-.summary-card p{
+.summary-card p {
   font-size: var(--text-base);
 }
 

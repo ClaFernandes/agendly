@@ -28,18 +28,12 @@ export const STATUS_CONFIG = {
   },
 };
 
-/**
- * Deriva o status visual de um agendamento.
- * Se está "em_aberto" mas a hora já passou → mostra como "concluido".
- * O status real na DB não é alterado — só a apresentação muda.
- */
 export function resolveStatus(appt) {
   if (appt.status !== APPOINTMENT_STATUS.EM_ABERTO) return appt.status;
   if (new Date(appt.ends_at) < new Date()) return APPOINTMENT_STATUS.CONCLUIDO;
   return APPOINTMENT_STATUS.EM_ABERTO;
 }
 
-// Select reutilizado em todas as queries
 const APPOINTMENT_SELECT = `
   *,
   service:services (

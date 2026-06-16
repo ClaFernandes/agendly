@@ -1,7 +1,6 @@
 /* src/pages/dashboard/css/dashboard-overview.css */
 
 /* Página base */
-
 .db-page {
     max-width: 900px;
 }
@@ -23,7 +22,6 @@
 }
 
 /* Boas-vindas */
-
 .db-welcome {
     display: flex;
     align-items: center;
@@ -65,7 +63,6 @@
 }
 
 /* Link público */
-
 .db-public-link {
     display: flex;
     align-items: center;
@@ -118,7 +115,6 @@
 }
 
 /* Banner de conta nova (sem serviços) */
-
 .db-onboarding-banner {
     display: flex;
     align-items: center;
@@ -166,13 +162,11 @@
 }
 
 /* Stats */
-
 .db-stat-placeholder {
     color: var(--color-text-subtle);
 }
 
 /* Utilitários partilhados */
-
 .pg-empty-subtext {
     font-size: var(--text-xs);
     color: var(--color-text-subtle);
@@ -196,10 +190,8 @@
 }
 
 /* Acesso rápido */
-
 .db-quick-links {
     display: grid;
-    /* Força 5 colunas no desktop, deixando os cartões mais pequenos e alinhados */
     grid-template-columns: repeat(5, 1fr);
     gap: 12px;
 }
@@ -249,7 +241,6 @@
 }
 
 /* Responsividade */
-
 @media (max-width: 640px) {
     .db-welcome {
         flex-direction: column;

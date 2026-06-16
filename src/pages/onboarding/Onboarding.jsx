@@ -162,7 +162,6 @@ export default function Onboarding() {
     setStep(2);
   }
 
-  // CORREÇÃO 1 — revogar o URL anterior antes de criar um novo, evitando memory leak
   function handleLogoChange(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -228,8 +227,6 @@ export default function Onboarding() {
     try {
       const logoUrl = await uploadLogo();
 
-      // CORREÇÃO 2 — re-verificar o slug antes de inserir, para apanhar conflitos
-      // que possam ter surgido enquanto o utilizador percorria os passos anteriores
       const stillAvailable = await checkSlug(slug);
       if (!stillAvailable) {
         setError(

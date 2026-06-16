@@ -1,5 +1,4 @@
 // src/pages/dashboard/Profile.jsx
-// (anteriormente Settings.jsx — rota: /dashboard/profile)
 
 import { useState, useEffect } from "react";
 import {
@@ -143,7 +142,6 @@ export default function Profile() {
   }, [business]);
 
   // Slug 
-
   async function checkSlug(value) {
     if (!value || value === business?.slug) {
       setSlugAvailable(null);
@@ -179,7 +177,6 @@ export default function Profile() {
   }
 
   // Logo 
-
   function handleLogoChange(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -215,7 +212,6 @@ export default function Profile() {
   }
 
   // Guardar alterações 
-
   async function handleSave() {
     setError(null);
     setSuccess(false);
@@ -272,15 +268,13 @@ export default function Profile() {
   }
 
   // Apagar conta 
-  // Ordem: logo no Storage → tabelas (cascade via FK ou manual) → auth user
-
   async function handleDeleteAccount() {
     if (!user?.id) return;
     setDeleting(true);
     setDeleteError(null);
 
     try {
-      // 1. Remove a logo do Storage se existir
+      // Remove a logo do Storage se existir
       if (business?.logo_url) {
         // Extrai o path relativo a partir da URL pública
         const url = new URL(business.logo_url);
@@ -310,7 +304,7 @@ export default function Profile() {
       });
       if (rpcError) throw rpcError;
 
-      // 5. Faz logout local e redireciona
+      // Faz logout local e redireciona
       await logout();
       navigate("/login", { replace: true });
 

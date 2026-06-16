@@ -71,7 +71,6 @@ export default function CalendarView({
         start: new Date(appt.starts_at),
         end: new Date(appt.ends_at),
         resource: appt,
-        // status derivado — para cor correcta no calendário
         derivedStatus: resolveStatus(appt),
       })),
     [appointments],

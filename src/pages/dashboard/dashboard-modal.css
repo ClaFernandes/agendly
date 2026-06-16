@@ -1,7 +1,6 @@
 /* src/pages/dashboard/css/dashboard-modal.css */
 
 /* Overlay e contentor */
-
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -31,7 +30,6 @@
 }
 
 /* Cabeçalho */
-
 .modal-header {
     display: flex;
     align-items: center;
@@ -59,7 +57,6 @@
 }
 
 /* Formulário */
-
 .modal-form {
     display: flex;
     flex-direction: column;
@@ -133,7 +130,6 @@
 }
 
 /* Autocomplete de clientes (usado no formulário de agendamento) */
-
 .client-autocomplete {
     position: relative;
 }
@@ -182,7 +178,6 @@
 }
 
 /* Acções do modal */
-
 .modal-actions {
     display: flex;
     justify-content: flex-end;
@@ -193,7 +188,6 @@
 }
 
 /* Modal de confirmação de apagar */
-
 .delete-modal-body {
     display: flex;
     flex-direction: column;
@@ -258,7 +252,6 @@
 }
 
 /* Botão de perigo (apagar) */
-
 .btn-danger {
     display: inline-flex;
     align-items: center;
@@ -285,7 +278,6 @@
 }
 
 /* Responsividade */
-
 @media (max-width: 640px) {
     .form-row {
         grid-template-columns: 1fr;

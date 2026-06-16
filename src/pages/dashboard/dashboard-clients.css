@@ -1,7 +1,6 @@
 /* src/pages/dashboard/css/dashboard-clients.css */
 
 /* Wrapper */
-
 .client-table-wrapper {
     display: flex;
     flex-direction: column;
@@ -9,7 +8,6 @@
 }
 
 /* Barra de pesquisa */
-
 .client-search {
     position: relative;
     display: flex;
@@ -32,7 +30,6 @@
 }
 
 /* Tabela */
-
 .client-table {
     width: 100%;
     border-collapse: collapse;
@@ -156,8 +153,7 @@
     white-space: nowrap;
 }
 
-/* Responsividade — cards no mobile */
-
+/* Responsividade */
 @media (max-width: 640px) {
     .client-table thead {
         display: none;

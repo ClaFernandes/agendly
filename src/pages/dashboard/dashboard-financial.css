@@ -1,7 +1,6 @@
 /* src/pages/dashboard/css/dashboard-financial.css */
 
 /* Selector de período */
-
 .fin-period-selector {
     display: flex;
     gap: 12px;
@@ -20,7 +19,6 @@
 }
 
 /* Gráfico de barras */
-
 .fin-chart {
     display: flex;
     flex-direction: column;
@@ -65,7 +63,6 @@
 }
 
 /* Tabela de transacções (reutilizável) */
-
 .admin-table-wrapper {
     overflow-x: auto;
 }
@@ -111,7 +108,6 @@
 }
 
 /* Responsividade */
-
 @media (max-width: 640px) {
     .fin-period-selector {
         flex-direction: column;

@@ -2,9 +2,7 @@
 
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-
 import { FiGrid, FiBriefcase, FiShield, FiLogOut } from "react-icons/fi";
-
 import logo from "../../assets/logo.svg";
 import "./AdminLayout.css";
 

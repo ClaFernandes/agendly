@@ -1,7 +1,5 @@
 /* src/pages/dashboard/css/dashboard-services.css */
 
-/* Tabela de serviços */
-
 .svc-table {
     width: 100%;
     border-collapse: collapse;
@@ -181,7 +179,7 @@
     margin-bottom: 16px;
 }
 
-/* Responsividade — cards no mobile */
+/* Responsividade */
 
 @media (max-width: 640px) {
     .svc-table thead {

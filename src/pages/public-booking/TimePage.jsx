@@ -1,4 +1,5 @@
 // src/pages/public-booking/TimePage.jsx
+
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useBooking } from "../../context/BookingContext";
@@ -21,7 +22,7 @@ export default function TimePage() {
         const dateObj = new Date(`${selectedDate}T00:00:00`);
         const dayOfWeek = dateObj.getDay();
 
-        // 1. Buscamos TODOS os turnos para aquele dia
+        // Busca todos os turnos para aquele dia
         const { data: hoursData, error: hoursError } = await supabase
           .from("working_hours")
           .select("start_time, end_time")
@@ -36,7 +37,7 @@ export default function TimePage() {
           return;
         }
 
-        // 2. Geramos slots para CADA turno e juntamos tudo numa lista só
+        // Gera slots para cada turno e juntamos tudo numa lista só
         let allPossibleSlots = [];
         hoursData.forEach((turno) => {
           const turnoSlots = generateSlots(
@@ -47,7 +48,7 @@ export default function TimePage() {
           allPossibleSlots = [...allPossibleSlots, ...turnoSlots];
         });
 
-        // 3. Buscar agendamentos existentes
+        // Buscar agendamentos existentes
         const startOfDay = new Date(`${selectedDate}T00:00:00`).toISOString();
         const endOfDay = new Date(`${selectedDate}T23:59:59`).toISOString();
 
@@ -60,7 +61,7 @@ export default function TimePage() {
 
         if (apptError) throw apptError;
 
-        // 4. Filtrar colisões
+        // Filtrar colisões
         const filtered = filterAvailableSlots(
           allPossibleSlots,
           appointments || [],

@@ -49,9 +49,8 @@ export default function AdminUsers() {
     }
   }
 
-  // Confirma e remove o admin.
+  // Confirma e remove o admin
   // Se o admin removido for o próprio utilizador logado, faz logout imediato
-  // — não faz sentido continuar com uma sessão sem perfil ativo.
   async function handleRemove(adminId) {
     const result = await removeAdmin(adminId);
     setConfirmRemoveId(null);

@@ -364,7 +364,7 @@
     color: #fff;
 }
 
-/* ─── react-big-calendar overrides ───────────────────────────────────────── */
+/* react-big-calendar overrides */
 
 /* Base */
 .calendar-wrapper .rbc-calendar {
@@ -375,7 +375,7 @@
     font-family: inherit;
 }
 
-/* ── Month view ── */
+/* Month view */
 .calendar-wrapper .rbc-month-view {
     flex: 1;
     display: flex;
@@ -518,7 +518,7 @@
     border-top: 0.5px dashed var(--color-border);
 }
 
-/* ── Day view events ── */
+/* Day view events */
 .calendar-wrapper .rbc-day-slot .rbc-event {
     border-radius: var(--radius-md) !important;
     border-width: 0 0 0 3px !important;
@@ -537,7 +537,7 @@
     filter: brightness(0.95);
 }
 
-/* Oculta o label padrão do RBC — usamos o componente customizado */
+/* Oculta o label padrão */
 .calendar-wrapper .rbc-day-slot .rbc-event-label {
     display: none;
 }
@@ -580,7 +580,7 @@
     opacity: 0.6;
 }
 
-/* ── Componente de evento customizado (dia/semana) ── */
+/* Componente de evento customizado (dia/semana) */
 .rbc-day-event-custom {
     display: flex;
     flex-direction: column;
@@ -664,7 +664,7 @@
     }
 }
 
-/* ── Gestão de agendamentos (BookingsPage) ── */
+/* Gestão de agendamentos (BookingsPage) */
 
 .bkg-toolbar {
     display: flex;

@@ -3,13 +3,11 @@
 import { useState, useMemo } from "react";
 import { RiCloseLine } from "react-icons/ri";
 
-// Converte um Date para o valor esperado por <input type="date">
 function toDateInputValue(d) {
     const pad = (n) => String(n).padStart(2, "0");
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-// Converte um Date para o valor esperado por <input type="time">
 function toTimeInputValue(d) {
     const pad = (n) => String(n).padStart(2, "0");
     return `${pad(d.getHours())}:${pad(d.getMinutes())}`;

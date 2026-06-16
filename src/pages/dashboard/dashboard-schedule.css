@@ -1,7 +1,6 @@
 /* src/pages/dashboard/css/dashboard-schedule.css */
 
 /* Dias da semana */
-
 .sch-day {
     padding: 16px 24px;
 }
@@ -165,7 +164,6 @@
 }
 
 /* Responsividade */
-
 @media (max-width: 640px) {
     .sch-intervals {
         padding-left: 0;
