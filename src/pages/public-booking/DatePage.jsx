@@ -1,4 +1,5 @@
 // src/pages/public-booking/DatePage.jsx
+
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useBooking } from "../../context/BookingContext";
@@ -22,7 +23,7 @@ export default function DatePage() {
   const minMonthDate = new Date(today.getFullYear(), today.getMonth(), 1);
   const maxMonthDate = new Date(today.getFullYear(), today.getMonth() + 2, 1);
 
-  // 1. Procurar quais os dias da semana que o negócio realmente abre
+  // Procura quais os dias da semana que o negócio realmente abre
   useEffect(() => {
     async function loadBusinessConfig() {
       if (!business?.id) return;
@@ -61,7 +62,7 @@ export default function DatePage() {
     if (next <= maxMonthDate) setCurrentViewDate(next);
   };
 
-  // 2. Construção da Matriz do Calendário (Alinhada à Segunda-feira)
+  // Construção da Matriz do Calendário (Alinhada à Segunda-feira)
   const firstDayOfMonth = new Date(viewYear, viewMonth, 1);
   // No JS: 0=Dom, 1=Seg, 2=Ter... Queremos transformar para: 0=Seg, 1=Ter... 6=Dom
   let startDayIndex = firstDayOfMonth.getDay() - 1;
@@ -69,19 +70,19 @@ export default function DatePage() {
 
   const totalDaysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
 
-  // Gerar array final de células
+  // Gera array final de células
   const calendarCells = [];
 
-  // Preencher os quadradinhos vazios do início do mês (dias do mês anterior)
+  // Preenche os quadradinhos vazios do início do mês (dias do mês anterior)
   for (let i = 0; i < startDayIndex; i++) {
     calendarCells.push({ isBlank: true, key: `blank-${i}` });
   }
 
-  // Preencher os dias reais do mês corrente
+  // Preenche os dias reais do mês corrente
   for (let dayNum = 1; dayNum <= totalDaysInMonth; dayNum++) {
     const cellDate = new Date(viewYear, viewMonth, dayNum);
 
-    // Gerar string local YYYY-MM-DD sem quebra de fuso horário
+    // Gera string local YYYY-MM-DD sem quebra de fuso horário
     const y = cellDate.getFullYear();
     const m = String(cellDate.getMonth() + 1).padStart(2, "0");
     const d = String(cellDate.getDate()).padStart(2, "0");
@@ -136,7 +137,7 @@ export default function DatePage() {
             onClick={handlePrevMonth}
             disabled={isPrevDisabled}
           >
-            <FiArrowLeft/>
+            <FiArrowLeft />
           </button>
           <span className="calendar-month-title">{monthLabel}</span>
           <button
@@ -145,7 +146,7 @@ export default function DatePage() {
             onClick={handleNextMonth}
             disabled={isNextDisabled}
           >
-            <FiArrowRight/>
+            <FiArrowRight />
           </button>
         </div>
 
@@ -191,13 +192,13 @@ export default function DatePage() {
         </div>
 
         <div className="page-actions">
-          <button 
+          <button
             type="button"
             className="onboarding-btn-back"
-            onClick={()=> navigate("../")}
+            onClick={() => navigate("../")}
           >
-            <FiArrowLeft/> Voltar
-          </button>          
+            <FiArrowLeft /> Voltar
+          </button>
         </div>
       </div>
     </div>

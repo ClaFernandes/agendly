@@ -1,0 +1,134 @@
+/* src/pages/dashboard/css/dashboard-financial.css */
+
+/* Selector de período */
+.fin-period-selector {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.fin-select {
+    padding: 9px 14px;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border-strong);
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+/* Gráfico de barras */
+.fin-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.fin-bar-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 90px;
+    align-items: center;
+    gap: 12px;
+}
+
+.fin-bar-label {
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fin-bar-track {
+    height: 10px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-2);
+    overflow: hidden;
+}
+
+.fin-bar-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    background: var(--color-brand);
+    transition: width 0.3s ease;
+}
+
+.fin-bar-value {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semi);
+    color: var(--color-text);
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* Tabela de transacções (reutilizável) */
+.admin-table-wrapper {
+    overflow-x: auto;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+}
+
+.admin-table thead tr {
+    border-bottom: 0.5px solid var(--color-border);
+}
+
+.admin-table tbody tr {
+    border-bottom: 0.5px solid var(--color-border);
+    transition: background-color 0.1s;
+}
+
+.admin-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.admin-table tbody tr:hover {
+    background-color: var(--color-surface-2);
+}
+
+.admin-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: var(--text-xs);
+    font-weight: var(--font-semi);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.admin-table td {
+    padding: 12px 16px;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+/* Responsividade */
+@media (max-width: 640px) {
+    .fin-period-selector {
+        flex-direction: column;
+    }
+
+    .fin-select {
+        width: 100%;
+    }
+
+    .fin-bar-row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+
+    .fin-bar-value {
+        text-align: left;
+    }
+
+    /* Oculta coluna Serviço em ecrãs pequenos */
+    .admin-table th:nth-child(3),
+    .admin-table td:nth-child(3) {
+        display: none;
+    }
+}

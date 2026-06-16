@@ -2,9 +2,7 @@
 
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-
 import { FiGrid, FiBriefcase, FiShield, FiLogOut } from "react-icons/fi";
-
 import logo from "../../assets/logo.svg";
 import "./AdminLayout.css";
 
@@ -59,7 +57,7 @@ export default function AdminLayout() {
             className={isActive("/admin/users") ? "active" : ""}
           >
             <FiShield />
-            <span>Admins</span>
+            <span>Administradores</span>
           </Link>
         </nav>
 

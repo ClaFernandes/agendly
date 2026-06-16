@@ -7,11 +7,14 @@ import {
   useState,
   useRef,
   useMemo,
+  useCallback,
 } from "react";
 
 import { supabase } from "../lib/supabase";
 
 const AuthContext = createContext();
+
+const INACTIVITY_TIMEOUT = 60 * 60 * 1000; // 60 minutos
 
 // eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
@@ -21,14 +24,14 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
-  const [userStatus, setUserStatus] = useState(null); // 'active' | 'pending' | 'rejected'
+  const [userStatus, setUserStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const isRegistering = useRef(false);
   const justSignedOut = useRef(false);
+  const inactivityTimer = useRef(null);
 
   const APP_BASE = `${window.location.origin}/agendly`;
 
-  // Vai buscar o role e o status do utilizador à tabela profiles
   async function fetchProfile(userId) {
     const { data, error } = await supabase
       .from("profiles")
@@ -44,7 +47,6 @@ export function AuthProvider({ children }) {
     return data ?? null;
   }
 
-  // Garante que o perfil existe — cria com role "provider" e status "active" se não existir
   async function ensureProfile(userId) {
     const profile = await fetchProfile(userId);
     if (profile) return profile;
@@ -61,6 +63,51 @@ export function AuthProvider({ children }) {
 
     return data ?? { role: "provider", status: "active" };
   }
+
+  // Faz logout por inatividade 
+  const logoutDueToInactivity = useCallback(async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.error("Erro no logout por inatividade:", e);
+    } finally {
+      setUser(null);
+      setUserRole(null);
+      setUserStatus(null);
+    }
+  }, []);
+
+  // Reinicia o timer a cada chamada
+  const resetInactivityTimer = useCallback(() => {
+    if (inactivityTimer.current) {
+      clearTimeout(inactivityTimer.current);
+    }
+    inactivityTimer.current = setTimeout(logoutDueToInactivity, INACTIVITY_TIMEOUT);
+  }, [logoutDueToInactivity]);
+
+  // Ativa/desativa os listeners de atividade 
+  useEffect(() => {
+    if (!user) {
+      // Utilizador não autenticado — limpa timer e não regista eventos
+      if (inactivityTimer.current) {
+        clearTimeout(inactivityTimer.current);
+        inactivityTimer.current = null;
+      }
+      return;
+    }
+
+    const events = ["mousemove", "mousedown", "keydown", "scroll", "touchstart"];
+
+    events.forEach((e) => window.addEventListener(e, resetInactivityTimer, { passive: true }));
+    resetInactivityTimer(); // arranca o timer ao fazer login
+
+    return () => {
+      events.forEach((e) => window.removeEventListener(e, resetInactivityTimer));
+      if (inactivityTimer.current) {
+        clearTimeout(inactivityTimer.current);
+      }
+    };
+  }, [user, resetInactivityTimer]);
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
@@ -185,16 +232,6 @@ export function AuthProvider({ children }) {
     if (error) throw error;
   }
 
-  async function loginWithGoogle() {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/agendly/register`,
-      },
-    });
-    if (error) throw error;
-  }
-
   const value = useMemo(
     () => ({
       user,
@@ -205,7 +242,6 @@ export function AuthProvider({ children }) {
       register,
       logout,
       recoverPassword,
-      loginWithGoogle,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [user, userRole, userStatus, loading],

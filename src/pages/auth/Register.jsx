@@ -3,7 +3,6 @@
 import { useNavigate, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { supabase } from "../../lib/supabase";
 import {
   FiEye,
   FiEyeOff,
@@ -14,26 +13,20 @@ import {
   FiX,
 } from "react-icons/fi";
 import { AiOutlineCheck } from "react-icons/ai";
-import { FcGoogle } from "react-icons/fc";
 import logo from "../../assets/logo.svg";
 import "./Auth.css";
 
-// Regras de password
 const passwordRules = [
   { id: "length", label: "Mínimo 8 caracteres", test: (p) => p.length >= 8 },
   { id: "upper", label: "Uma letra maiúscula", test: (p) => /[A-Z]/.test(p) },
   { id: "lower", label: "Uma letra minúscula", test: (p) => /[a-z]/.test(p) },
   { id: "number", label: "Um número", test: (p) => /[0-9]/.test(p) },
-  {
-    id: "special",
-    label: "Um carácter especial",
-    test: (p) => /[^A-Za-z0-9]/.test(p),
-  },
+  { id: "special", label: "Um carácter especial", test: (p) => /[^A-Za-z0-9]/.test(p) },
 ];
 
 export default function Register() {
   const navigate = useNavigate();
-  const { register, loginWithGoogle, user, userRole, loading } = useAuth();
+  const { register, user, userRole, loading } = useAuth();
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -44,85 +37,34 @@ export default function Register() {
   const [error, setError] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
 
-  // Redirecionamento pós-registo/login
+  // Após registo, vai sempre para onboarding
   useEffect(() => {
     if (loading) return;
     if (!user || userRole !== "provider") return;
-
-    //  Google - vai para o dashboard se tiver negócio, ou para onboarding se não tiver
-    const isGoogleUser = user.app_metadata?.provider === "google";
-
-    if (!isGoogleUser) {
-      // Registo por email — utilizador novo, vai sempre para onboarding
-      navigate("/onboarding", { replace: true });
-      return;
-    }
-
-    // Google — verifica se já tem negócio
-    async function handleGoogleRedirect() {
-      const { data } = await supabase
-        .from("business")
-        .select("id")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      if (data) {
-        navigate("/dashboard", { replace: true });
-      } else {
-        navigate("/onboarding", { replace: true });
-      }
-    }
-
-    handleGoogleRedirect();
+    navigate("/onboarding", { replace: true });
   }, [user, userRole, loading, navigate]);
 
-  // Avaliação das regras de password
-  const rulesStatus = passwordRules.map((rule) => ({
-    ...rule,
-    passed: rule.test(password),
-  }));
-
+  const rulesStatus = passwordRules.map((rule) => ({ ...rule, passed: rule.test(password) }));
   const allRulesPassed = rulesStatus.every((r) => r.passed);
   const passwordsMatch = password === confirmPassword && confirmPassword !== "";
 
-  // Função de registo — tenta criar conta e fazer login imediato - useEffect trata do redirecionamento
   async function handleRegister(e) {
     e.preventDefault();
     setError(null);
 
-    if (!allRulesPassed) {
-      setError("A password não cumpre todos os requisitos.");
-      return;
-    }
-    if (!passwordsMatch) {
-      setError("As passwords não coincidem.");
-      return;
-    }
+    if (!allRulesPassed) { setError("A password não cumpre todos os requisitos."); return; }
+    if (!passwordsMatch) { setError("As passwords não coincidem."); return; }
 
     setFormLoading(true);
-
     try {
       await register(email, password, fullName);
     } catch (err) {
-      if (
-        err.message?.includes("already registered") ||
-        err.message?.includes("User already exists")
-      ) {
+      if (err.message?.includes("already registered") || err.message?.includes("User already exists")) {
         setError("Este email já está registado. Tenta fazer login.");
       } else {
         setError("Erro ao criar conta. Tenta novamente.");
       }
       setFormLoading(false);
-    }
-  }
-
-  //Função para buscar role do utilizador, com retries para lidar com delay na criação do perfil
-  async function handleGoogle() {
-    setError(null);
-    try {
-      await loginWithGoogle();
-    } catch {
-      setError("Erro ao registar com Google. Tenta novamente.");
     }
   }
 
@@ -134,23 +76,13 @@ export default function Register() {
           <img src={logo} alt="Agendly" className="auth-logo" />
           <span>Agendly</span>
         </Link>
-
         <div className="auth-marketing-body">
           <h2>Começa em menos de 2 minutos</h2>
-          <p>
-            Cria a tua conta, configura o negócio e partilha o link com os teus
-            clientes.
-          </p>
+          <p>Cria a tua conta, configura o negócio e partilha o link com os teus clientes.</p>
           <ul className="auth-features">
-            <li>
-              <AiOutlineCheck /> Registo 100% gratuito
-            </li>
-            <li>
-              <AiOutlineCheck /> Página pública ativa imediatamente
-            </li>
-            <li>
-              <AiOutlineCheck /> Cancelamento a qualquer momento
-            </li>
+            <li><AiOutlineCheck /> Registo 100% gratuito</li>
+            <li><AiOutlineCheck /> Página pública ativa imediatamente</li>
+            <li><AiOutlineCheck /> Cancelamento a qualquer momento</li>
           </ul>
         </div>
       </div>
@@ -168,20 +100,8 @@ export default function Register() {
 
           {error && <p className="auth-error">{error}</p>}
 
-          <button
-            type="button"
-            className="auth-google-btn"
-            onClick={handleGoogle}
-          >
-            <FcGoogle className="auth-google-icon" />
-            Continuar com Google
-          </button>
-
-          <div className="auth-divider">
-            <span>ou</span>
-          </div>
-
           <form onSubmit={handleRegister}>
+            {/* Nome */}
             <div className="auth-field">
               <label htmlFor="fullName">Nome completo</label>
               <div className="auth-input-wrapper">
@@ -193,10 +113,12 @@ export default function Register() {
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Manuel Silva"
                   required
+                  disabled={formLoading}
                 />
               </div>
             </div>
 
+            {/* Email */}
             <div className="auth-field">
               <label htmlFor="email">Email</label>
               <div className="auth-input-wrapper">
@@ -208,10 +130,12 @@ export default function Register() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="mail@mail.com"
                   required
+                  disabled={formLoading}
                 />
               </div>
             </div>
 
+            {/* Password */}
             <div className="auth-field">
               <label htmlFor="password">Palavra-passe</label>
               <div className="auth-input-wrapper">
@@ -223,6 +147,7 @@ export default function Register() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
+                  disabled={formLoading}
                 />
                 <button
                   type="button"
@@ -236,10 +161,7 @@ export default function Register() {
               {password.length > 0 && (
                 <ul className="auth-password-rules">
                   {rulesStatus.map((rule) => (
-                    <li
-                      key={rule.id}
-                      className={rule.passed ? "rule-passed" : "rule-failed"}
-                    >
+                    <li key={rule.id} className={rule.passed ? "rule-passed" : "rule-failed"}>
                       {rule.passed ? <FiCheck /> : <FiX />}
                       {rule.label}
                     </li>
@@ -248,6 +170,7 @@ export default function Register() {
               )}
             </div>
 
+            {/* Confirmar password */}
             <div className="auth-field">
               <label htmlFor="confirmPassword">Confirmar palavra-passe</label>
               <div className="auth-input-wrapper">
@@ -259,6 +182,7 @@ export default function Register() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
                   required
+                  disabled={formLoading}
                 />
                 <button
                   type="button"
@@ -270,20 +194,10 @@ export default function Register() {
               </div>
 
               {confirmPassword.length > 0 && (
-                <p
-                  className={
-                    passwordsMatch ? "auth-match-ok" : "auth-match-error"
-                  }
-                >
-                  {passwordsMatch ? (
-                    <>
-                      <FiCheck /> As palavras-passe coincidem
-                    </>
-                  ) : (
-                    <>
-                      <FiX /> As palavras-passe não coincidem
-                    </>
-                  )}
+                <p className={passwordsMatch ? "auth-match-ok" : "auth-match-error"}>
+                  {passwordsMatch
+                    ? <><FiCheck /> As palavras-passe coincidem</>
+                    : <><FiX /> As palavras-passe não coincidem</>}
                 </p>
               )}
             </div>

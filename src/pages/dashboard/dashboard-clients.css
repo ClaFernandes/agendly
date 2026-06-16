@@ -1,0 +1,213 @@
+/* src/pages/dashboard/css/dashboard-clients.css */
+
+/* Wrapper */
+.client-table-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Barra de pesquisa */
+.client-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.client-search-icon {
+    position: absolute;
+    left: 12px;
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-subtle);
+    pointer-events: none;
+}
+
+.client-search-input {
+    width: 100%;
+    padding: 9px 12px 9px 38px;
+    border-radius: var(--radius-md);
+}
+
+/* Tabela */
+.client-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+}
+
+.client-table thead tr {
+    border-bottom: 0.5px solid var(--color-border);
+}
+
+.client-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: var(--text-xs);
+    font-weight: var(--font-semi);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.client-table tbody tr {
+    border-bottom: 0.5px solid var(--color-border);
+    transition: background-color 0.1s;
+}
+
+.client-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.client-table tbody tr:hover {
+    background-color: var(--color-surface-2);
+}
+
+.client-table td {
+    padding: 12px 16px;
+    vertical-align: middle;
+}
+
+/* Linha favorita */
+.client-row--favorite {
+    background-color: var(--color-warning-50);
+}
+
+.client-row--favorite:hover {
+    background-color: var(--color-warning-50);
+}
+
+/* Botão coração */
+.client-fav-cell {
+    width: 40px;
+    text-align: center;
+}
+
+.client-fav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-md);
+    color: var(--color-text-subtle);
+    font-size: 16px;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.client-fav-btn:hover {
+    background-color: var(--color-surface-2);
+    color: var(--color-danger-400);
+}
+
+.client-fav-btn--active {
+    color: var(--color-danger-600);
+}
+
+.client-fav-btn--active:hover {
+    color: var(--color-danger-700);
+}
+
+.client-fav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Nome, email, telefone */
+.client-name {
+    font-weight: var(--font-medium);
+    color: var(--color-text);
+}
+
+.client-email,
+.client-phone {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    margin-top: 2px;
+}
+
+/* Visitas badge */
+.client-visits {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    background: var(--color-brand-subtle);
+    color: var(--color-brand);
+    font-size: var(--text-xs);
+    font-weight: var(--font-semi);
+}
+
+.client-spent {
+    font-weight: var(--font-semi);
+    color: var(--color-text);
+    white-space: nowrap;
+}
+
+.client-last-visit {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    white-space: nowrap;
+}
+
+/* Responsividade */
+@media (max-width: 640px) {
+    .client-table thead {
+        display: none;
+    }
+
+    .client-table,
+    .client-table tbody,
+    .client-table tr,
+    .client-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .client-table tbody tr {
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 12px;
+        padding: 14px 16px 14px 44px;
+        border: 0.5px solid var(--color-border);
+        border-radius: var(--radius-md);
+        margin-bottom: 10px;
+        background: var(--color-surface);
+    }
+
+    .client-table tbody tr:last-child {
+        margin-bottom: 0;
+    }
+
+    .client-table td {
+        padding: 0;
+        border: none;
+    }
+
+    .client-fav-cell {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: auto;
+    }
+
+    .client-table td:nth-child(2) {
+        flex: 1 1 100%;
+        padding-right: 32px;
+    }
+
+    .client-table td:nth-child(3)::before {
+        content: "Visitas: ";
+        font-size: var(--text-xs);
+        color: var(--color-text-subtle);
+    }
+
+    .client-table td:nth-child(5) {
+        margin-left: auto;
+    }
+}

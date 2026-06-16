@@ -8,7 +8,7 @@
 
 /* Sidebar */
 .admin-sidebar {
-    width: 220px;
+    width: 260px;
     flex-shrink: 0;
     background: linear-gradient(180deg, #3730a3 0%, #1e1b4b 100%);
     display: flex;
@@ -154,7 +154,7 @@
 
 /* Área de conteúdo */
 .admin-content {
-    margin-left: 220px;
+    margin-left: 260px;
     flex: 1;
     min-height: 100vh;
     padding: 40px 40px 60px;

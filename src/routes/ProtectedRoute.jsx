@@ -14,10 +14,9 @@ export default function ProtectedRoute({ children, role }) {
   if (isResetPage) return children;
 
   if (!user) {
-    if (role === "admin") {
-      return <Navigate to="/admin/login" replace />;
-    }
-    return <Navigate to="/login" replace />;
+    return role === "admin"
+      ? <Navigate to="/admin/login" replace />
+      : <Navigate to="/login" replace />;
   }
 
   if (role === "admin" && userRole === "admin" && userStatus !== "active") {
@@ -25,17 +24,11 @@ export default function ProtectedRoute({ children, role }) {
   }
 
   if (role && userRole !== role) {
-    if (!userRole) return <div>A carregar perfil...</div>;
-
-    if (userRole === "provider") {
-      return <Navigate to="/dashboard" replace />;
-    }
-
+    if (userRole === "provider") return <Navigate to="/dashboard" replace />;
     if (userRole === "admin") {
-      if (userStatus !== "active") {
-        return <Navigate to="/admin/login" replace />;
-      }
-      return <Navigate to="/admin" replace />;
+      return userStatus !== "active"
+        ? <Navigate to="/admin/login" replace />
+        : <Navigate to="/admin" replace />;
     }
   }
 
