@@ -2,25 +2,20 @@
 
 import { useState, useMemo } from "react";
 import {
-  RiAddLine,
-  RiCheckLine,
-  RiCloseLine,
-  RiArrowGoBackLine,
-  RiPencilLine,
-  RiSearchLine,
-  RiTimeLine,
-  RiTimerLine,
-  RiToolsLine,
-  RiMoneyDollarCircleLine,
-  RiCalendarLine,
+  RiAddLine, RiCheckLine, RiCloseLine, RiArrowGoBackLine,
+  RiPencilLine, RiSearchLine, RiTimeLine, RiTimerLine,
+  RiToolsLine, RiMoneyDollarCircleLine, RiCalendarLine,
+  RiArrowLeftSLine, RiArrowRightSLine, RiUserUnfollowLine,
 } from "react-icons/ri";
-import { useAppointments, resolveStatus, STATUS_CONFIG, APPOINTMENT_STATUS } from "../../hooks/useAppointments";
+import {
+  useAppointments, resolveStatus, STATUS_CONFIG,
+  APPOINTMENT_STATUS, isFuture, isPast,
+} from "../../hooks/useAppointments";
 import { useServices } from "../../hooks/useServices";
 import AppointmentFormModal from "../../components/service-panel/AppointmentFormModal";
 import "./Dashboard.css";
 
-const MONTH_NAMES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-
+// Helpers 
 const AVATAR_COLORS = [
   { bg: "#EEEDFE", color: "#534AB7" },
   { bg: "#E1F5EE", color: "#0F6E56" },
@@ -49,10 +44,33 @@ function getDurationMinutes(start, end) {
   return Math.round((new Date(end) - new Date(start)) / 60000);
 }
 
+// Início da semana (segunda-feira)
+function getWeekStart(date) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+function getWeekEnd(weekStart) {
+  const d = new Date(weekStart);
+  d.setDate(d.getDate() + 6);
+  d.setHours(23, 59, 59, 999);
+  return d;
+}
+function formatWeekLabel(weekStart) {
+  const end = getWeekEnd(weekStart);
+  const startStr = weekStart.toLocaleDateString("pt-PT", { day: "2-digit", month: "short" });
+  const endStr = end.toLocaleDateString("pt-PT", { day: "2-digit", month: "short" });
+  return `${startStr} – ${endStr}`;
+}
+
 const PILL_STYLES = {
   em_aberto: { background: "#FEF9EC", color: "#92620A" },
   concluido: { background: "#E1F5EE", color: "#0F6E56" },
   cancelado: { background: "#FCEBEB", color: "#A32D2D" },
+  nao_compareceu: { background: "#F5F3FF", color: "#7C3AED" },
 };
 
 function StatusPill({ status }) {
@@ -64,9 +82,13 @@ function StatusPill({ status }) {
   );
 }
 
-function BookingCard({ appt, saving, onComplete, onCancel, onReopen, onEdit }) {
+// Card 
+function BookingCard({ appt, saving, onComplete, onCancel, onReopen, onEdit, onNoShow }) {
   const [open, setOpen] = useState(false);
   const derived = resolveStatus(appt);
+  const future = isFuture(appt);
+  const past = isPast(appt);
+
   const idx = getColorIndex(appt.client_name || appt.id);
   const avatarStyle = AVATAR_COLORS[idx];
   const barColor = TIME_BAR_COLORS[idx];
@@ -78,10 +100,13 @@ function BookingCard({ appt, saving, onComplete, onCancel, onReopen, onEdit }) {
     ? Number(appt.service.price).toLocaleString("pt-PT", { style: "currency", currency: "EUR" })
     : "—";
 
+  const isNoShow = appt.status === APPOINTMENT_STATUS.NAO_COMPARECEU;
+  const isCancelled = derived === APPOINTMENT_STATUS.CANCELADO;
+
   return (
     <div
       className={`appt-item-v2${open ? " appt-item-v2--open" : ""}`}
-      style={{ opacity: derived === APPOINTMENT_STATUS.CANCELADO ? 0.65 : 1 }}
+      style={{ opacity: isCancelled || isNoShow ? 0.65 : 1 }}
       onClick={() => setOpen((o) => !o)}
     >
       <div className="appt-item-v2-body">
@@ -141,49 +166,59 @@ function BookingCard({ appt, saving, onComplete, onCancel, onReopen, onEdit }) {
           </div>
 
           <div className="appt-item-actions">
-            {/* Editar — sempre disponível */}
-            <button
-              className="appt-action-btn"
-              disabled={saving}
-              onClick={() => onEdit(appt)}
-            >
-              <RiPencilLine aria-hidden="true" />
-              Editar
-            </button>
+            {/*
+              REGRAS DE AÇÕES:
+              - Futuro + em_aberto    → Editar, Cancelar, Concluir (antecipar)
+              - Passado + em_aberto   → Concluir, Não compareceu
+              - Futuro + cancelado    → Editar, Reabrir
+              - Passado + cancelado   → nada
+              - Qualquer + concluido  → nada (automático)
+              - Qualquer + no-show    → Reabrir
+            */}
 
-            {/* Cancelar — sempre disponível exceto se já cancelado */}
-            {derived !== APPOINTMENT_STATUS.CANCELADO && (
-              <button
-                className="appt-action-btn appt-action-btn--cancel"
-                disabled={saving}
-                onClick={() => onCancel(appt.id)}
-              >
-                <RiCloseLine aria-hidden="true" />
-                Cancelar
-              </button>
+            {/* Futuro em aberto */}
+            {future && derived === APPOINTMENT_STATUS.EM_ABERTO && (
+              <>
+                <button className="appt-action-btn" disabled={saving} onClick={() => onEdit(appt)}>
+                  <RiPencilLine aria-hidden="true" />Editar
+                </button>
+                <button className="appt-action-btn appt-action-btn--cancel" disabled={saving} onClick={() => onCancel(appt.id)}>
+                  <RiCloseLine aria-hidden="true" />Cancelar
+                </button>
+                <button className="appt-action-btn appt-action-btn--complete" disabled={saving} onClick={() => onComplete(appt.id)}>
+                  <RiCheckLine aria-hidden="true" />Concluir
+                </button>
+              </>
             )}
 
-            {/* Concluir — só se em aberto */}
-            {derived === APPOINTMENT_STATUS.EM_ABERTO && (
-              <button
-                className="appt-action-btn appt-action-btn--complete"
-                disabled={saving}
-                onClick={() => onComplete(appt.id)}
-              >
-                <RiCheckLine aria-hidden="true" />
-                Concluir
-              </button>
+            {/* Passado em aberto (hora passou mas não foi marcado) */}
+            {past && appt.status === APPOINTMENT_STATUS.EM_ABERTO && (
+              <>
+                <button className="appt-action-btn appt-action-btn--complete" disabled={saving} onClick={() => onComplete(appt.id)}>
+                  <RiCheckLine aria-hidden="true" />Confirmar conclusão
+                </button>
+                <button className="appt-action-btn appt-action-btn--noshow" disabled={saving} onClick={() => onNoShow(appt.id)}>
+                  <RiUserUnfollowLine aria-hidden="true" />Não compareceu
+                </button>
+              </>
             )}
 
-            {/* Reabrir — se cancelado ou concluído */}
-            {derived !== APPOINTMENT_STATUS.EM_ABERTO && (
-              <button
-                className="appt-action-btn appt-action-btn--reopen"
-                disabled={saving}
-                onClick={() => onReopen(appt.id)}
-              >
-                <RiArrowGoBackLine aria-hidden="true" />
-                Reabrir
+            {/* Futuro cancelado */}
+            {future && isCancelled && (
+              <>
+                <button className="appt-action-btn" disabled={saving} onClick={() => onEdit(appt)}>
+                  <RiPencilLine aria-hidden="true" />Editar
+                </button>
+                <button className="appt-action-btn appt-action-btn--reopen" disabled={saving} onClick={() => onReopen(appt.id)}>
+                  <RiArrowGoBackLine aria-hidden="true" />Reabrir
+                </button>
+              </>
+            )}
+
+            {/* No-show → só reabrir */}
+            {isNoShow && (
+              <button className="appt-action-btn appt-action-btn--reopen" disabled={saving} onClick={() => onReopen(appt.id)}>
+                <RiArrowGoBackLine aria-hidden="true" />Reabrir
               </button>
             )}
           </div>
@@ -193,31 +228,47 @@ function BookingCard({ appt, saving, onComplete, onCancel, onReopen, onEdit }) {
   );
 }
 
+// Filtros 
+
 const FILTERS = [
   { key: "all", label: "Todos" },
   { key: "em_aberto", label: "Em aberto" },
   { key: "concluido", label: "Concluído" },
   { key: "cancelado", label: "Cancelado" },
+  { key: "nao_compareceu", label: "Não compareceu" },
 ];
+
+// Página 
 
 export default function BookingsPage() {
   const {
-    appointments,
-    loading,
-    error,
-    saving,
-    completeAppointment,
-    cancelAppointment,
-    reopenAppointment,
-    createAppointment,
-    updateAppointment,
+    appointments, loading, error, saving,
+    completeAppointment, cancelAppointment, reopenAppointment,
+    markNoShow, createAppointment, updateAppointment,
   } = useAppointments();
 
   const { services = [] } = useServices();
 
-  const now = new Date();
-  const [selectedMonth, setSelectedMonth] = useState(now.getMonth());
-  const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+  // Navegação por semana
+  const [weekStart, setWeekStart] = useState(() => getWeekStart(new Date()));
+  const weekEnd = getWeekEnd(weekStart);
+
+  const isCurrentWeek = getWeekStart(new Date()).toDateString() === weekStart.toDateString();
+
+  function prevWeek() {
+    const d = new Date(weekStart);
+    d.setDate(d.getDate() - 7);
+    setWeekStart(d);
+  }
+  function nextWeek() {
+    const d = new Date(weekStart);
+    d.setDate(d.getDate() + 7);
+    setWeekStart(d);
+  }
+  function goToThisWeek() {
+    setWeekStart(getWeekStart(new Date()));
+  }
+
   const [activeFilter, setActiveFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [modalState, setModalState] = useState(null);
@@ -237,17 +288,11 @@ export default function BookingsPage() {
     return Array.from(map.values());
   }, [appointments]);
 
-  const years = useMemo(() => {
-    const set = new Set(appointments.map((a) => new Date(a.starts_at).getFullYear()));
-    set.add(now.getFullYear());
-    return Array.from(set).sort((a, b) => b - a);
-  }, [appointments]);
-
-  // Filtra por mês/ano → estado → pesquisa
+  // Filtra por semana → estado → pesquisa
   const filtered = useMemo(() => {
     return appointments.filter((a) => {
       const d = new Date(a.starts_at);
-      if (d.getFullYear() !== selectedYear || d.getMonth() !== selectedMonth) return false;
+      if (d < weekStart || d > weekEnd) return false;
       if (activeFilter !== "all" && resolveStatus(a) !== activeFilter) return false;
       if (search.trim()) {
         const q = search.toLowerCase();
@@ -259,12 +304,13 @@ export default function BookingsPage() {
       }
       return true;
     });
-  }, [appointments, selectedMonth, selectedYear, activeFilter, search]);
+  }, [appointments, weekStart, weekEnd, activeFilter, search]);
 
+  // Contagens da semana visível
   const counts = useMemo(() => {
     const base = appointments.filter((a) => {
       const d = new Date(a.starts_at);
-      return d.getFullYear() === selectedYear && d.getMonth() === selectedMonth;
+      return d >= weekStart && d <= weekEnd;
     });
     const c = { all: base.length };
     base.forEach((a) => {
@@ -272,7 +318,7 @@ export default function BookingsPage() {
       c[s] = (c[s] || 0) + 1;
     });
     return c;
-  }, [appointments, selectedMonth, selectedYear]);
+  }, [appointments, weekStart, weekEnd]);
 
   async function handleModalSubmit(payload) {
     if (modalState?.mode === "edit") {
@@ -303,27 +349,21 @@ export default function BookingsPage() {
 
       {error && <p className="sch-error">{error}</p>}
 
-      {/* Filtros de período + pesquisa */}
+      {/* Navegação por semana + pesquisa */}
       <div className="bkg-toolbar">
-        <div className="bkg-period">
-          <select
-            className="fin-select"
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(Number(e.target.value))}
-          >
-            {MONTH_NAMES.map((name, i) => (
-              <option key={i} value={i}>{name}</option>
-            ))}
-          </select>
-          <select
-            className="fin-select"
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(Number(e.target.value))}
-          >
-            {years.map((y) => (
-              <option key={y} value={y}>{y}</option>
-            ))}
-          </select>
+        <div className="bkg-week-nav">
+          <button className="appt-nav-btn" onClick={prevWeek} aria-label="Semana anterior">
+            <RiArrowLeftSLine aria-hidden="true" />
+          </button>
+          <span className="bkg-week-label">{formatWeekLabel(weekStart)}</span>
+          <button className="appt-nav-btn" onClick={nextWeek} aria-label="Semana seguinte">
+            <RiArrowRightSLine aria-hidden="true" />
+          </button>
+          {!isCurrentWeek && (
+            <button className="btn-secondary" onClick={goToThisWeek} style={{ height: 32, padding: "0 12px" }}>
+              Esta semana
+            </button>
+          )}
         </div>
 
         <div className="bkg-search">
@@ -359,8 +399,8 @@ export default function BookingsPage() {
         ) : filtered.length === 0 ? (
           <div className="pg-empty">
             <RiCalendarLine className="pg-empty-icon" aria-hidden="true" />
-            <p className="pg-empty-text">Sem agendamentos para este período.</p>
-            <p className="pg-empty-subtext">Tenta mudar o filtro ou o período.</p>
+            <p className="pg-empty-text">Sem agendamentos nesta semana.</p>
+            <p className="pg-empty-subtext">Navega para outra semana ou cria um novo agendamento.</p>
           </div>
         ) : (
           <div className="appt-list">
@@ -372,6 +412,7 @@ export default function BookingsPage() {
                 onComplete={completeAppointment}
                 onCancel={cancelAppointment}
                 onReopen={reopenAppointment}
+                onNoShow={markNoShow}
                 onEdit={(appt) => setModalState({ mode: "edit", appointment: appt })}
               />
             ))}
