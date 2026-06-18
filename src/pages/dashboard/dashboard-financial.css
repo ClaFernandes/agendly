@@ -1,10 +1,30 @@
 /* src/pages/dashboard/css/dashboard-financial.css */
 
-/* Selector de período */
+/* Totais globais (topo) */
+.fin-totals-row {
+    margin-bottom: 24px;
+}
+
+.fin-stat-card--hero {
+    max-width: 280px;
+}
+
+.fin-hero-value {
+    font-size: var(--text-3xl, 2rem) !important;
+}
+
+/* Selector de período (mês) */
 .fin-period-selector {
     display: flex;
+    align-items: center;
     gap: 12px;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
+}
+
+.fin-period-label {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semi);
+    color: var(--color-text-muted);
 }
 
 .fin-select {
@@ -18,7 +38,13 @@
     cursor: pointer;
 }
 
-/* Gráfico de barras */
+/* Selector de ano (dentro da secção do gráfico) */
+.fin-year-selector {
+    display: flex;
+    align-items: center;
+}
+
+/* Gráfico de barras horizontal (por serviço) */
 .fin-chart {
     display: flex;
     flex-direction: column;
@@ -62,7 +88,7 @@
     white-space: nowrap;
 }
 
-/* Tabela de transacções (reutilizável) */
+/* Tabela de transacções */
 .admin-table-wrapper {
     overflow-x: auto;
 }
@@ -109,8 +135,12 @@
 
 /* Responsividade */
 @media (max-width: 640px) {
+    .fin-stat-card--hero {
+        max-width: 100%;
+    }
+
     .fin-period-selector {
-        flex-direction: column;
+        flex-wrap: wrap;
     }
 
     .fin-select {
@@ -126,7 +156,6 @@
         text-align: left;
     }
 
-    /* Oculta coluna Serviço em ecrãs pequenos */
     .admin-table th:nth-child(3),
     .admin-table td:nth-child(3) {
         display: none;

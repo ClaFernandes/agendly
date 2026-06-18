@@ -2,20 +2,33 @@
 
 import { useState, useMemo } from "react";
 import {
-  RiAddLine, RiCheckLine, RiCloseLine, RiArrowGoBackLine,
-  RiPencilLine, RiSearchLine, RiTimeLine, RiTimerLine,
-  RiToolsLine, RiMoneyDollarCircleLine, RiCalendarLine,
-  RiArrowLeftSLine, RiArrowRightSLine, RiUserUnfollowLine,
+  RiAddLine,
+  RiCheckLine,
+  RiCloseLine,
+  RiPencilLine,
+  RiSearchLine,
+  RiTimeLine,
+  RiTimerLine,
+  RiToolsLine,
+  RiMoneyDollarCircleLine,
+  RiCalendarLine,
+  RiArrowLeftSLine,
+  RiArrowRightSLine,
+  RiUserUnfollowLine,
 } from "react-icons/ri";
 import {
-  useAppointments, resolveStatus, STATUS_CONFIG,
-  APPOINTMENT_STATUS, isFuture, isPast,
+  useAppointments,
+  resolveStatus,
+  STATUS_CONFIG,
+  APPOINTMENT_STATUS,
+  isFuture,
+  isPast,
 } from "../../hooks/useAppointments";
 import { useServices } from "../../hooks/useServices";
 import AppointmentFormModal from "../../components/service-panel/AppointmentFormModal";
 import "./Dashboard.css";
 
-// Helpers 
+// Helpers
 const AVATAR_COLORS = [
   { bg: "#EEEDFE", color: "#534AB7" },
   { bg: "#E1F5EE", color: "#0F6E56" },
@@ -24,10 +37,22 @@ const AVATAR_COLORS = [
   { bg: "#FBEAF0", color: "#993556" },
   { bg: "#EAF3DE", color: "#3B6D11" },
 ];
-const TIME_BAR_COLORS = ["#7F77DD", "#1D9E75", "#D85A30", "#378ADD", "#D4537E", "#639922"];
+const TIME_BAR_COLORS = [
+  "#7F77DD",
+  "#1D9E75",
+  "#D85A30",
+  "#378ADD",
+  "#D4537E",
+  "#639922",
+];
 
 function getInitials(name = "") {
-  return name.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase();
+  return name
+    .split(" ")
+    .slice(0, 2)
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
 }
 function getColorIndex(name = "") {
   let hash = 0;
@@ -35,10 +60,17 @@ function getColorIndex(name = "") {
   return hash % AVATAR_COLORS.length;
 }
 function formatTime(iso) {
-  return new Date(iso).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+  return new Date(iso).toLocaleTimeString("pt-PT", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 function formatDateLabel(iso) {
-  return new Date(iso).toLocaleDateString("pt-PT", { weekday: "short", day: "2-digit", month: "2-digit" });
+  return new Date(iso).toLocaleDateString("pt-PT", {
+    weekday: "short",
+    day: "2-digit",
+    month: "2-digit",
+  });
 }
 function getDurationMinutes(start, end) {
   return Math.round((new Date(end) - new Date(start)) / 60000);
@@ -61,8 +93,14 @@ function getWeekEnd(weekStart) {
 }
 function formatWeekLabel(weekStart) {
   const end = getWeekEnd(weekStart);
-  const startStr = weekStart.toLocaleDateString("pt-PT", { day: "2-digit", month: "short" });
-  const endStr = end.toLocaleDateString("pt-PT", { day: "2-digit", month: "short" });
+  const startStr = weekStart.toLocaleDateString("pt-PT", {
+    day: "2-digit",
+    month: "short",
+  });
+  const endStr = end.toLocaleDateString("pt-PT", {
+    day: "2-digit",
+    month: "short",
+  });
   return `${startStr} – ${endStr}`;
 }
 
@@ -76,14 +114,17 @@ const PILL_STYLES = {
 function StatusPill({ status }) {
   const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.em_aberto;
   return (
-    <span className="appt-status-pill" style={PILL_STYLES[status] ?? PILL_STYLES.em_aberto}>
+    <span
+      className="appt-status-pill"
+      style={PILL_STYLES[status] ?? PILL_STYLES.em_aberto}
+    >
       {config.label}
     </span>
   );
 }
 
-// Card 
-function BookingCard({ appt, saving, onComplete, onCancel, onReopen, onEdit, onNoShow }) {
+// Card
+function BookingCard({ appt, saving, onComplete, onCancel, onEdit, onNoShow }) {
   const [open, setOpen] = useState(false);
   const derived = resolveStatus(appt);
   const future = isFuture(appt);
@@ -96,28 +137,47 @@ function BookingCard({ appt, saving, onComplete, onCancel, onReopen, onEdit, onN
   const endTime = formatTime(appt.ends_at);
   const duration = getDurationMinutes(appt.starts_at, appt.ends_at);
   const dateLabel = formatDateLabel(appt.starts_at);
-  const price = appt.service?.price != null
-    ? Number(appt.service.price).toLocaleString("pt-PT", { style: "currency", currency: "EUR" })
-    : "—";
+  const price =
+    appt.service?.price != null
+      ? Number(appt.service.price).toLocaleString("pt-PT", {
+          style: "currency",
+          currency: "EUR",
+        })
+      : "—";
 
   const isNoShow = appt.status === APPOINTMENT_STATUS.NAO_COMPARECEU;
   const isCancelled = derived === APPOINTMENT_STATUS.CANCELADO;
+
+  // Sem acções disponíveis: concluído, cancelado, não compareceu
+  const hasActions =
+    (future && derived === APPOINTMENT_STATUS.EM_ABERTO) ||
+    (past && appt.status === APPOINTMENT_STATUS.EM_ABERTO);
 
   return (
     <div
       className={`appt-item-v2${open ? " appt-item-v2--open" : ""}`}
       style={{ opacity: isCancelled || isNoShow ? 0.65 : 1 }}
-      onClick={() => setOpen((o) => !o)}
+      onClick={() => hasActions && setOpen((o) => !o)}
+      style={{
+        opacity: isCancelled || isNoShow ? 0.65 : 1,
+        cursor: hasActions ? "pointer" : "default",
+      }}
     >
       <div className="appt-item-v2-body">
-        <div className="appt-avatar" style={avatarStyle}>{getInitials(appt.client_name)}</div>
+        <div className="appt-avatar" style={avatarStyle}>
+          {getInitials(appt.client_name)}
+        </div>
         <div className="appt-item-info">
           <div className="appt-item-name">{appt.client_name}</div>
           <div className="appt-time-block">
             <div className="appt-time-bar" style={{ background: barColor }} />
             <div>
-              <div className="appt-time-text">{startTime} – {endTime}</div>
-              <div className="appt-time-sub">{appt.service?.name} · {dateLabel} · {duration} min</div>
+              <div className="appt-time-text">
+                {startTime} – {endTime}
+              </div>
+              <div className="appt-time-sub">
+                {appt.service?.name} · {dateLabel} · {duration} min
+              </div>
             </div>
           </div>
         </div>
@@ -127,99 +187,116 @@ function BookingCard({ appt, saving, onComplete, onCancel, onReopen, onEdit, onN
         </div>
       </div>
 
-      {open && (
+      {open && hasActions && (
         <div className="appt-item-details" onClick={(e) => e.stopPropagation()}>
           <div className="appt-detail-grid">
             <div className="appt-detail-item">
               <RiTimeLine aria-hidden="true" />
-              <div><span className="appt-detail-label">Início</span>{startTime}</div>
+              <div>
+                <span className="appt-detail-label">Início</span>
+                {startTime}
+              </div>
             </div>
             <div className="appt-detail-item">
               <RiTimerLine aria-hidden="true" />
-              <div><span className="appt-detail-label">Fim</span>{endTime}</div>
+              <div>
+                <span className="appt-detail-label">Fim</span>
+                {endTime}
+              </div>
             </div>
             <div className="appt-detail-item">
               <RiToolsLine aria-hidden="true" />
-              <div><span className="appt-detail-label">Serviço</span>{appt.service?.name}</div>
+              <div>
+                <span className="appt-detail-label">Serviço</span>
+                {appt.service?.name}
+              </div>
             </div>
             <div className="appt-detail-item">
               <RiMoneyDollarCircleLine aria-hidden="true" />
-              <div><span className="appt-detail-label">Valor</span>{price}</div>
+              <div>
+                <span className="appt-detail-label">Valor</span>
+                {price}
+              </div>
             </div>
             {appt.client_email && (
               <div className="appt-detail-item">
                 <RiCalendarLine aria-hidden="true" />
-                <div><span className="appt-detail-label">Email</span>{appt.client_email}</div>
+                <div>
+                  <span className="appt-detail-label">Email</span>
+                  {appt.client_email}
+                </div>
               </div>
             )}
             {appt.client_phone && (
               <div className="appt-detail-item">
                 <RiCalendarLine aria-hidden="true" />
-                <div><span className="appt-detail-label">Telefone</span>{appt.client_phone}</div>
+                <div>
+                  <span className="appt-detail-label">Telefone</span>
+                  {appt.client_phone}
+                </div>
               </div>
             )}
             {appt.notes && (
               <div className="appt-detail-item appt-detail-item--full">
-                <div><span className="appt-detail-label">Notas</span>{appt.notes}</div>
+                <div>
+                  <span className="appt-detail-label">Notas</span>
+                  {appt.notes}
+                </div>
               </div>
             )}
           </div>
 
           <div className="appt-item-actions">
-            {/*
-              REGRAS DE AÇÕES:
-              - Futuro + em_aberto    → Editar, Cancelar, Concluir (antecipar)
-              - Passado + em_aberto   → Concluir, Não compareceu
-              - Futuro + cancelado    → Editar, Reabrir
-              - Passado + cancelado   → nada
-              - Qualquer + concluido  → nada (automático)
-              - Qualquer + no-show    → Reabrir
-            */}
-
-            {/* Futuro em aberto */}
+            {/* Futuro em aberto → Editar, Cancelar, Concluir */}
             {future && derived === APPOINTMENT_STATUS.EM_ABERTO && (
               <>
-                <button className="appt-action-btn" disabled={saving} onClick={() => onEdit(appt)}>
-                  <RiPencilLine aria-hidden="true" />Editar
+                <button
+                  className="appt-action-btn"
+                  disabled={saving}
+                  onClick={() => onEdit(appt)}
+                >
+                  <RiPencilLine aria-hidden="true" />
+                  Editar
                 </button>
-                <button className="appt-action-btn appt-action-btn--cancel" disabled={saving} onClick={() => onCancel(appt.id)}>
-                  <RiCloseLine aria-hidden="true" />Cancelar
+                <button
+                  className="appt-action-btn appt-action-btn--cancel"
+                  disabled={saving}
+                  onClick={() => onCancel(appt.id)}
+                >
+                  <RiCloseLine aria-hidden="true" />
+                  Cancelar
                 </button>
-                <button className="appt-action-btn appt-action-btn--complete" disabled={saving} onClick={() => onComplete(appt.id)}>
-                  <RiCheckLine aria-hidden="true" />Concluir
+                <button
+                  className="appt-action-btn appt-action-btn--complete"
+                  disabled={saving}
+                  onClick={() => onComplete(appt.id)}
+                >
+                  <RiCheckLine aria-hidden="true" />
+                  Concluir
                 </button>
               </>
             )}
 
-            {/* Passado em aberto (hora passou mas não foi marcado) */}
+            {/* Passado em aberto → Confirmar conclusão ou Não compareceu */}
             {past && appt.status === APPOINTMENT_STATUS.EM_ABERTO && (
               <>
-                <button className="appt-action-btn appt-action-btn--complete" disabled={saving} onClick={() => onComplete(appt.id)}>
-                  <RiCheckLine aria-hidden="true" />Confirmar conclusão
+                <button
+                  className="appt-action-btn appt-action-btn--complete"
+                  disabled={saving}
+                  onClick={() => onComplete(appt.id)}
+                >
+                  <RiCheckLine aria-hidden="true" />
+                  Confirmar conclusão
                 </button>
-                <button className="appt-action-btn appt-action-btn--noshow" disabled={saving} onClick={() => onNoShow(appt.id)}>
-                  <RiUserUnfollowLine aria-hidden="true" />Não compareceu
-                </button>
-              </>
-            )}
-
-            {/* Futuro cancelado */}
-            {future && isCancelled && (
-              <>
-                <button className="appt-action-btn" disabled={saving} onClick={() => onEdit(appt)}>
-                  <RiPencilLine aria-hidden="true" />Editar
-                </button>
-                <button className="appt-action-btn appt-action-btn--reopen" disabled={saving} onClick={() => onReopen(appt.id)}>
-                  <RiArrowGoBackLine aria-hidden="true" />Reabrir
+                <button
+                  className="appt-action-btn appt-action-btn--noshow"
+                  disabled={saving}
+                  onClick={() => onNoShow(appt.id)}
+                >
+                  <RiUserUnfollowLine aria-hidden="true" />
+                  Não compareceu
                 </button>
               </>
-            )}
-
-            {/* No-show → só reabrir */}
-            {isNoShow && (
-              <button className="appt-action-btn appt-action-btn--reopen" disabled={saving} onClick={() => onReopen(appt.id)}>
-                <RiArrowGoBackLine aria-hidden="true" />Reabrir
-              </button>
             )}
           </div>
         </div>
@@ -228,8 +305,7 @@ function BookingCard({ appt, saving, onComplete, onCancel, onReopen, onEdit, onN
   );
 }
 
-// Filtros 
-
+// Filtros
 const FILTERS = [
   { key: "all", label: "Todos" },
   { key: "em_aberto", label: "Em aberto" },
@@ -238,13 +314,18 @@ const FILTERS = [
   { key: "nao_compareceu", label: "Não compareceu" },
 ];
 
-// Página 
-
+// Página
 export default function BookingsPage() {
   const {
-    appointments, loading, error, saving,
-    completeAppointment, cancelAppointment, reopenAppointment,
-    markNoShow, createAppointment, updateAppointment,
+    appointments,
+    loading,
+    error,
+    saving,
+    completeAppointment,
+    cancelAppointment,
+    markNoShow,
+    createAppointment,
+    updateAppointment,
   } = useAppointments();
 
   const { services = [] } = useServices();
@@ -253,7 +334,8 @@ export default function BookingsPage() {
   const [weekStart, setWeekStart] = useState(() => getWeekStart(new Date()));
   const weekEnd = getWeekEnd(weekStart);
 
-  const isCurrentWeek = getWeekStart(new Date()).toDateString() === weekStart.toDateString();
+  const isCurrentWeek =
+    getWeekStart(new Date()).toDateString() === weekStart.toDateString();
 
   function prevWeek() {
     const d = new Date(weekStart);
@@ -273,7 +355,10 @@ export default function BookingsPage() {
   const [search, setSearch] = useState("");
   const [modalState, setModalState] = useState(null);
 
-  const activeServices = useMemo(() => services.filter((s) => s.active), [services]);
+  const activeServices = useMemo(
+    () => services.filter((s) => s.active),
+    [services],
+  );
 
   const clientSuggestions = useMemo(() => {
     const map = new Map();
@@ -293,14 +378,16 @@ export default function BookingsPage() {
     return appointments.filter((a) => {
       const d = new Date(a.starts_at);
       if (d < weekStart || d > weekEnd) return false;
-      if (activeFilter !== "all" && resolveStatus(a) !== activeFilter) return false;
+      if (activeFilter !== "all" && resolveStatus(a) !== activeFilter)
+        return false;
       if (search.trim()) {
         const q = search.toLowerCase();
         if (
           !a.client_name?.toLowerCase().includes(q) &&
           !a.client_email?.toLowerCase().includes(q) &&
           !a.service?.name?.toLowerCase().includes(q)
-        ) return false;
+        )
+          return false;
       }
       return true;
     });
@@ -322,7 +409,10 @@ export default function BookingsPage() {
 
   async function handleModalSubmit(payload) {
     if (modalState?.mode === "edit") {
-      const result = await updateAppointment(modalState.appointment.id, payload);
+      const result = await updateAppointment(
+        modalState.appointment.id,
+        payload,
+      );
       if (result.success) setModalState(null);
       return result;
     }
@@ -336,11 +426,15 @@ export default function BookingsPage() {
       <div className="pg-header">
         <div>
           <h1 className="pg-title">Gestão de agendamentos</h1>
-          <p className="pg-subtitle">Cria, edita e gere todos os teus agendamentos.</p>
+          <p className="pg-subtitle">
+            Cria, edita e gere todos os teus agendamentos.
+          </p>
         </div>
         <button
           className="btn-primary"
-          onClick={() => setModalState({ mode: "create", initialDate: new Date() })}
+          onClick={() =>
+            setModalState({ mode: "create", initialDate: new Date() })
+          }
         >
           <RiAddLine aria-hidden="true" />
           Novo agendamento
@@ -352,15 +446,27 @@ export default function BookingsPage() {
       {/* Navegação por semana + pesquisa */}
       <div className="bkg-toolbar">
         <div className="bkg-week-nav">
-          <button className="appt-nav-btn" onClick={prevWeek} aria-label="Semana anterior">
+          <button
+            className="appt-nav-btn"
+            onClick={prevWeek}
+            aria-label="Semana anterior"
+          >
             <RiArrowLeftSLine aria-hidden="true" />
           </button>
           <span className="bkg-week-label">{formatWeekLabel(weekStart)}</span>
-          <button className="appt-nav-btn" onClick={nextWeek} aria-label="Semana seguinte">
+          <button
+            className="appt-nav-btn"
+            onClick={nextWeek}
+            aria-label="Semana seguinte"
+          >
             <RiArrowRightSLine aria-hidden="true" />
           </button>
           {!isCurrentWeek && (
-            <button className="btn-secondary" onClick={goToThisWeek} style={{ height: 32, padding: "0 12px" }}>
+            <button
+              className="btn-secondary"
+              onClick={goToThisWeek}
+              style={{ height: 32, padding: "0 12px" }}
+            >
               Esta semana
             </button>
           )}
@@ -400,7 +506,9 @@ export default function BookingsPage() {
           <div className="pg-empty">
             <RiCalendarLine className="pg-empty-icon" aria-hidden="true" />
             <p className="pg-empty-text">Sem agendamentos nesta semana.</p>
-            <p className="pg-empty-subtext">Navega para outra semana ou cria um novo agendamento.</p>
+            <p className="pg-empty-subtext">
+              Navega para outra semana ou cria um novo agendamento.
+            </p>
           </div>
         ) : (
           <div className="appt-list">
@@ -411,9 +519,10 @@ export default function BookingsPage() {
                 saving={saving}
                 onComplete={completeAppointment}
                 onCancel={cancelAppointment}
-                onReopen={reopenAppointment}
                 onNoShow={markNoShow}
-                onEdit={(appt) => setModalState({ mode: "edit", appointment: appt })}
+                onEdit={(appt) =>
+                  setModalState({ mode: "edit", appointment: appt })
+                }
               />
             ))}
           </div>
