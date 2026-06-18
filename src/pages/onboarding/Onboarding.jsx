@@ -446,7 +446,7 @@ export default function Onboarding() {
                   onChange={(e) =>
                     setPhone(e.target.value.replace(/[^\d\s+]/g, ""))
                   }
-                  placeholder="+351 123456789"
+                  placeholder="+351 XXX XXX XXX"
                   required
                 />
               </div>

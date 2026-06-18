@@ -1,13 +1,21 @@
 // src/pages/dashboard/Financial.jsx
 
 import { useMemo, useState } from "react";
-import { useAppointments } from "../../hooks/useAppointments";
+import { useAppointments, resolveStatus } from "../../hooks/useAppointments";
 import { exportFinancialCSV } from "../../lib/exportCsv";
-
 import { RiDownloadLine, RiBarChartLine } from "react-icons/ri";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 import "./Dashboard.css";
 
-// Formata preço em euros
 function formatPrice(value) {
   return new Intl.NumberFormat("pt-PT", {
     style: "currency",
@@ -16,7 +24,6 @@ function formatPrice(value) {
   }).format(value ?? 0);
 }
 
-// Formata data para pt-PT
 function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString("pt-PT", {
     day: "2-digit",
@@ -25,7 +32,6 @@ function formatDate(dateStr) {
   });
 }
 
-// Nomes dos meses em português
 const MONTH_NAMES = [
   "Jan",
   "Fev",
@@ -41,55 +47,107 @@ const MONTH_NAMES = [
   "Dez",
 ];
 
+const STATUS_LABEL = {
+  concluido: "Concluído",
+  nao_compareceu: "Não compareceu",
+  em_aberto: "Em aberto",
+};
+
+// Tooltip partilhado — declarado fora do componente
+function CustomTooltip({ active, payload, label }) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div
+      style={{
+        background: "var(--color-surface)",
+        border: "0.5px solid var(--color-border-strong)",
+        borderRadius: "var(--radius-md)",
+        padding: "8px 12px",
+        fontSize: 13,
+        color: "var(--color-text)",
+      }}
+    >
+      <p style={{ margin: 0, fontWeight: "var(--font-semi)" }}>{label}</p>
+      <p style={{ margin: "2px 0 0", color: "var(--color-brand)" }}>
+        {formatPrice(payload[0].value)}
+      </p>
+    </div>
+  );
+}
+
 export default function Financial() {
   const { appointments, loading, error } = useAppointments();
 
-  // Filtro de período — mês actual por omissão
-  const now = new Date();
-  const [selectedYear, setSelectedYear] = useState(now.getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState(now.getMonth()); // 0-indexed
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
 
-  // Filtra apenas agendamentos concluídos do período seleccionado — receita já confirmada
-  const periodAppointments = useMemo(() => {
-    return appointments.filter((a) => {
-      if (a.status !== "concluido") return false;
-      const date = new Date(a.starts_at);
-      return (
-        date.getFullYear() === selectedYear && date.getMonth() === selectedMonth
-      );
-    });
-  }, [appointments, selectedYear, selectedMonth]);
+  const years = useMemo(() => {
+    const set = new Set(
+      appointments.map((a) => new Date(a.starts_at).getFullYear()),
+    );
+    set.add(new Date().getFullYear());
+    return Array.from(set).sort((a, b) => b - a);
+  }, [appointments]);
 
-  // Agendamentos ainda em aberto dentro do período seleccionado — receita ainda
-  // não confirmada, mas que se espera entrar se tudo correr como agendado
-  const periodOpenAppointments = useMemo(() => {
-    return appointments.filter((a) => {
-      if (a.status !== "em_aberto") return false;
-      const date = new Date(a.starts_at);
-      return (
-        date.getFullYear() === selectedYear && date.getMonth() === selectedMonth
-      );
-    });
-  }, [appointments, selectedYear, selectedMonth]);
-
-  // Todos os concluídos (para o total acumulado)
-  const allCompleted = useMemo(
-    () => appointments.filter((a) => a.status === "concluido"),
+  // ── Todos os confirmados de sempre ──────────────────────────────
+  const allConfirmed = useMemo(
+    () => appointments.filter((a) => resolveStatus(a) === "concluido"),
     [appointments],
   );
 
-  // Métricas do período
+  const totalRevenue = useMemo(
+    () =>
+      allConfirmed.reduce((sum, a) => sum + Number(a.service?.price ?? 0), 0),
+    [allConfirmed],
+  );
+
+  // ── Dados mensais do ano seleccionado (gráfico de evolução) ─────
+  const monthlyData = useMemo(() => {
+    return MONTH_NAMES.map((name, i) => {
+      const total = appointments
+        .filter((a) => {
+          const d = new Date(a.starts_at);
+          return (
+            d.getFullYear() === selectedYear &&
+            d.getMonth() === i &&
+            resolveStatus(a) === "concluido"
+          );
+        })
+        .reduce((sum, a) => sum + Number(a.service?.price ?? 0), 0);
+      return { name, total, isCurrent: i === selectedMonth };
+    });
+  }, [appointments, selectedYear, selectedMonth]);
+
+  // ── Período seleccionado (mês + ano) — exclui cancelados ────────
+  const periodAll = useMemo(() => {
+    return appointments.filter((a) => {
+      const d = new Date(a.starts_at);
+      if (d.getFullYear() !== selectedYear || d.getMonth() !== selectedMonth)
+        return false;
+      return resolveStatus(a) !== "cancelado";
+    });
+  }, [appointments, selectedYear, selectedMonth]);
+
+  const periodConfirmed = useMemo(
+    () => periodAll.filter((a) => resolveStatus(a) === "concluido"),
+    [periodAll],
+  );
+
+  const periodFuture = useMemo(
+    () => periodAll.filter((a) => resolveStatus(a) === "em_aberto"),
+    [periodAll],
+  );
+
   const metrics = useMemo(() => {
-    const revenue = periodAppointments.reduce(
+    const revenue = periodConfirmed.reduce(
       (sum, a) => sum + Number(a.service?.price ?? 0),
       0,
     );
-    const count = periodAppointments.length;
+    const count = periodConfirmed.length;
     const avg = count > 0 ? revenue / count : 0;
 
-    // Serviço mais popular no período
     const serviceCount = {};
-    periodAppointments.forEach((a) => {
+    periodConfirmed.forEach((a) => {
       const name = a.service?.name ?? "Desconhecido";
       serviceCount[name] = (serviceCount[name] ?? 0) + 1;
     });
@@ -98,65 +156,41 @@ export default function Financial() {
     )[0];
 
     return { revenue, count, avg, topService };
-  }, [periodAppointments]);
+  }, [periodConfirmed]);
 
-  // Receita prevista — soma do que está em aberto no período, ainda não confirmado
   const projectedRevenue = useMemo(
     () =>
-      periodOpenAppointments.reduce(
-        (sum, a) => sum + Number(a.service?.price ?? 0),
-        0,
-      ),
-    [periodOpenAppointments],
+      periodFuture.reduce((sum, a) => sum + Number(a.service?.price ?? 0), 0),
+    [periodFuture],
   );
 
-  // Total acumulado (todos os tempos)
-  const totalRevenue = useMemo(
-    () =>
-      allCompleted.reduce((sum, a) => sum + Number(a.service?.price ?? 0), 0),
-    [allCompleted],
-  );
-
-  // Receita por serviço no período (para o gráfico de barras simples)
+  // ── Receita por serviço (gráfico vertical) ──────────────────────
   const revenueByService = useMemo(() => {
     const map = {};
-    periodAppointments.forEach((a) => {
+    periodConfirmed.forEach((a) => {
       const name = a.service?.name ?? "Desconhecido";
       map[name] = (map[name] ?? 0) + Number(a.service?.price ?? 0);
     });
     return Object.entries(map)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 6); // Máximo de 6 serviços
-  }, [periodAppointments]);
+      .slice(0, 6)
+      .map(([name, total]) => ({ name, total }));
+  }, [periodConfirmed]);
 
-  // Máximo para calcular a largura das barras
-  const maxRevenue = Math.max(...revenueByService.map(([, v]) => v), 1);
-
-  // Prepara dados para exportação CSV
   function handleExport() {
-    const rows = periodAppointments.map((a) => ({
+    const rows = periodConfirmed.map((a) => ({
       date: formatDate(a.starts_at),
       client_name: a.client_name,
       service_name: a.service?.name ?? "",
       price: a.service?.price ?? 0,
-      status: a.status,
+      status: STATUS_LABEL[resolveStatus(a)] ?? resolveStatus(a),
     }));
     exportFinancialCSV(rows);
   }
 
-  // Anos disponíveis para o selector (desde o primeiro agendamento)
-  const years = useMemo(() => {
-    const now = new Date();
-    const set = new Set(
-      appointments.map((a) => new Date(a.starts_at).getFullYear()),
-    );
-    set.add(now.getFullYear());
-    return Array.from(set).sort((a, b) => b - a);
-  }, [appointments]);
-
   return (
     <div className="db-page">
-      {/* Cabeçalho */}
+      {/* ── Cabeçalho ─────────────────────────────────────────── */}
       <div className="pg-header">
         <div>
           <h1 className="pg-title">Financeiro</h1>
@@ -164,11 +198,10 @@ export default function Financial() {
             Acompanha as receitas e o desempenho do teu negócio.
           </p>
         </div>
-
         <button
           className="btn-secondary"
           onClick={handleExport}
-          disabled={loading || periodAppointments.length === 0}
+          disabled={loading || periodConfirmed.length === 0}
         >
           <RiDownloadLine aria-hidden="true" />
           Exportar CSV
@@ -177,7 +210,7 @@ export default function Financial() {
 
       {error && <p className="sch-error">{error}</p>}
 
-      {/* Selector de período */}
+      {/* ── Selector de período ───────────────────────────────── */}
       <div className="fin-period-selector">
         <select
           value={selectedMonth}
@@ -203,33 +236,36 @@ export default function Financial() {
         </select>
       </div>
 
-      {/* Cards de métricas */}
+      {/* ── 5 cards ───────────────────────────────────────────── */}
       <div className="pg-stats-grid">
         <div className="pg-stat-card">
-          <p className="pg-stat-label">Receita confirmada</p>
+          <p className="pg-stat-label">Receita total</p>
+          <p className="pg-stat-value">
+            {loading ? "—" : formatPrice(totalRevenue)}
+          </p>
+          <p className="pg-stat-meta">
+            {allConfirmed.length} serviços no total
+          </p>
+        </div>
+
+        <div className="pg-stat-card">
+          <p className="pg-stat-label">Receita do mês</p>
           <p className="pg-stat-value">
             {loading ? "—" : formatPrice(metrics.revenue)}
           </p>
-          <p className="pg-stat-meta">{metrics.count} serviços concluídos</p>
+          <p className="pg-stat-meta">
+            {MONTH_NAMES[selectedMonth]} {selectedYear}
+          </p>
         </div>
 
-        {/* Receita prevista — agendamentos em aberto no período, ainda não confirmados */}
         <div className="pg-stat-card">
           <p className="pg-stat-label">Receita prevista</p>
           <p className="pg-stat-value">
             {loading ? "—" : formatPrice(projectedRevenue)}
           </p>
           <p className="pg-stat-meta">
-            {periodOpenAppointments.length} agendamentos em aberto
+            {periodFuture.length} agendamentos futuros
           </p>
-        </div>
-
-        <div className="pg-stat-card">
-          <p className="pg-stat-label">Ticket médio</p>
-          <p className="pg-stat-value">
-            {loading ? "—" : formatPrice(metrics.avg)}
-          </p>
-          <p className="pg-stat-meta">por agendamento</p>
         </div>
 
         <div className="pg-stat-card">
@@ -238,22 +274,69 @@ export default function Financial() {
             {loading ? "—" : metrics.topService ? metrics.topService[0] : "—"}
           </p>
           {metrics.topService && (
-            <p className="pg-stat-meta">{metrics.topService[1]} vezes</p>
+            <p className="pg-stat-meta">
+              {metrics.topService[1]} vezes este mês
+            </p>
           )}
         </div>
 
         <div className="pg-stat-card">
-          <p className="pg-stat-label">Receita total acumulada</p>
-          <p className="pg-stat-value">
-            {loading ? "—" : formatPrice(totalRevenue)}
-          </p>
+          <p className="pg-stat-label">Transacções confirmadas</p>
+          <p className="pg-stat-value">{loading ? "—" : metrics.count}</p>
           <p className="pg-stat-meta">
-            {allCompleted.length} serviços no total
+            {MONTH_NAMES[selectedMonth]} {selectedYear}
           </p>
         </div>
       </div>
 
-      {/* Gráfico de barras simples por serviço */}
+      {/* ── Evolução mensal ───────────────────────────────────── */}
+      <div className="pg-section">
+        <div className="pg-section-header">
+          <h2 className="pg-section-title">Evolução mensal</h2>
+          <span className="pg-section-meta">{selectedYear}</span>
+        </div>
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart
+            data={monthlyData}
+            barSize={28}
+            margin={{ top: 4, right: 4, left: 0, bottom: 0 }}
+          >
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="var(--color-border)"
+              vertical={false}
+            />
+            <XAxis
+              dataKey="name"
+              tick={{ fontSize: 12, fill: "var(--color-text-muted)" }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <YAxis
+              tickFormatter={(v) => `${v}€`}
+              tick={{ fontSize: 12, fill: "var(--color-text-muted)" }}
+              axisLine={false}
+              tickLine={false}
+              width={48}
+            />
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ fill: "var(--color-surface-2)" }}
+            />
+            <Bar dataKey="total" radius={[4, 4, 0, 0]}>
+              {monthlyData.map((entry, index) => (
+                <Cell
+                  key={index}
+                  fill="var(--color-brand)"
+                  fillOpacity={entry.isCurrent ? 1 : 0.25}
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* ── Receita por serviço (barras verticais) ────────────── */}
       <div className="pg-section">
         <div className="pg-section-header">
           <h2 className="pg-section-title">Receita por serviço</h2>
@@ -261,43 +344,62 @@ export default function Financial() {
             {MONTH_NAMES[selectedMonth]} {selectedYear}
           </span>
         </div>
-
         {revenueByService.length === 0 ? (
           <div className="pg-empty">
             <RiBarChartLine className="pg-empty-icon" aria-hidden="true" />
             <p className="pg-empty-text">Sem dados para este período.</p>
             <p className="pg-empty-subtext">
-              Os dados aparecem quando há agendamentos concluídos.
+              Os dados aparecem quando há serviços realizados.
             </p>
           </div>
         ) : (
-          <div className="fin-chart">
-            {revenueByService.map(([name, value]) => (
-              <div key={name} className="fin-bar-row">
-                <span className="fin-bar-label">{name}</span>
-                <div className="fin-bar-track">
-                  <div
-                    className="fin-bar-fill"
-                    style={{ width: `${(value / maxRevenue) * 100}%` }}
-                  />
-                </div>
-                <span className="fin-bar-value">{formatPrice(value)}</span>
-              </div>
-            ))}
-          </div>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart
+              data={revenueByService}
+              barSize={36}
+              margin={{ top: 4, right: 4, left: 0, bottom: 4 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="var(--color-border)"
+                vertical={false}
+              />
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 12, fill: "var(--color-text-muted)" }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tickFormatter={(v) => `${v}€`}
+                tick={{ fontSize: 12, fill: "var(--color-text-muted)" }}
+                axisLine={false}
+                tickLine={false}
+                width={48}
+              />
+              <Tooltip
+                content={<CustomTooltip />}
+                cursor={{ fill: "var(--color-surface-2)" }}
+              />
+              <Bar
+                dataKey="total"
+                fill="var(--color-brand)"
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
         )}
       </div>
 
-      {/* Tabela de transacções do período */}
+      {/* ── Tabela de transacções ─────────────────────────────── */}
       <div className="pg-section">
         <div className="pg-section-header">
-          <h2 className="pg-section-title">Transacções</h2>
+          <h2 className="pg-section-title">Transacções confirmadas</h2>
           <span className="pg-section-meta">
-            {periodAppointments.length} registos
+            {periodConfirmed.length} registos
           </span>
         </div>
-
-        {periodAppointments.length === 0 ? (
+        {periodConfirmed.length === 0 ? (
           <div className="pg-empty">
             <p className="pg-empty-text">Sem transacções neste período.</p>
           </div>
@@ -310,15 +412,32 @@ export default function Financial() {
                   <th>Cliente</th>
                   <th>Serviço</th>
                   <th>Valor</th>
+                  <th>Estado</th>
                 </tr>
               </thead>
               <tbody>
-                {periodAppointments.map((a) => (
+                {periodConfirmed.map((a) => (
                   <tr key={a.id}>
                     <td>{formatDate(a.starts_at)}</td>
                     <td>{a.client_name}</td>
                     <td>{a.service?.name ?? "—"}</td>
                     <td>{formatPrice(a.service?.price)}</td>
+                    <td>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 500,
+                          padding: "2px 8px",
+                          borderRadius: 99,
+                          background:
+                            a.status === "concluido" ? "#E1F5EE" : "#F5F3FF",
+                          color:
+                            a.status === "concluido" ? "#0F6E56" : "#7C3AED",
+                        }}
+                      >
+                        {a.status === "concluido" ? "Manual" : "Automático"}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>

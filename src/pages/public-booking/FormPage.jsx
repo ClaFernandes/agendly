@@ -6,7 +6,7 @@ import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
 
 export default function FormPage() {
   const navigate = useNavigate();
-  const { clientData, setClientData } = useBooking(); 
+  const { clientData, setClientData } = useBooking();
 
   // Inicia o state local com os dados globais (útil se o cliente andar para trás e para a frente)
   const [formData, setFormData] = useState({
@@ -68,7 +68,7 @@ export default function FormPage() {
             id="client_phone"
             name="client_phone"
             required
-            placeholder="(00) 99999-9999"
+            placeholder="+351 XXX XXX XXX"
             value={formData.client_phone}
             onChange={handleChange}
           />
@@ -87,19 +87,19 @@ export default function FormPage() {
         </div>
 
         <div className="form-actions-row">
-          <button 
+          <button
             type="button"
             className="onboarding-btn-back"
-            onClick={()=> navigate("../time")}
+            onClick={() => navigate("../time")}
           >
-            <FiArrowLeft/> Voltar
+            <FiArrowLeft /> Voltar
           </button>
-          
-          <button 
-            type="submit" 
+
+          <button
+            type="submit"
             className="submit-form-btn"
           >
-            Ver Resumo <FiArrowRight/>
+            Ver Resumo <FiArrowRight />
           </button>
         </div>
       </form>
