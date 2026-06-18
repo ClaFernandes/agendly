@@ -447,7 +447,7 @@ export default function Profile() {
                 type="tel"
                 value={phone}
                 onChange={e => setPhone(e.target.value.replace(/[^\d\s+\-()]/g, ""))}
-                placeholder="+351 911 111 111"
+                placeholder="+351 XXX XXX XXX"
                 className="set-input"
               />
             </div>

@@ -70,12 +70,13 @@ export default function AdminRegister() {
         await supabase.auth.signUp({
           email,
           password,
+          options: { emailRedirectTo: null },
         });
 
       if (signUpError) throw signUpError;
 
       const newUserId = signUpData.user?.id;
-      if (!newUserId) throw new Error("Erro ao criar utilizador.");
+      if (!newUserId) throw new Error("Não foi possível criar o utilizador. Tenta novamente.");
 
       // Upsert do perfil com role "admin" e status "pending"
       const { error: profileError } = await supabase
@@ -99,8 +100,11 @@ export default function AdminRegister() {
       });
     } catch (err) {
       // Trata erro de email já registado
-      if (err.message?.includes("already registered")) {
-        setError("Este email já está registado.");
+      if (
+        err.message?.includes("already registered") ||
+        err.message?.includes("User already registered")
+      ) {
+        setError("Este email já está registado. Tenta fazer login ou usa outro email.");
       } else {
         setError(err.message || "Erro ao criar conta. Tenta novamente.");
       }

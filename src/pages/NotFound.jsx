@@ -1,12 +1,15 @@
 // src/pages/NotFound.jsx
 
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { FiHome, FiArrowLeft, FiSearch } from "react-icons/fi";
 import logo from "../assets/logo.svg";
 import "./NotFound.css";
 
 const NotFound = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isPublicBooking = location.pathname.startsWith("/p/");
 
   return (
     <div className="notfound-container">
@@ -20,6 +23,7 @@ const NotFound = () => {
         </div>
 
         {/* Conteúdo Principal */}
+        {/* Conteúdo Principal */}
         <div className="notfound-content">
           <div className="notfound-badge">
             <span>4</span>
@@ -29,10 +33,22 @@ const NotFound = () => {
             <span>4</span>
           </div>
 
-          <h2>Este negócio não foi encontrado</h2>
-          <p className="notfound-subtitle">
-            Confirma o link com o prestador de serviço.
-          </p>
+          {isPublicBooking ? (
+            <>
+              <h2>Negócio não encontrado</h2>
+              <p className="notfound-subtitle">
+                O link que seguiste não corresponde a nenhum negócio ativo.
+                Confirma o endereço com o prestador de serviço.
+              </p>
+            </>
+          ) : (
+            <>
+              <h2>Página não encontrada</h2>
+              <p className="notfound-subtitle">
+                A página que procuras não existe ou foi movida.
+              </p>
+            </>
+          )}
 
           {/* Ações */}
           <div className="notfound-actions">

@@ -25,6 +25,8 @@ import {
   isPast,
 } from "../../hooks/useAppointments";
 import { useServices } from "../../hooks/useServices";
+import { useBusiness } from "../../context/BusinessContext";
+import { useRealtime } from "../../hooks/useRealtime";
 import AppointmentFormModal from "../../components/service-panel/AppointmentFormModal";
 import "./Dashboard.css";
 
@@ -140,9 +142,9 @@ function BookingCard({ appt, saving, onComplete, onCancel, onEdit, onNoShow }) {
   const price =
     appt.service?.price != null
       ? Number(appt.service.price).toLocaleString("pt-PT", {
-          style: "currency",
-          currency: "EUR",
-        })
+        style: "currency",
+        currency: "EUR",
+      })
       : "—";
 
   const isNoShow = appt.status === APPOINTMENT_STATUS.NAO_COMPARECEU;
@@ -326,14 +328,22 @@ export default function BookingsPage() {
     markNoShow,
     createAppointment,
     updateAppointment,
+    refetch,
   } = useAppointments();
 
   const { services = [] } = useServices();
+  const { business } = useBusiness();
+
+  //  Realtime — novos agendamentos aparecem sem refresh 
+  const handleRealtimeUpdate = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
+  useRealtime(business?.id, handleRealtimeUpdate);
 
   // Navegação por semana
   const [weekStart, setWeekStart] = useState(() => getWeekStart(new Date()));
   const weekEnd = getWeekEnd(weekStart);
-
   const isCurrentWeek =
     getWeekStart(new Date()).toDateString() === weekStart.toDateString();
 

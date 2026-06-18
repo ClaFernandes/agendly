@@ -180,9 +180,13 @@ export function useAdmin() {
 
   async function removeAdmin(userId) {
     setSaving(true);
+    setError(null);
+
     await supabase.from("profiles").delete().eq("id", userId);
     const { error } = await supabase.rpc("delete_user_by_id", { user_id: userId });
+
     if (error) { setError(error.message); setSaving(false); return { success: false }; }
+
     setAdmins((prev) => prev.filter((a) => a.id !== userId));
     setSaving(false); return { success: true };
   }
@@ -199,18 +203,36 @@ export function useAdmin() {
 
   async function rejectAdmin(userId) {
     setSaving(true);
-    await supabase.from("profiles").delete().eq("id", userId);
-    const { error } = await supabase.rpc("delete_user_by_id", { user_id: userId });
+    setError(null);
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({ status: "rejected" })
+      .eq("id", userId);
+
     if (error) { setError(error.message); setSaving(false); return { success: false }; }
+
     setPendingAdmins((prev) => prev.filter((a) => a.id !== userId));
-    setSaving(false); return { success: true };
+    setSaving(false);
+    return { success: true };
   }
 
   return {
-    stats, businesses, recentBusinesses, admins, pendingAdmins,
-    loading, error, saving,
-    toggleBusinessActive, updateBusiness, deleteBusiness,
-    sendPasswordReset, removeAdmin, approveAdmin, rejectAdmin,
+    stats,
+    businesses,
+    recentBusinesses,
+    admins,
+    pendingAdmins,
+    loading,
+    error,
+    saving,
+    toggleBusinessActive,
+    updateBusiness,
+    deleteBusiness,
+    sendPasswordReset,
+    removeAdmin,
+    approveAdmin,
+    rejectAdmin,
     refetch: load,
   };
 }
