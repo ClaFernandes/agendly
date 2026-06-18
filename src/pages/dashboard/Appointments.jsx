@@ -43,7 +43,7 @@ function DayAppointmentCard({ appt }) {
     : "—";
 
   const statusColors = {
-    em_aberto: { bg: "#FEF9EC", color: "#92620A", label: "Em aberto" },
+    em_aberto: { bg: "#FEF9EC", color: "#92620A", label: "Próximo" },
     concluido: { bg: "#E1F5EE", color: "#0F6E56", label: "Concluído" },
     cancelado: { bg: "#FCEBEB", color: "#A32D2D", label: "Cancelado" },
   };

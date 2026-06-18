@@ -7,13 +7,14 @@ import { useBusiness } from "../context/BusinessContext";
 export const APPOINTMENT_STATUS = {
   EM_ABERTO: "em_aberto",
   CONCLUIDO: "concluido",
+  AWAITING_CONFIRMATION: "awaiting_confirmation", // Novo estado derivado
   CANCELADO: "cancelado",
   NAO_COMPARECEU: "nao_compareceu",
 };
 
 export const STATUS_CONFIG = {
   em_aberto: {
-    label: "Em aberto",
+    label: "Próximo",
     color: "var(--color-warning-600)",
     bg: "var(--color-warning-50)",
   },
@@ -21,6 +22,11 @@ export const STATUS_CONFIG = {
     label: "Concluído",
     color: "var(--color-success-600)",
     bg: "var(--color-success-50)",
+  },
+  awaiting_confirmation: {
+    label: "A Confirmar",
+    color: "var(--color-primary-700)",
+    bg: "var(--color-primary-50)",
   },
   cancelado: {
     label: "Cancelado",
@@ -37,7 +43,8 @@ export const STATUS_CONFIG = {
 /** Define o status visual de um agendamento */
 export function resolveStatus(appt) {
   if (appt.status !== APPOINTMENT_STATUS.EM_ABERTO) return appt.status;
-  if (new Date(appt.ends_at) < new Date()) return APPOINTMENT_STATUS.CONCLUIDO;
+  // Se já passou, aguarda confirmação. Se não, continua em aberto.
+  if (new Date(appt.ends_at) < new Date()) return APPOINTMENT_STATUS.AWAITING_CONFIRMATION;
   return APPOINTMENT_STATUS.EM_ABERTO;
 }
 
@@ -193,6 +200,7 @@ export function useAppointments({
 
   // Agrupamentos usando status derivado
   const emAberto = appointments.filter((a) => resolveStatus(a) === APPOINTMENT_STATUS.EM_ABERTO);
+  const aConfirmar = appointments.filter((a) => resolveStatus(a) === APPOINTMENT_STATUS.AWAITING_CONFIRMATION);
   const concluidos = appointments.filter((a) => resolveStatus(a) === APPOINTMENT_STATUS.CONCLUIDO);
   const cancelados = appointments.filter((a) => resolveStatus(a) === APPOINTMENT_STATUS.CANCELADO);
   const naoCompareceu = appointments.filter((a) => resolveStatus(a) === APPOINTMENT_STATUS.NAO_COMPARECEU);
@@ -215,6 +223,7 @@ export function useAppointments({
     updateAppointment,
     refetch: load,
     emAberto,
+    aConfirmar,
     concluidos,
     cancelados,
     naoCompareceu,

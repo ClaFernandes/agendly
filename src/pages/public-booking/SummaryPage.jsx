@@ -47,7 +47,7 @@ export default function SummaryPage() {
 
   return (
     <div className="page-header">
-      <h2>Revisa o teu Agendamento</h2>
+      <h2>Revisa o teu agendamento</h2>
       <div className="summary-card">
         <h3>{business?.name}</h3>
         <p>

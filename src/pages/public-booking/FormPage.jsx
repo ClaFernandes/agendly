@@ -30,19 +30,19 @@ export default function FormPage() {
   return (
     <div className="form-page-container">
       <div className="page-header">
-        <h2>Seus Dados</h2>
-        <p>Informe seus dados de contato para confirmar o agendamento.</p>
+        <h2>Quem sou?</h2>
+        <p>Informe teus dados de contacto.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="booking-form">
         <div className="form-group">
-          <label htmlFor="client_name">Nome Completo *</label>
+          <label htmlFor="client_name">Nome e Apelido *</label>
           <input
             type="text"
             id="client_name"
             name="client_name"
             required
-            placeholder="Digite seu nome"
+            placeholder="Digite o teu nome"
             value={formData.client_name}
             onChange={handleChange}
           />
@@ -62,7 +62,7 @@ export default function FormPage() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="client_phone">Telefone / WhatsApp *</label>
+          <label htmlFor="client_phone">Telemóvel / WhatsApp *</label>
           <input
             type="tel"
             id="client_phone"
@@ -80,7 +80,7 @@ export default function FormPage() {
             id="notes"
             name="notes"
             rows="3"
-            placeholder="Algum aviso ou detalhe para o profissional?"
+            placeholder="Caso queiras deixar algum aviso para o profissional?"
             value={formData.notes}
             onChange={handleChange}
           />

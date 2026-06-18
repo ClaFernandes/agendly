@@ -328,7 +328,7 @@ export default function Profile() {
         </div>
         <button className="btn-primary" onClick={handleSave} disabled={saving}>
           <RiSaveLine aria-hidden="true" />
-          {saving ? "A guardar..." : "Guardar"}
+          {saving ? "A guardar..." : "Guardar alterações"}
         </button>
       </div>
 

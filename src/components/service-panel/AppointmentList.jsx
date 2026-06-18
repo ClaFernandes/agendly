@@ -227,9 +227,9 @@ function AppointmentCard({ appt, saving, onComplete, onCancel, onReopen }) {
 
 const FILTERS = [
   { key: "all",      label: "Todos" },
-  { key: "em_aberto", label: "Em aberto" },
-  { key: "concluido", label: "Concluído" },
-  { key: "cancelado", label: "Cancelado" },
+  { key: "em_aberto", label: "Próximos" },
+  { key: "concluido", label: "Concluídos" },
+  { key: "cancelado", label: "Cancelados" },
 ];
 
 export default function AppointmentList({
