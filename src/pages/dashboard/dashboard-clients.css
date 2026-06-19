@@ -153,6 +153,33 @@
     white-space: nowrap;
 }
 
+/* Coluna de ações / botão editar */
+.client-th-actions {
+    text-align: right;
+}
+
+.client-td-actions {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.client-edit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-md);
+    color: var(--color-text-muted);
+    font-size: 15px;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.client-edit-btn:hover {
+    background-color: var(--color-brand-subtle);
+    color: var(--color-brand);
+}
+
 /* Responsividade */
 @media (max-width: 640px) {
     .client-table thead {
@@ -209,5 +236,12 @@
 
     .client-table td:nth-child(5) {
         margin-left: auto;
+    }
+
+    .client-td-actions {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        text-align: right;
     }
 }

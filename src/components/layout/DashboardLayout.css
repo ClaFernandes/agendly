@@ -40,8 +40,8 @@
 .dl-avatar {
     width: 48px;
     height: 48px;
-    background: #ffffff;
-    color: #4f46e5;
+    background: var(--color-surface);
+    color: var(--color-brand);
     display: flex;
     align-items: center;
     justify-content: center;
