@@ -132,7 +132,7 @@ export function AuthProvider({ children }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (isRegistering.current) return;
 
       if (event === "SIGNED_OUT") {
@@ -153,22 +153,29 @@ export function AuthProvider({ children }) {
 
       justSignedOut.current = false;
 
-      try {
-        if (session?.user) {
-          const profile = await ensureProfile(session.user.id);
-          setUser(session.user);
-          setUserRole(profile?.role ?? "provider");
-          setUserStatus(profile?.status ?? "active");
-        } else {
-          setUser(null);
-          setUserRole(null);
-          setUserStatus(null);
+      // O supabase-js mantém um lock interno enquanto este callback corre.
+      // Fazer await a queries à BD aqui dentro (que precisam do token de
+      // sessão) provoca deadlock e a app fica presa em "A carregar..." ao
+      // recarregar a página. Adiamos o trabalho com setTimeout para libertar
+      // o lock antes de carregar o perfil.
+      setTimeout(async () => {
+        try {
+          if (session?.user) {
+            const profile = await ensureProfile(session.user.id);
+            setUser(session.user);
+            setUserRole(profile?.role ?? "provider");
+            setUserStatus(profile?.status ?? "active");
+          } else {
+            setUser(null);
+            setUserRole(null);
+            setUserStatus(null);
+          }
+        } catch (error) {
+          console.error("Erro no onAuthStateChange:", error);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("Erro no onAuthStateChange:", error);
-      } finally {
-        setLoading(false);
-      }
+      }, 0);
     });
 
     return () => subscription.unsubscribe();
