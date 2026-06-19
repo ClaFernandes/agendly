@@ -7,9 +7,9 @@
 }
 
 .booking-header {
-  background-color: #ffffff;
+  background-color: var(--color-surface);
   padding: 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -76,9 +76,9 @@
   text-align: center;
   padding: 1rem;
   font-size: 0.85rem;
-  color: #6c757d;
-  background-color: #ffffff;
-  border-top: 1px solid #dee2e6;
+  color: var(--color-text-muted);
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
 }
 
 /* Botões de demonstração temporários */
@@ -86,7 +86,7 @@
   width: 100%;
   padding: 1rem;
   background: white;
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   cursor: pointer;
   text-align: left;
@@ -95,13 +95,13 @@
 }
 
 .demo-btn:hover {
-  border-color: #4f46e5;
-  background-color: #f5f3ff;
+  border-color: var(--color-brand);
+  background-color: var(--color-brand-subtle);
 }
 
 .next-btn {
   display: inline-block;
-  background-color: #4f46e5;
+  background-color: var(--color-brand);
   color: white;
   padding: 0.75rem 1.5rem;
   border-radius: 6px;
@@ -157,8 +157,8 @@
   height: 32px;
   border-radius: var(--radius-full, 50%);
   border: 2px solid var(--color-border, #e5e7eb);
-  background: var(--color-surface, #ffffff);
-  color: var(--color-text-muted, #6b7280);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-semi, 600);
   transition: all 0.2s ease;
@@ -166,7 +166,7 @@
 
 .step-name {
   font-size: var(--text-xs, 0.75rem);
-  color: var(--color-text-subtle, #9ca3af);
+  color: var(--color-text-subtle);
   white-space: nowrap;
   text-align: center;
   transition: color 0.2s ease;
@@ -176,7 +176,7 @@
 .step-line {
   flex: 1;
   height: 2px;
-  background: var(--color-border, #e5e7eb);
+  background: var(--color-border);
   margin: 0 -32px;
   transform: translateY(15px);
   transition: background 0.3s ease;
@@ -184,32 +184,32 @@
 
 /* Estados: Ativo (Onde o cliente está agora) */
 .step-item.active .step-circle {
-  border-color: var(--color-brand, #4f46e5);
-  background: var(--color-brand, #4f46e5);
+  border-color: var(--color-brand);
+  background: var(--color-brand);
   color: #ffffff;
-  box-shadow: 0 0 0 4px var(--color-brand-subtle, #e0e7ff);
+  box-shadow: 0 0 0 4px var(--color-brand-subtle);
 }
 
 .step-item.active .step-name {
-  color: var(--color-brand, #4f46e5);
+  color: var(--color-brand);
   font-weight: var(--font-medium, 500);
 }
 
 /* ESTADO: COMPLETADO (Etapas que já passaram) */
 .step-item.completed .step-circle {
-  border-color: var(--color-brand, #4f46e5);
-  background: var(--color-brand, #4f46e5);
-  color: #ffffff;
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+  color: var(--color-surface);
 }
 
 .step-item.completed .step-name {
-  color: var(--color-brand, #4f46e5);
+  color: var(--color-brand);
   font-weight: var(--font-medium, 500);
 }
 
 /* A linha fica ativa quando passa pelo passo corrente */
 .step-line.active {
-  background: var(--color-brand, #4f46e5);
+  background: var(--color-brand);
 }
 
 /* Tela de Seleção de Serviços */
@@ -256,7 +256,7 @@
   font-size: 0.95rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #4b5563;
+  color: var(--color-text-muted);
   margin-bottom: 0.75rem;
   font-weight: 600;
 }
@@ -270,7 +270,7 @@
 
 .service-card {
   background: white;
-  border: 2px solid #e0e7ff;
+  border: 2px solid var(--color-brand-subtle);
   border-radius: 12px;
   padding: 1.25rem;
   cursor: pointer;
@@ -283,18 +283,18 @@
 
 .service-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .service-info h4 {
   font-size: 1.1rem;
-  color: #1f2937;
+  color: var(--color-text);
   font-weight: 600;
 }
 
 .service-info p {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin-top: 0.35rem;
   line-height: 1.4;
 }
@@ -302,8 +302,8 @@
 .service-duration {
   display: inline-block;
   font-size: 0.8rem;
-  color: #4b5563;
-  background: #f3f4f6;
+  color: var(--color-text-muted);
+  background: var(--color-surface-2);
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
   margin-top: 0.75rem;
@@ -320,7 +320,7 @@
 .service-price {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text);
 }
 
 .select-service-btn {
@@ -330,7 +330,7 @@
   gap: 8px;
   padding: 12px 20px;
   background: var(--color-brand);
-  color: #fff;
+  color: var(--color-surface);
   border: none;
   border-radius: var(--radius-md);
   font-size: var(--text-sm);
@@ -375,7 +375,7 @@
 
 .select-service-btn.text-only {
   background: transparent;
-  color: #4f46e5;
+  color: var(--color-brand);
   font-size: 1.2rem;
   padding: 0;
 }
@@ -411,7 +411,7 @@
 
 .date-card {
   background: white;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   border-radius: 10px;
   padding: 0.75rem 0.5rem;
   display: flex;
@@ -423,32 +423,32 @@
 }
 
 .date-card:hover {
-  border-color: #4f46e5;
-  background-color: #f5f3ff;
+  border-color: var(--color-brand);
+  background-color: var(--color-brand-subtle);
 }
 
 .date-card.selected {
-  background-color: #4f46e5;
-  border-color: #4f46e5;
+  background-color: var(--color-brand);
+  border-color: var(--color-brand);
   color: white;
-  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
 .date-card-weekday {
   font-size: 0.75rem;
   text-transform: uppercase;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 
 .date-card.selected .date-card-weekday {
-  color: #c7d2fe;
+  color: var(--color-primary-400);
 }
 
 .date-card-num {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text);
 }
 
 .date-card.selected .date-card-num {
@@ -458,11 +458,11 @@
 .date-card-month {
   font-size: 0.7rem;
   text-transform: capitalize;
-  color: #9ca3af;
+  color: var(--color-text-subtle);
 }
 
 .date-card.selected .date-card-month {
-  color: #e0e7ff;
+  color: var(--color-text-subtle);
 }
 
 /* Seletor Manual */
@@ -474,28 +474,28 @@
   background: white;
   padding: 1rem;
   border-radius: 10px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
 }
 
 .manual-date-picker label {
   font-size: 0.85rem;
   font-weight: 500;
-  color: #4b5563;
+  color: var(--color-text-muted);
 }
 
 .manual-date-picker input[type="date"] {
   padding: 0.6rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border-strong);
   border-radius: 6px;
   font-size: 1rem;
-  color: #111827;
+  color: var(--color-text);
   font-family: inherit;
   outline: none;
 }
 
 .manual-date-picker input[type="date"]:focus {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 3px #e0e7ff;
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px var(--color-brand-subtle);
 }
 
 /* Área de Botões inferiores */
@@ -568,9 +568,9 @@
 
 /* Estado Desabilitado (Horário já agendado/indisponível) */
 .time-slot-btn:disabled {
-  background-color: #f3f4f6;
-  border-color: #e5e7eb;
-  color: #9ca3af;
+  background-color: var(--color-surface-2);
+  border-color: var(--color-border);
+  color: var(--color-text-subtle);
   text-decoration: line-through;
   cursor: not-allowed;
   opacity: 0.6;
@@ -587,7 +587,7 @@
   background: white;
   padding: 1.5rem;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -602,26 +602,26 @@
 .form-group label {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text);
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border-strong);
   border-radius: 8px;
   font-size: 0.95rem;
   font-family: inherit;
-  color: #111827;
+  color: var(--color-text);
   outline: none;
   transition: border-color 0.15s;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 3px #e0e7ff;
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px var(--color-brand-subtle);
 }
 
 .form-group textarea {
@@ -652,7 +652,7 @@
 }
 
 .submit-form-btn:hover {
-  background-color: #4338ca;
+  background-color: var(--color-brand-hover);
 }
 
 .summary-card {
@@ -675,29 +675,29 @@
 .item-title {
   font-size: 1.05rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text);
 }
 
 .item-subtitle {
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   margin-top: 0.15rem;
 }
 
 .item-price {
   font-size: 1.15rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text);
 }
 
 /* Boxes de destaque internos */
 .summary-datetime-box,
 .summary-client-box {
-  background-color: #f9fafb;
+  background-color: var(--color-surface-2);
   padding: 0.85rem;
   border-radius: 8px;
   font-size: 0.95rem;
-  color: #374151;
+  color: var(--color-text);
   line-height: 1.5;
 }
 
@@ -716,9 +716,9 @@
 .summary-notes {
   margin-top: 0.5rem;
   font-style: italic;
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 0.9rem;
-  border-left: 2px solid #e5e7eb;
+  border-left: 2px solid var(--color-border);
   padding-left: 0.5rem;
 }
 

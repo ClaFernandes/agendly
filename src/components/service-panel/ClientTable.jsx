@@ -1,6 +1,6 @@
 // src/components/service-panel/ClientTable.jsx
 
-import { RiHeartLine, RiHeartFill, RiSearchLine } from "react-icons/ri";
+import { RiHeartLine, RiHeartFill, RiSearchLine, RiPencilLine } from "react-icons/ri";
 
 // Formata data para pt-PT
 function formatDate(dateStr) {
@@ -29,6 +29,7 @@ export default function ClientTable({
   isFavorite,
   onToggleFavorite,
   favoritesLoading = false,
+  onEditClient,
 }) {
   if (loading) {
     return <div className="appt-loading">A carregar clientes...</div>;
@@ -133,6 +134,18 @@ export default function ClientTable({
                     <span className="client-last-visit">
                       {formatDate(client.last_visit)}
                     </span>
+                  </td>
+
+                  {/* Editar */}
+                  <td className="client-td-actions">
+                    <button
+                      className="client-edit-btn"
+                      onClick={() => onEditClient?.(client)}
+                      title="Editar dados de contacto"
+                      aria-label={`Editar ${client.client_name}`}
+                    >
+                      <RiPencilLine aria-hidden="true" />
+                    </button>
                   </td>
                 </tr>
               );

@@ -23,7 +23,7 @@
 
 .calendar-nav-btn {
   border: none;
-  color: #374151;
+  color: var(--color-text);
   width: 36px;
   height: 36px;
   border-radius: 8px;
@@ -37,7 +37,7 @@
 }
 
 .calendar-nav-btn:hover:not(:disabled) {
-  color: #111827;
+  color: var(--color-text);
 }
 
 .calendar-nav-btn:disabled {
@@ -56,7 +56,7 @@
 .calendar-weekdays-grid span {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--color-text-muted);
   padding: 0.5rem 0;
 }
 
@@ -131,6 +131,6 @@
 .loading-calendar {
   text-align: center;
   padding: 2rem;
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 0.95rem;
 }

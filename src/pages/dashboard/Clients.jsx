@@ -3,17 +3,146 @@
 import { useState, useMemo } from "react";
 import { useAppointments } from "../../hooks/useAppointments";
 import { useFavorites } from "../../hooks/useFavorites";
+import { useBusiness } from "../../context/BusinessContext";
 import { exportClientsCSV } from "../../lib/exportCsv";
 import ClientTable from "../../components/service-panel/ClientTable";
 import { RiDownloadLine, RiHeartLine } from "react-icons/ri";
 import "./Dashboard.css";
 
+// Modal de edição de dados do cliente 
+function EditClientModal({ client, saving, onClose, onSubmit }) {
+  const [form, setForm] = useState({
+    client_name: client.client_name || "",
+    client_email: client.client_email || "",
+    client_phone: client.client_phone || "",
+  });
+  const [formError, setFormError] = useState(null);
+
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setFormError(null);
+
+    if (!form.client_name.trim()) {
+      setFormError("O nome é obrigatório.");
+      return;
+    }
+    if (!form.client_email.trim() && !form.client_phone.trim()) {
+      setFormError("Indica pelo menos um contacto (email ou telefone).");
+      return;
+    }
+
+    const result = await onSubmit(form);
+    if (!result?.success) {
+      setFormError(result?.error || "Não foi possível guardar as alterações.");
+    }
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div
+        className="modal modal--sm"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="edit-client-title"
+      >
+        <div className="modal-header">
+          <h2 id="edit-client-title" className="modal-title">
+            Editar dados do cliente
+          </h2>
+          <button className="modal-close" onClick={onClose} aria-label="Fechar">
+            ×
+          </button>
+        </div>
+
+        <form className="modal-form" onSubmit={handleSubmit}>
+          {formError && <div className="form-error">{formError}</div>}
+
+          <div className="form-field">
+            <label className="form-label" htmlFor="edit-client-name">
+              Nome <span className="form-required">*</span>
+            </label>
+            <input
+              id="edit-client-name"
+              name="client_name"
+              type="text"
+              className="form-input"
+              value={form.client_name}
+              onChange={handleChange}
+              autoFocus
+            />
+          </div>
+
+          <div className="form-field">
+            <label className="form-label" htmlFor="edit-client-email">
+              Email
+            </label>
+            <input
+              id="edit-client-email"
+              name="client_email"
+              type="email"
+              className="form-input"
+              placeholder="exemplo@email.com"
+              value={form.client_email}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-field">
+            <label className="form-label" htmlFor="edit-client-phone">
+              Telefone
+            </label>
+            <input
+              id="edit-client-phone"
+              name="client_phone"
+              type="tel"
+              className="form-input"
+              placeholder="+351 9XX XXX XXX"
+              value={form.client_phone}
+              onChange={handleChange}
+            />
+          </div>
+
+          <p className="pg-empty-subtext" style={{ textAlign: "left" }}>
+            Esta alteração atualiza os dados de contacto em todos os
+            agendamentos deste cliente, incluindo o histórico.
+          </p>
+
+          <div className="modal-actions">
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={onClose}
+              disabled={saving}
+            >
+              Cancelar
+            </button>
+            <button type="submit" className="btn-primary" disabled={saving}>
+              {saving ? "A guardar..." : "Guardar alterações"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// Página principal
 export default function Clients() {
-  const { appointments, loading: apptLoading } = useAppointments();
+  const { business } = useBusiness();
+  const { appointments, loading: apptLoading, refetch } = useAppointments();
   const { isFavorite, toggleFavorite, loading: favLoading } = useFavorites();
 
   const [search, setSearch] = useState("");
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
+  const [editTarget, setEditTarget] = useState(null); // null | client
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [editError, setEditError] = useState(null);
 
   // Agrupa agendamentos por client_email e calcula métricas
   const clients = useMemo(() => {
@@ -89,6 +218,39 @@ export default function Clients() {
     exportClientsCSV(filteredClients);
   }
 
+  // Atualiza nome/email/telefone em todos os agendamentos do cliente
+  async function handleSaveClientEdit(form) {
+    if (!editTarget || !business?.id) {
+      return { success: false, error: "Não foi possível identificar o negócio." };
+    }
+
+    setSavingEdit(true);
+    setEditError(null);
+
+    const { error } = await supabase
+      .from("appointments")
+      .update({
+        client_name: form.client_name.trim(),
+        client_email: form.client_email.trim(),
+        client_phone: form.client_phone.trim(),
+      })
+      .eq("business_id", business.id)
+      .eq("client_email", editTarget.client_email);
+
+    if (error) {
+      setEditError(error.message);
+      setSavingEdit(false);
+      return { success: false, error: error.message };
+    }
+
+    // Se o favorito estava marcado com o email antigo e o email mudou, favorito "perde-se" 
+    // os favoritos também são indexados por client_email.
+    await refetch();
+    setSavingEdit(false);
+    setEditTarget(null);
+    return { success: true };
+  }
+
   return (
     <div className="db-page">
       {/* Cabeçalho */}
@@ -157,8 +319,20 @@ export default function Clients() {
           isFavorite={isFavorite}
           onToggleFavorite={toggleFavorite}
           favoritesLoading={favLoading}
+          onEditClient={setEditTarget}
         />
       </div>
+
+      {/* Modal de edição */}
+      {editTarget && (
+        <EditClientModal
+          client={editTarget}
+          saving={savingEdit}
+          onClose={() => setEditTarget(null)}
+          onSubmit={handleSaveClientEdit}
+        />
+      )}
+
     </div>
   );
 }
