@@ -249,7 +249,7 @@ function BookingCard({ appt, saving, onComplete, onCancel, onEdit, onNoShow }) {
           </div>
 
           <div className="appt-item-actions">
-            {/* Futuro em aberto → Editar, Cancelar, Concluir */}
+            {/* Futuro em aberto → Editar, Cancelar */}
             {future && derived === APPOINTMENT_STATUS.EM_ABERTO && (
               <>
                 <button
@@ -267,19 +267,11 @@ function BookingCard({ appt, saving, onComplete, onCancel, onEdit, onNoShow }) {
                 >
                   <RiCloseLine aria-hidden="true" />
                   Cancelar
-                </button>
-                <button
-                  className="appt-action-btn appt-action-btn--complete"
-                  disabled={saving}
-                  onClick={() => onComplete(appt.id)}
-                >
-                  <RiCheckLine aria-hidden="true" />
-                  Concluir
-                </button>
+                </button>                
               </>
             )}
 
-            {/* Passado em aberto → Confirmar conclusão ou Não compareceu */}
+            {/* Atual em aberto → Confirmar conclusão ou Não compareceu */}
             {past && appt.status === APPOINTMENT_STATUS.EM_ABERTO && (
               <>
                 <button
@@ -288,7 +280,7 @@ function BookingCard({ appt, saving, onComplete, onCancel, onEdit, onNoShow }) {
                   onClick={() => onComplete(appt.id)}
                 >
                   <RiCheckLine aria-hidden="true" />
-                  Confirmar conclusão
+                  Confirmar presença
                 </button>
                 <button
                   className="appt-action-btn appt-action-btn--noshow"
@@ -310,10 +302,10 @@ function BookingCard({ appt, saving, onComplete, onCancel, onEdit, onNoShow }) {
 // Filtros
 const FILTERS = [
   { key: "all", label: "Todos" },
-  { key: "em_aberto", label: "Em aberto" },
-  { key: "concluido", label: "Concluído" },
-  { key: "cancelado", label: "Cancelado" },
-  { key: "nao_compareceu", label: "Não compareceu" },
+  { key: "em_aberto", label: "Próximos" },
+  { key: "concluido", label: "Concluídos" },
+  { key: "cancelado", label: "Cancelados" },
+  { key: "nao_compareceu", label: "Não compareceram" },
 ];
 
 // Página

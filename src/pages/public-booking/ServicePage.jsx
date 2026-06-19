@@ -15,8 +15,8 @@ export default function ServicePage() {
   return (
     <div className="service-page-container">
       <div className="page-header">
-        <h2>Selecione um serviço</h2>
-        <p>Escolha a opção desejada para prosseguir com o agendamento.</p>
+        <h2>O que queres agendar?</h2>
+        <p>Escolha uma opção para prosseguir com o agendamento.</p>
       </div>
 
       <div className="services-list">

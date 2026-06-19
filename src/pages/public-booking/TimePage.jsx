@@ -94,7 +94,7 @@ export default function TimePage() {
         <div className="closed-message">Sem horários disponíveis. Seleciona outra data.</div>
       ) : (
         <div className="time-section">
-          <h2>Horários Disponíveis</h2>
+          <h2>Seleciona um horário</h2>
           <div className="time-grid">
             {slots.map((slot) => (
               <button

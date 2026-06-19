@@ -241,6 +241,13 @@
   margin-top: 0.25rem;
 }
 
+.page-concluded {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
 .services-section {
   margin-top: 0.5rem;
 }

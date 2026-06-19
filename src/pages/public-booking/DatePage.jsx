@@ -123,8 +123,8 @@ export default function DatePage() {
   return (
     <div className="date-page-container">
       <div className="page-header">
-        <h2>Escolha a Data</h2>
-        <p>Selecione o melhor dia para o seu atendimento.</p>
+        <h2>Qual dia preferes?</h2>
+        <p>Seleciona o melhor dia para o teu atendimento.</p>
       </div>
 
       {/* Calendário Customizado */}
