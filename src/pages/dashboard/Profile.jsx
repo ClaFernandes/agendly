@@ -106,6 +106,7 @@ export default function Profile() {
   const navigate = useNavigate();
 
   // Campos do formulário
+  const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [phone, setPhone] = useState("");
@@ -141,6 +142,11 @@ export default function Profile() {
     setCurrentLogoUrl(business.logo_url ?? null);
     setRemoveLogo(false);
   }, [business]);
+
+  useEffect(() => {
+    if (!user) return;
+    setEmail(user.email ?? "");
+  }, [user]);
 
   // Slug 
   async function checkSlug(value) {
@@ -387,10 +393,11 @@ export default function Profile() {
       <div className="pg-section">
         <div className="pg-section-header">
           <h2 className="pg-section-title">Dados do negócio</h2>
+          <h4 className="pg-subtitle">{email}</h4>
         </div>
         <div className="set-form">
           {/* Nome */}
-          <div className="set-field">
+          <div className="set-field">            
             <label htmlFor="set-name" className="set-label">
               Nome do negócio <span className="set-required">*</span>
             </label>
