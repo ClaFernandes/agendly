@@ -405,7 +405,9 @@
 
 .calendar-wrapper .rbc-row-content {
     flex: 1;
-    overflow-y: auto;
+    overflow: auto;
+    overflow: overlay;
+    scrollbar-width: none; 
 }
 
 .calendar-wrapper .rbc-month-view .rbc-event {

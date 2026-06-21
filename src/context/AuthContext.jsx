@@ -16,7 +16,6 @@ const AuthContext = createContext();
 
 const INACTIVITY_TIMEOUT = 60 * 60 * 1000; // 60 minutos
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   return useContext(AuthContext);
 }

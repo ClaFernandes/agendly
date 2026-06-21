@@ -250,30 +250,40 @@ export default function Dashboard() {
       <div className="pg-stats-grid">
         <div className="pg-stat-card">
           <p className="pg-stat-label">Receita mensal</p>
-          <p className="pg-stat-value">
-            {apptLoading ? "—" : new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" }).format(monthlyRevenue)}
-          </p>
-          <p className="pg-stat-meta">mês actual</p>
+          <div>
+            <p className="pg-stat-value">
+              {apptLoading ? "—" : new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" }).format(monthlyRevenue)}
+            </p>
+            <p className="pg-stat-meta">mês actual</p>
+          </div>
         </div>
         <div className="pg-stat-card">
           <p className="pg-stat-label">Agendamentos hoje</p>
-          <p className="pg-stat-value">{apptLoading ? "—" : todayCount}</p>
-          <p className="pg-stat-meta">{apptLoading ? "" : `${today.filter(a => resolveStatus(a) === "em_aberto").length} por acontecer`}</p>
+          <div>
+            <p className="pg-stat-value">{apptLoading ? "—" : todayCount}</p>
+            <p className="pg-stat-meta">{apptLoading ? "" : `${today.filter(a => resolveStatus(a) === "em_aberto").length} por acontecer`}</p>
+          </div>
         </div>
         <div className="pg-stat-card">
           <p className="pg-stat-label">Agendamentos semana</p>
-          <p className="pg-stat-value">{apptLoading ? "—" : weekCount}</p>
-          <p className="pg-stat-meta">esta semana</p>
+          <div>
+            <p className="pg-stat-value">{apptLoading ? "—" : weekCount}</p>
+            <p className="pg-stat-meta">esta semana</p>
+          </div>
         </div>
         <div className="pg-stat-card">
           <p className="pg-stat-label">Serviços ativos</p>
-          <p className="pg-stat-value">{svcLoading ? "—" : activeServices}</p>
-          {!svcLoading && <p className="pg-stat-meta">{totalServices} no total</p>}
+          <div>
+            <p className="pg-stat-value">{svcLoading ? "—" : activeServices}</p>
+            {!svcLoading && <p className="pg-stat-meta">{totalServices} no total</p>}
+          </div>
         </div>
         <div className="pg-stat-card">
           <p className="pg-stat-label">Serviços em destaque</p>
-          <p className="pg-stat-value">{svcLoading ? "—" : featuredServices}</p>
-          {!svcLoading && <p className="pg-stat-meta">{activeServices} {activeServices === 1 ? "ativo" : "ativos"}</p>}
+          <div>
+            <p className="pg-stat-value">{svcLoading ? "—" : featuredServices}</p>
+            {!svcLoading && <p className="pg-stat-meta">{activeServices} {activeServices === 1 ? "ativo" : "ativos"}</p>}
+          </div>
         </div>
       </div>
 
@@ -314,8 +324,8 @@ export default function Dashboard() {
               <div className="db-quick-link-icon">
                 <Icon aria-hidden="true" />
               </div>
-              <div>
                 <p className="db-quick-link-label">{label}</p>
+              <div>
                 <p className="db-quick-link-desc">{description}</p>
               </div>
             </Link>

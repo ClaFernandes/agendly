@@ -7,6 +7,7 @@ import { useBusiness } from "../../context/BusinessContext";
 import { exportClientsCSV } from "../../lib/exportCsv";
 import ClientTable from "../../components/service-panel/ClientTable";
 import { RiDownloadLine, RiHeartLine } from "react-icons/ri";
+import { supabase } from "../../lib/supabase";
 import "./Dashboard.css";
 
 // Modal de edição de dados do cliente 
@@ -253,6 +254,7 @@ export default function Clients() {
 
   return (
     <div className="db-page">
+      {editError && <p className="sch-error">{editError}</p>}
       {/* Cabeçalho */}
       <div className="pg-header">
         <div>
