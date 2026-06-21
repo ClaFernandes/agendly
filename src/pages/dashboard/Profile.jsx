@@ -287,17 +287,12 @@ export default function Profile() {
         }
       }
 
-      // Apaga dados associados 
-      if (business?.id) {
-        await supabase.from("client_favorites").delete().eq("business_id", business.id);
-        await supabase.from("appointments").delete().eq("business_id", business.id);
-        await supabase.from("working_hours").delete().eq("business_id", business.id);
-        await supabase.from("services").delete().eq("business_id", business.id);
-        await supabase.from("business").delete().eq("id", business.id);
-      }
-
-      // Apaga o profile (tabela profiles)
-      await supabase.from("profiles").delete().eq("id", user.id);
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .delete()
+        .eq("id", user.id);
+        
+      if (profileError) throw profileError;
 
       // Apaga o utilizador do Auth via RPC 
       const { error: rpcError } = await supabase.rpc("delete_user_by_id", {
