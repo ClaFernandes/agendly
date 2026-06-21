@@ -64,7 +64,7 @@ function DayAppointmentCard({ appt }) {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div className="appt-item-name" style={{ marginBottom: 2 }}>{appt.client_name}</div>
           <div className="appt-time-text">{startTime} – {endTime}</div>
-          <div className="appt-time-sub">{appt.service?.name} · {duration} min</div>
+          <div className="appt-time-sub">{appt.service?.name} ⏱ {duration} min</div>
         </div>
 
         {/* Preço + status */}

@@ -118,7 +118,7 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
           <div className="form-row">
             <div className="form-field">
               <label htmlFor="svc-duration" className="form-label">
-                Duração (min) <span className="form-required">*</span>
+                ⏱ Duração (min) <span className="form-required">*</span>
               </label>
               <input
                 id="svc-duration"

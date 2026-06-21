@@ -109,7 +109,7 @@ function AppointmentCard({ appt, saving, onComplete, onCancel, onReopen }) {
                 {startTime} – {endTime}
               </div>
               <div className="appt-time-sub">
-                {appt.service?.name ?? appt.service_name} · {dateLabel} · {duration} min
+                {appt.service?.name ?? appt.service_name} · {dateLabel} ⏱ {duration} min
               </div>
             </div>
           </div>

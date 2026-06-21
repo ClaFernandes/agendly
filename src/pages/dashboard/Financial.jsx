@@ -240,52 +240,62 @@ export default function Financial() {
       <div className="pg-stats-grid">
         <div className="pg-stat-card">
           <p className="pg-stat-label">Receita total</p>
-          <p className="pg-stat-value">
-            {loading ? "—" : formatPrice(totalRevenue)}
-          </p>
-          <p className="pg-stat-meta">
-            {allConfirmed.length} serviços no total
-          </p>
+          <div>
+            <p className="pg-stat-value">
+              {loading ? "—" : formatPrice(totalRevenue)}
+            </p>
+            <p className="pg-stat-meta">
+              {allConfirmed.length} serviços no total
+            </p>
+          </div>
         </div>
 
         <div className="pg-stat-card">
           <p className="pg-stat-label">Receita do mês</p>
-          <p className="pg-stat-value">
-            {loading ? "—" : formatPrice(metrics.revenue)}
-          </p>
-          <p className="pg-stat-meta">
-            {MONTH_NAMES[selectedMonth]} {selectedYear}
-          </p>
+          <div>
+            <p className="pg-stat-value">
+              {loading ? "—" : formatPrice(metrics.revenue)}
+            </p>
+            <p className="pg-stat-meta">
+              {MONTH_NAMES[selectedMonth]} {selectedYear}
+            </p>
+          </div>
         </div>
 
         <div className="pg-stat-card">
           <p className="pg-stat-label">Receita prevista</p>
-          <p className="pg-stat-value">
-            {loading ? "—" : formatPrice(projectedRevenue)}
-          </p>
-          <p className="pg-stat-meta">
-            {periodFuture.length} agendamentos futuros
-          </p>
+          <div>
+            <p className="pg-stat-value">
+              {loading ? "—" : formatPrice(projectedRevenue)}
+            </p>
+            <p className="pg-stat-meta">
+              {periodFuture.length} agend. futuros
+            </p>
+          </div>
         </div>
 
         <div className="pg-stat-card">
           <p className="pg-stat-label">Serviço mais popular</p>
-          <p className="pg-stat-value" style={{ fontSize: "var(--text-lg)" }}>
-            {loading ? "—" : metrics.topService ? metrics.topService[0] : "—"}
-          </p>
-          {metrics.topService && (
-            <p className="pg-stat-meta">
-              {metrics.topService[1]} vezes este mês
+          <div>
+            <p className="pg-stat-value" style={{ fontSize: "var(--text-lg)" }}>
+              {loading ? "—" : metrics.topService ? metrics.topService[0] : "—"}
             </p>
-          )}
+            {metrics.topService && (
+              <p className="pg-stat-meta">
+                {metrics.topService[1]} vezes este mês
+              </p>
+            )}
+          </div>
         </div>
 
         <div className="pg-stat-card">
           <p className="pg-stat-label">Transacções confirmadas</p>
-          <p className="pg-stat-value">{loading ? "—" : metrics.count}</p>
-          <p className="pg-stat-meta">
-            {MONTH_NAMES[selectedMonth]} {selectedYear}
-          </p>
+          <div>
+            <p className="pg-stat-value">{loading ? "—" : metrics.count}</p>
+            <p className="pg-stat-meta">
+              {MONTH_NAMES[selectedMonth]} {selectedYear}
+            </p>
+          </div>
         </div>
       </div>
 

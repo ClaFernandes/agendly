@@ -66,6 +66,7 @@ function DeleteAccountModal({ onConfirm, onCancel, deleting }) {
           <p className="delete-modal-subtext">
             Ao confirmar, todos os dados do teu negócio serão apagados permanentemente —
             serviços, horários, agendamentos, clientes favoritos e a tua conta.
+            <br/><br/><strong>Os clientes com agendamentos abertos serão notificados por email.</strong>
           </p>
 
           {/* Checkbox de confirmação extra */}

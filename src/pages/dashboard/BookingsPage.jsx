@@ -126,7 +126,7 @@ function StatusPill({ status }) {
 }
 
 // Card
-function BookingCard({ appt, saving, onComplete, onCancel, onEdit, onNoShow }) {
+function BookingCard({ appt, saving, onComplete, onCancel, onEdit, onNoShow, onReopen }) {
   const [open, setOpen] = useState(false);
   const derived = resolveStatus(appt);
   const future = isFuture(appt);
@@ -150,10 +150,13 @@ function BookingCard({ appt, saving, onComplete, onCancel, onEdit, onNoShow }) {
   const isNoShow = appt.status === APPOINTMENT_STATUS.NAO_COMPARECEU;
   const isCancelled = derived === APPOINTMENT_STATUS.CANCELADO;
 
-  // Sem acções disponíveis: concluído, cancelado, não compareceu
+  // Permite abrir para editar estados concluído, cancelado, não compareceu
   const hasActions =
     (future && derived === APPOINTMENT_STATUS.EM_ABERTO) ||
-    (past && appt.status === APPOINTMENT_STATUS.EM_ABERTO);
+    (past && appt.status === APPOINTMENT_STATUS.EM_ABERTO) ||
+    derived === APPOINTMENT_STATUS.CONCLUIDO ||
+    derived === APPOINTMENT_STATUS.CANCELADO ||
+    derived === APPOINTMENT_STATUS.NAO_COMPARECEU;
 
   return (
     <div
@@ -292,6 +295,42 @@ function BookingCard({ appt, saving, onComplete, onCancel, onEdit, onNoShow }) {
                 </button>
               </>
             )}
+
+            {/* Concluído → Marcar como Não compareceu */}
+            {derived === APPOINTMENT_STATUS.CONCLUIDO && (
+              <button
+                className="appt-action-btn appt-action-btn--noshow"
+                disabled={saving}
+                onClick={() => onNoShow(appt.id)}
+              >
+                <RiUserUnfollowLine aria-hidden="true" />
+                Não compareceu
+              </button>
+            )}
+
+            {/* Não compareceu → Marcar como Concluído */}
+            {derived === APPOINTMENT_STATUS.NAO_COMPARECEU && (
+              <button
+                className="appt-action-btn appt-action-btn--complete"
+                disabled={saving}
+                onClick={() => onComplete(appt.id)}
+              >
+                <RiCheckLine aria-hidden="true" />
+                Concluído
+              </button>
+            )}
+
+            {/* Cancelado → Reabrir */}
+            {derived === APPOINTMENT_STATUS.CANCELADO && (
+              <button
+                className="appt-action-btn appt-action-btn--complete"
+                disabled={saving}
+                onClick={() => onReopen(appt.id)}
+              >
+                <RiCheckLine aria-hidden="true" />
+                Reabrir
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -318,6 +357,7 @@ export default function BookingsPage() {
     completeAppointment,
     cancelAppointment,
     markNoShow,
+    reopenAppointment,
     createAppointment,
     updateAppointment,
     refetch,
@@ -522,6 +562,7 @@ export default function BookingsPage() {
                 onComplete={completeAppointment}
                 onCancel={cancelAppointment}
                 onNoShow={markNoShow}
+                onReopen={reopenAppointment}
                 onEdit={(appt) =>
                   setModalState({ mode: "edit", appointment: appt })
                 }
