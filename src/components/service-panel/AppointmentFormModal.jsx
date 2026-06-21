@@ -93,35 +93,45 @@ export default function AppointmentFormModal({
     }
 
     async function handleSubmit(e) {
-        e.preventDefault();
-        const validationError = validate();
-        if (validationError) {
-            setFormError(validationError);
-            return;
-        }
-        setFormError(null);
-
-        const service = services.find((s) => s.id === formData.service_id);
-        const startsAtDate = new Date(`${formData.date}T${formData.time}:00`);
-        const endsAtDate = new Date(
-            startsAtDate.getTime() + (service?.duration_min ?? 0) * 60000,
-        );
-
-        const payload = {
-            client_name: formData.client_name.trim(),
-            client_email: formData.client_email.trim(),
-            client_phone: formData.client_phone.trim(),
-            notes: formData.notes.trim(),
-            service_id: formData.service_id,
-            starts_at: startsAtDate.toISOString(),
-            ends_at: endsAtDate.toISOString(),
-        };
-
-        const result = await onSubmit(payload);
-        if (!result?.success) {
-            setFormError(result?.error || "Não foi possível guardar o agendamento.");
-        }
+    e.preventDefault();
+    const validationError = validate();
+    if (validationError) {
+        setFormError(validationError);
+        return;
     }
+    setFormError(null);
+
+    const service = services.find((s) => s.id === formData.service_id);
+    
+    // 1. Criar os objetos de data baseados na hora local do browser
+    const startsAtDate = new Date(`${formData.date}T${formData.time}:00`);
+    const endsAtDate = new Date(
+        startsAtDate.getTime() + (service?.duration_min ?? 0) * 60000,
+    );
+
+    // 2. Aplicar a Opção B: Forçar o ISO a manter a hora literal pretendida
+    const tzOffsetStart = startsAtDate.getTimezoneOffset() * 60000;
+    const forcedStartDate = new Date(startsAtDate.getTime() - tzOffsetStart);
+
+    const tzOffsetEnd = endsAtDate.getTimezoneOffset() * 60000;
+    const forcedEndDate = new Date(endsAtDate.getTime() - tzOffsetEnd);
+
+    const payload = {
+        client_name: formData.client_name.trim(),
+        client_email: formData.client_email.trim(),
+        client_phone: formData.client_phone.trim(),
+        notes: formData.notes.trim(),
+        service_id: formData.service_id,
+        // Agora envia ex: "2026-06-25T14:30:00.000Z" independentemente de onde o cliente está
+        starts_at: forcedStartDate.toISOString(),
+        ends_at: forcedEndDate.toISOString(),
+    };
+
+    const result = await onSubmit(payload);
+    if (!result?.success) {
+        setFormError(result?.error || "Não foi possível guardar o agendamento.");
+    }
+}
 
     return (
         <div className="modal-overlay" onClick={onClose}>

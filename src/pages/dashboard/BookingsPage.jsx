@@ -65,13 +65,16 @@ function formatTime(iso) {
   return new Date(iso).toLocaleTimeString("pt-PT", {
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "UTC",
   });
 }
+
 function formatDateLabel(iso) {
   return new Date(iso).toLocaleDateString("pt-PT", {
     weekday: "short",
     day: "2-digit",
     month: "2-digit",
+    timeZone: "UTC", 
   });
 }
 function getDurationMinutes(start, end) {
@@ -418,7 +421,16 @@ export default function BookingsPage() {
   // Filtra por semana → estado → pesquisa
   const filtered = useMemo(() => {
     return appointments.filter((a) => {
-      const d = new Date(a.starts_at);
+      const apptUtc = new Date(a.starts_at);
+      // Criamos uma data baseada nos números literais do UTC do agendamento
+      const d = new Date(
+        apptUtc.getUTCFullYear(),
+        apptUtc.getUTCMonth(),
+        apptUtc.getUTCDate(),
+        apptUtc.getUTCHours(),
+        apptUtc.getUTCMinutes()
+      );
+
       if (d < weekStart || d > weekEnd) return false;
       if (activeFilter !== "all" && resolveStatus(a) !== activeFilter)
         return false;
@@ -438,7 +450,14 @@ export default function BookingsPage() {
   // Contagens da semana visível
   const counts = useMemo(() => {
     const base = appointments.filter((a) => {
-      const d = new Date(a.starts_at);
+      const apptUtc = new Date(a.starts_at);
+      const d = new Date(
+        apptUtc.getUTCFullYear(),
+        apptUtc.getUTCMonth(),
+        apptUtc.getUTCDate(),
+        apptUtc.getUTCHours(),
+        apptUtc.getUTCMinutes()
+      );
       return d >= weekStart && d <= weekEnd;
     });
     const c = { all: base.length };

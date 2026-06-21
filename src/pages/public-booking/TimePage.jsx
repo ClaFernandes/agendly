@@ -62,14 +62,36 @@ export default function TimePage() {
         if (apptError) throw apptError;
 
         // Filtrar colisões
-        const filtered = filterAvailableSlots(
+        let filtered = filterAvailableSlots(
           allPossibleSlots,
           appointments || [],
           selectedService.duration_min,
           selectedDate
         );
 
-        setSlots(filtered);
+        // NOVO: Impedir que horários no passado apareçam se for o dia de hoje
+        const todayStr = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
+        if (selectedDate === todayStr) {
+          const now = new Date();
+          const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+          filtered = filtered.map((slot) => {
+            const [slotH, slotM] = slot.time.split(":").map(Number);
+            const slotMinutes = slotH * 60 + slotM;
+
+            // Se o horário do slot já passou no dia de hoje, marcamos como indisponível
+            if (slotMinutes <= currentMinutes) {
+              return { ...slot, available: false };
+            }
+            return slot;
+          });
+        }
+
+        // Remove de vez os botões do ecrã se preferires escondê-los, 
+        // ou deixa apenas desativados (disabled). Para esconder completamente, fazemos:
+        const visibleSlots = filtered.filter(slot => slot.available);
+
+        setSlots(visibleSlots);
       } catch (error) {
         console.error("Erro ao carregar horários:", error.message);
         setSlots([]);

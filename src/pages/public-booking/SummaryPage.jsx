@@ -15,35 +15,40 @@ export default function SummaryPage() {
     useBooking();
 
   const handleConfirmAppointment = async () => {
-    setIsSubmitting(true);
+  setIsSubmitting(true);
 
-    // Cria a data de INÍCIO correta baseada no fuso local do navegador
-    const startsAtDate = new Date(`${selectedDate}T${selectedTime}:00`);
+  // 1. Criar os objetos de data baseados na hora local do browser
+  const startsAtDate = new Date(`${selectedDate}T${selectedTime}:00`);
+  const endsAtDate = new Date(startsAtDate.getTime() + selectedService.duration_min * 60000);
 
-    // Calcula a data de FIM somando os minutos de duração do serviço
-    const endsAtDate = new Date(startsAtDate.getTime() + selectedService.duration_min * 60000);
+  // 2. Aplicar a Opção B: Forçar o ISO a manter a hora literal pretendida
+  const tzOffsetStart = startsAtDate.getTimezoneOffset() * 60000;
+  const forcedStartDate = new Date(startsAtDate.getTime() - tzOffsetStart);
 
-    try {
-      const { error } = await supabase.from("appointments").insert({
-        business_id: business.id,
-        service_id: selectedService.id,
-        starts_at: startsAtDate.toISOString(), // Envia UTC seguro para o Postgres
-        ends_at: endsAtDate.toISOString(),     // Fundamental para o filtro de colisão
-        client_name: clientData.client_name,
-        client_email: clientData.client_email,
-        client_phone: clientData.client_phone,
-        notes: clientData.notes,
-        status: "em_aberto",
-      });
+  const tzOffsetEnd = endsAtDate.getTimezoneOffset() * 60000;
+  const forcedEndDate = new Date(endsAtDate.getTime() - tzOffsetEnd);
 
-      if (error) throw error;
-      navigate("../confirm");
-    } catch (err) {
-      alert("Falha ao salvar agendamento: " + err.message);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  try {
+    const { error } = await supabase.from("appointments").insert({
+      business_id: business.id,
+      service_id: selectedService.id,
+      starts_at: forcedStartDate.toISOString(), // Grava a hora exata selecionada
+      ends_at: forcedEndDate.toISOString(),     // Grava o fim exato calculado
+      client_name: clientData.client_name,
+      client_email: clientData.client_email,
+      client_phone: clientData.client_phone,
+      notes: clientData.notes,
+      status: "em_aberto",
+    });
+
+    if (error) throw error;
+    navigate("../confirm");
+  } catch (err) {
+    alert("Falha ao salvar agendamento: " + err.message);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="page-header">

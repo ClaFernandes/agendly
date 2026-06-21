@@ -25,7 +25,11 @@ function getColorIndex(name = "") {
   return hash % AVATAR_COLORS.length;
 }
 function formatTime(iso) {
-  return new Date(iso).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+  return new Date(iso).toLocaleTimeString("pt-PT", { 
+    hour: "2-digit", 
+    minute: "2-digit",
+    timeZone: "UTC" 
+  });
 }
 function getDurationMinutes(start, end) {
   return Math.round((new Date(end) - new Date(start)) / 60000);
@@ -121,9 +125,14 @@ export default function Appointments() {
     ? "Hoje"
     : selectedDate.toLocaleDateString("pt-PT", { weekday: "long", day: "2-digit", month: "long" });
 
-  const sidebarAppointments = appointments.filter(
-    (a) => new Date(a.starts_at).toDateString() === selectedDate.toDateString()
-  );
+  const sidebarAppointments = appointments.filter((a) => {
+    const apptDate = new Date(a.starts_at);
+    return (
+      apptDate.getUTCFullYear() === selectedDate.getFullYear() &&
+      apptDate.getUTCMonth() === selectedDate.getMonth() &&
+      apptDate.getUTCDate() === selectedDate.getDate()
+    );
+  });
 
   return (
     <div className="db-page db-page--wide">

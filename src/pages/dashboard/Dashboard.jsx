@@ -27,11 +27,22 @@ function getInitials(name) {
 }
 
 function formatTime(iso) {
-  return new Date(iso).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+  // o timezone "UTC" le o valor guardado exatamente como está na base de dados
+  return new Date(iso).toLocaleTimeString("pt-PT", { 
+    hour: "2-digit", 
+    minute: "2-digit", 
+    timeZone: "UTC" 
+  });
 }
 
 function formatDateShort(iso) {
-  return new Date(iso).toLocaleDateString("pt-PT", { weekday: "short", day: "2-digit", month: "short" });
+  // Forçamos o timezone "UTC" para evitar que mudanças de fuso horário alterem o dia do agendamento
+  return new Date(iso).toLocaleDateString("pt-PT", { 
+    weekday: "short", 
+    day: "2-digit", 
+    month: "short", 
+    timeZone: "UTC" 
+  });
 }
 
 const AVATAR_COLORS = [
