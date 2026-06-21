@@ -1,7 +1,7 @@
 // src/pages/public-booking/DatePage.jsx
 
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useBooking } from "../../context/BookingContext";
 import { supabase } from "../../lib/supabase";
 import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
@@ -112,13 +112,14 @@ export default function DatePage() {
   };
 
   const monthLabel = currentViewDate.toLocaleDateString("pt-PT", {
-    month: "long"
+    month: "long",
   });
 
   const isPrevDisabled = new Date(viewYear, viewMonth - 1, 1) < minMonthDate;
   const isNextDisabled = new Date(viewYear, viewMonth + 1, 1) > maxMonthDate;
 
-  if (loadingConfig) return <div className="loading-calendar">A carregar calendário...</div>;
+  if (loadingConfig)
+    return <div className="loading-calendar">A carregar calendário...</div>;
 
   return (
     <div className="date-page-container">
@@ -165,7 +166,9 @@ export default function DatePage() {
         <div className="calendar-days-grid">
           {calendarCells.map((cell) => {
             if (cell.isBlank) {
-              return <div key={cell.key} className="calendar-cell blank-cell"></div>;
+              return (
+                <div key={cell.key} className="calendar-cell blank-cell"></div>
+              );
             }
 
             const isSelected = selectedDate === cell.dateStr;
@@ -183,7 +186,11 @@ export default function DatePage() {
                 className={`calendar-cell day-btn ${statusClass}`}
                 disabled={cell.isDisabled}
                 onClick={() => handleSelectDate(cell.dateStr)}
-                title={cell.hasNoHours && !cell.isPast ? "Sem horários de funcionamento" : ""}
+                title={
+                  cell.hasNoHours && !cell.isPast
+                    ? "Sem horários de funcionamento"
+                    : ""
+                }
               >
                 {cell.dayNum}
               </button>

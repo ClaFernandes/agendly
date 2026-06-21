@@ -1,6 +1,6 @@
 // src/pages/public-booking/FormPage.jsx
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useBooking } from "../../context/BookingContext";
 import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
 
@@ -95,10 +95,7 @@ export default function FormPage() {
             <FiArrowLeft /> Voltar
           </button>
 
-          <button
-            type="submit"
-            className="submit-form-btn"
-          >
+          <button type="submit" className="submit-form-btn">
             Ver Resumo <FiArrowRight />
           </button>
         </div>

@@ -84,24 +84,25 @@ export function BusinessProvider({ children }) {
     setLoading(false);
   }, [user, userRole]);
 
-  // Memorizar a função de update para não mudar a referência
+  // Memoriza a função de update para não mudar a referência
   const updateBusiness = useCallback((updatedFields) => {
     setBusiness((prev) => ({ ...prev, ...updatedFields }));
   }, []);
 
-  // Memorizar o objeto do valor do Contexto
-  const contextValue = useMemo(() => ({
-    business,
-    loading,
-    error,
-    updateBusiness,
-    refresh
-  }), [business, loading, error, updateBusiness, refresh]);
+  // Memoriza o objeto do valor do Contexto
+  const contextValue = useMemo(
+    () => ({
+      business,
+      loading,
+      error,
+      updateBusiness,
+      refresh,
+    }),
+    [business, loading, error, updateBusiness, refresh],
+  );
 
   return (
-    <BusinessContext.Provider
-      value={{ business, loading, error, updateBusiness, refresh }}
-    >
+    <BusinessContext.Provider value={contextValue}>
       {children}
     </BusinessContext.Provider>
   );

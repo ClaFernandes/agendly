@@ -1,7 +1,7 @@
 // src/pages/public-booking/TimePage.jsx
 
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useBooking } from "../../context/BookingContext";
 import { generateSlots, filterAvailableSlots } from "../../lib/slots";
 import { supabase } from "../../lib/supabase";
@@ -9,7 +9,13 @@ import { FiArrowLeft } from "react-icons/fi";
 
 export default function TimePage() {
   const navigate = useNavigate();
-  const { business, selectedService, selectedDate, selectedTime, setSelectedTime } = useBooking();
+  const {
+    business,
+    selectedService,
+    selectedDate,
+    selectedTime,
+    setSelectedTime,
+  } = useBooking();
   const [slots, setSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
 
@@ -43,7 +49,7 @@ export default function TimePage() {
           const turnoSlots = generateSlots(
             turno.start_time,
             turno.end_time,
-            selectedService.duration_min
+            selectedService.duration_min,
           );
           allPossibleSlots = [...allPossibleSlots, ...turnoSlots];
         });
@@ -66,11 +72,11 @@ export default function TimePage() {
           allPossibleSlots,
           appointments || [],
           selectedService.duration_min,
-          selectedDate
+          selectedDate,
         );
 
-        // NOVO: Impedir que horários no passado apareçam se for o dia de hoje
-        const todayStr = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
+        // Impedir que horários no passado apareçam se for o dia de hoje
+        const todayStr = new Date().toISOString().split("T")[0];
         if (selectedDate === todayStr) {
           const now = new Date();
           const currentMinutes = now.getHours() * 60 + now.getMinutes();
@@ -87,9 +93,8 @@ export default function TimePage() {
           });
         }
 
-        // Remove de vez os botões do ecrã se preferires escondê-los, 
-        // ou deixa apenas desativados (disabled). Para esconder completamente, fazemos:
-        const visibleSlots = filtered.filter(slot => slot.available);
+        // Remove de vez os botões do ecrã se preferires escondê-los, ou deixa apenas desativados
+        const visibleSlots = filtered.filter((slot) => slot.available);
 
         setSlots(visibleSlots);
       } catch (error) {
@@ -113,7 +118,9 @@ export default function TimePage() {
   return (
     <div className="time-page-container">
       {slots.length === 0 && !loadingSlots ? (
-        <div className="closed-message">Sem horários disponíveis. Seleciona outra data.</div>
+        <div className="closed-message">
+          Sem horários disponíveis. Seleciona outra data.
+        </div>
       ) : (
         <div className="time-section">
           <h2>Seleciona um horário</h2>
@@ -140,7 +147,6 @@ export default function TimePage() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

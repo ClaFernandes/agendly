@@ -20,7 +20,10 @@ import "./Dashboard.css";
 function getInitials(name) {
   if (!name) return "?";
   const stopWords = new Set(["do", "da", "de", "dos", "das", "e", "o", "a"]);
-  const words = name.trim().split(/\s+/).filter(w => !stopWords.has(w.toLowerCase()));
+  const words = name
+    .trim()
+    .split(/\s+/)
+    .filter((w) => !stopWords.has(w.toLowerCase()));
   if (words.length === 0) return name.slice(0, 2).toUpperCase();
   if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
   return (words[0][0] + words[1][0]).toUpperCase();
@@ -28,20 +31,20 @@ function getInitials(name) {
 
 function formatTime(iso) {
   // o timezone "UTC" le o valor guardado exatamente como está na base de dados
-  return new Date(iso).toLocaleTimeString("pt-PT", { 
-    hour: "2-digit", 
-    minute: "2-digit", 
-    timeZone: "UTC" 
+  return new Date(iso).toLocaleTimeString("pt-PT", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
   });
 }
 
 function formatDateShort(iso) {
   // Forçamos o timezone "UTC" para evitar que mudanças de fuso horário alterem o dia do agendamento
-  return new Date(iso).toLocaleDateString("pt-PT", { 
-    weekday: "short", 
-    day: "2-digit", 
-    month: "short", 
-    timeZone: "UTC" 
+  return new Date(iso).toLocaleDateString("pt-PT", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    timeZone: "UTC",
   });
 }
 
@@ -71,40 +74,90 @@ function UpcomingCard({ appt }) {
   const avatar = AVATAR_COLORS[idx];
   const derived = resolveStatus(appt);
   const pill = STATUS_PILL[derived] ?? STATUS_PILL.em_aberto;
-  const price = appt.service?.price != null
-    ? Number(appt.service.price).toLocaleString("pt-PT", { style: "currency", currency: "EUR" })
-    : "—";
+  const price =
+    appt.service?.price != null
+      ? Number(appt.service.price).toLocaleString("pt-PT", {
+          style: "currency",
+          currency: "EUR",
+        })
+      : "—";
 
   return (
-    <div style={{
-      display: "flex",
-      alignItems: "center",
-      gap: 12,
-      padding: "12px 0",
-      borderBottom: "0.5px solid var(--color-border)",
-    }}>
-      <div style={{
-        width: 36, height: 36, borderRadius: "50%",
-        background: avatar.bg, color: avatar.color,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 12, fontWeight: 600, flexShrink: 0,
-      }}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        padding: "12px 0",
+        borderBottom: "0.5px solid var(--color-border)",
+      }}
+    >
+      <div
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: "50%",
+          background: avatar.bg,
+          color: avatar.color,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 12,
+          fontWeight: 600,
+          flexShrink: 0,
+        }}
+      >
         {getInitials(appt.client_name)}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: "var(--text-sm)", fontWeight: 500, color: "var(--color-text)" }}>
+        <div
+          style={{
+            fontSize: "var(--text-sm)",
+            fontWeight: 500,
+            color: "var(--color-text)",
+          }}
+        >
           {appt.client_name}
         </div>
-        <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-muted)", marginTop: 2 }}>
-          {appt.service?.name} · {formatDateShort(appt.starts_at)} · {formatTime(appt.starts_at)}
+        <div
+          style={{
+            fontSize: "var(--text-xs)",
+            color: "var(--color-text-muted)",
+            marginTop: 2,
+          }}
+        >
+          {appt.service?.name} · {formatDateShort(appt.starts_at)} ·{" "}
+          {formatTime(appt.starts_at)}
         </div>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, flexShrink: 0 }}>
-        <span style={{ fontSize: "var(--text-sm)", fontWeight: 600, color: "var(--color-text)" }}>{price}</span>
-        <span style={{
-          fontSize: 11, fontWeight: 500, padding: "2px 8px",
-          borderRadius: "var(--radius-full)", background: pill.bg, color: pill.color,
-        }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-end",
+          gap: 4,
+          flexShrink: 0,
+        }}
+      >
+        <span
+          style={{
+            fontSize: "var(--text-sm)",
+            fontWeight: 600,
+            color: "var(--color-text)",
+          }}
+        >
+          {price}
+        </span>
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 500,
+            padding: "2px 8px",
+            borderRadius: "var(--radius-full)",
+            background: pill.bg,
+            color: pill.color,
+          }}
+        >
           {pill.label}
         </span>
       </div>
@@ -113,11 +166,36 @@ function UpcomingCard({ appt }) {
 }
 
 const QUICK_LINKS = [
-  { to: "/dashboard/appointments", icon: RiCalendarLine, label: "Agenda", description: "Consulta o calendário" },
-  { to: "/dashboard/bookings", icon: RiCalendarCheckLine, label: "Gestão", description: "Gere os teus agendamentos" },
-  { to: "/dashboard/services", icon: RiScissorsCutLine, label: "Serviços", description: "Cria e edita os teus serviços" },
-  { to: "/dashboard/schedule", icon: RiTimeLine, label: "Horários", description: "Define os teus dias e horas" },
-  { to: "/dashboard/settings", icon: RiUserSettingsLine, label: "Perfil", description: "Edita os dados do teu negócio" },
+  {
+    to: "/dashboard/appointments",
+    icon: RiCalendarLine,
+    label: "Agenda",
+    description: "Consulta o calendário",
+  },
+  {
+    to: "/dashboard/bookings",
+    icon: RiCalendarCheckLine,
+    label: "Gestão",
+    description: "Gere os teus agendamentos",
+  },
+  {
+    to: "/dashboard/services",
+    icon: RiScissorsCutLine,
+    label: "Serviços",
+    description: "Cria e edita os teus serviços",
+  },
+  {
+    to: "/dashboard/schedule",
+    icon: RiTimeLine,
+    label: "Horários",
+    description: "Define os teus dias e horas",
+  },
+  {
+    to: "/dashboard/settings",
+    icon: RiUserSettingsLine,
+    label: "Perfil",
+    description: "Edita os dados do teu negócio",
+  },
 ];
 
 export default function Dashboard() {
@@ -146,8 +224,8 @@ export default function Dashboard() {
   }
 
   const totalServices = services.length;
-  const activeServices = services.filter(s => s.active).length;
-  const featuredServices = services.filter(s => s.is_featured).length;
+  const activeServices = services.filter((s) => s.active).length;
+  const featuredServices = services.filter((s) => s.is_featured).length;
   const todayCount = today.length;
 
   const weekCount = useMemo(() => {
@@ -160,7 +238,7 @@ export default function Dashboard() {
     const end = new Date(start);
     end.setDate(start.getDate() + 6);
     end.setHours(23, 59, 59, 999);
-    return appointments.filter(a => {
+    return appointments.filter((a) => {
       const d = new Date(a.starts_at);
       return d >= start && d <= end;
     }).length;
@@ -169,10 +247,13 @@ export default function Dashboard() {
   const monthlyRevenue = useMemo(() => {
     const now = new Date();
     return appointments
-      .filter(a => {
+      .filter((a) => {
         if (a.status !== "concluido") return false;
         const d = new Date(a.starts_at);
-        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        return (
+          d.getMonth() === now.getMonth() &&
+          d.getFullYear() === now.getFullYear()
+        );
       })
       .reduce((sum, a) => sum + Number(a.service?.price ?? 0), 0);
   }, [appointments]);
@@ -181,7 +262,9 @@ export default function Dashboard() {
   const upcoming = useMemo(() => {
     const now = new Date();
     return appointments
-      .filter(a => resolveStatus(a) === "em_aberto" && new Date(a.starts_at) >= now)
+      .filter(
+        (a) => resolveStatus(a) === "em_aberto" && new Date(a.starts_at) >= now,
+      )
       .slice(0, 5);
   }, [appointments]);
 
@@ -204,9 +287,15 @@ export default function Dashboard() {
         <div className="db-welcome-info">
           <div className="db-welcome-avatar">
             {business?.logo_url ? (
-              <img src={business.logo_url} alt={business.name} className="db-welcome-avatar-img" />
+              <img
+                src={business.logo_url}
+                alt={business.name}
+                className="db-welcome-avatar-img"
+              />
             ) : (
-              <div className="db-welcome-avatar-initials">{getInitials(business?.name)}</div>
+              <div className="db-welcome-avatar-initials">
+                {getInitials(business?.name)}
+              </div>
             )}
           </div>
           <div>
@@ -245,12 +334,18 @@ export default function Dashboard() {
             <RiAlertLine aria-hidden="true" />
           </div>
           <div className="db-onboarding-body">
-            <p className="db-onboarding-title">Começa por criar os teus serviços</p>
+            <p className="db-onboarding-title">
+              Começa por criar os teus serviços
+            </p>
             <p className="db-onboarding-desc">
-              Para os clientes conseguirem agendar, precisas de ter pelo menos um serviço activo.
+              Para os clientes conseguirem agendar, precisas de ter pelo menos
+              um serviço activo.
             </p>
           </div>
-          <Link to="/dashboard/services" className="btn-primary db-onboarding-btn">
+          <Link
+            to="/dashboard/services"
+            className="btn-primary db-onboarding-btn"
+          >
             <RiScissorsCutLine aria-hidden="true" />
             Criar serviço
           </Link>
@@ -263,7 +358,12 @@ export default function Dashboard() {
           <p className="pg-stat-label">Receita mensal</p>
           <div>
             <p className="pg-stat-value">
-              {apptLoading ? "—" : new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" }).format(monthlyRevenue)}
+              {apptLoading
+                ? "—"
+                : new Intl.NumberFormat("pt-PT", {
+                    style: "currency",
+                    currency: "EUR",
+                  }).format(monthlyRevenue)}
             </p>
             <p className="pg-stat-meta">mês actual</p>
           </div>
@@ -272,7 +372,11 @@ export default function Dashboard() {
           <p className="pg-stat-label">Agendamentos hoje</p>
           <div>
             <p className="pg-stat-value">{apptLoading ? "—" : todayCount}</p>
-            <p className="pg-stat-meta">{apptLoading ? "" : `${today.filter(a => resolveStatus(a) === "em_aberto").length} por acontecer`}</p>
+            <p className="pg-stat-meta">
+              {apptLoading
+                ? ""
+                : `${today.filter((a) => resolveStatus(a) === "em_aberto").length} por acontecer`}
+            </p>
           </div>
         </div>
         <div className="pg-stat-card">
@@ -286,14 +390,22 @@ export default function Dashboard() {
           <p className="pg-stat-label">Serviços ativos</p>
           <div>
             <p className="pg-stat-value">{svcLoading ? "—" : activeServices}</p>
-            {!svcLoading && <p className="pg-stat-meta">{totalServices} no total</p>}
+            {!svcLoading && (
+              <p className="pg-stat-meta">{totalServices} no total</p>
+            )}
           </div>
         </div>
         <div className="pg-stat-card">
           <p className="pg-stat-label">Serviços em destaque</p>
           <div>
-            <p className="pg-stat-value">{svcLoading ? "—" : featuredServices}</p>
-            {!svcLoading && <p className="pg-stat-meta">{activeServices} {activeServices === 1 ? "ativo" : "ativos"}</p>}
+            <p className="pg-stat-value">
+              {svcLoading ? "—" : featuredServices}
+            </p>
+            {!svcLoading && (
+              <p className="pg-stat-meta">
+                {activeServices} {activeServices === 1 ? "ativo" : "ativos"}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -302,7 +414,9 @@ export default function Dashboard() {
       <div className="pg-section" style={{ marginBottom: 24 }}>
         <div className="pg-section-header">
           <h2 className="pg-section-title">Próximos agendamentos</h2>
-          <Link to="/dashboard/bookings" className="btn-secondary">Ver todos</Link>
+          <Link to="/dashboard/bookings" className="btn-secondary">
+            Ver todos
+          </Link>
         </div>
 
         {apptLoading ? (
@@ -335,7 +449,7 @@ export default function Dashboard() {
               <div className="db-quick-link-icon">
                 <Icon aria-hidden="true" />
               </div>
-                <p className="db-quick-link-label">{label}</p>
+              <p className="db-quick-link-label">{label}</p>
               <div>
                 <p className="db-quick-link-desc">{description}</p>
               </div>

@@ -13,7 +13,6 @@ import {
   FiCheck,
   FiUserPlus,
 } from "react-icons/fi";
-
 import logo from "../../assets/logo.svg";
 import "./Auth.css";
 

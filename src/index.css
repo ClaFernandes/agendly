@@ -171,8 +171,6 @@ textarea::placeholder {
 }
 
 /* Utilitários */
-
-/* texto cortado com reticências (...) - para texto maior que o espaço disponível*/
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;

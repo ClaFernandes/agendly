@@ -10,7 +10,11 @@ import {
   RiToolsLine,
   RiMoneyDollarCircleLine,
 } from "react-icons/ri";
-import { resolveStatus, STATUS_CONFIG, APPOINTMENT_STATUS } from "../../hooks/useAppointments";
+import {
+  resolveStatus,
+  STATUS_CONFIG,
+  APPOINTMENT_STATUS,
+} from "../../hooks/useAppointments";
 
 const AVATAR_COLORS = [
   { bg: "#EEEDFE", color: "#534AB7" },
@@ -21,10 +25,22 @@ const AVATAR_COLORS = [
   { bg: "#EAF3DE", color: "#3B6D11" },
 ];
 
-const TIME_BAR_COLORS = ["#7F77DD", "#1D9E75", "#D85A30", "#378ADD", "#D4537E", "#639922"];
+const TIME_BAR_COLORS = [
+  "#7F77DD",
+  "#1D9E75",
+  "#D85A30",
+  "#378ADD",
+  "#D4537E",
+  "#639922",
+];
 
 function getInitials(name = "") {
-  return name.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase();
+  return name
+    .split(" ")
+    .slice(0, 2)
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
 }
 
 function getColorIndex(name = "") {
@@ -55,12 +71,15 @@ function formatDateLabel(iso) {
 function StatusPill({ status }) {
   const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.em_aberto;
   const pillStyles = {
-    em_aberto:  { background: "#FEF9EC", color: "#92620A" },
-    concluido:  { background: "#E1F5EE", color: "#0F6E56" },
-    cancelado:  { background: "#FCEBEB", color: "#A32D2D" },
+    em_aberto: { background: "#FEF9EC", color: "#92620A" },
+    concluido: { background: "#E1F5EE", color: "#0F6E56" },
+    cancelado: { background: "#FCEBEB", color: "#A32D2D" },
   };
   return (
-    <span className="appt-status-pill" style={pillStyles[status] ?? pillStyles.em_aberto}>
+    <span
+      className="appt-status-pill"
+      style={pillStyles[status] ?? pillStyles.em_aberto}
+    >
       {config.label}
     </span>
   );
@@ -78,16 +97,21 @@ function AppointmentCard({ appt, saving, onComplete, onCancel, onReopen }) {
   const duration = getDurationMinutes(appt.starts_at, appt.ends_at);
   const initials = getInitials(appt.client_name);
   const dateLabel = formatDateLabel(appt.starts_at);
-  const price = typeof appt.price === "number"
-    ? appt.price.toLocaleString("pt-PT", { style: "currency", currency: "EUR" })
-    : appt.service?.price != null
-    ? Number(appt.service.price).toLocaleString("pt-PT", { style: "currency", currency: "EUR" })
-    : "—";
+  const price =
+    typeof appt.price === "number"
+      ? appt.price.toLocaleString("pt-PT", {
+          style: "currency",
+          currency: "EUR",
+        })
+      : appt.service?.price != null
+        ? Number(appt.service.price).toLocaleString("pt-PT", {
+            style: "currency",
+            currency: "EUR",
+          })
+        : "—";
 
-  // Agendamentos cancelados ficam com opacidade reduzida
-  const cardStyle = derived === APPOINTMENT_STATUS.CANCELADO
-    ? { opacity: 0.6 }
-    : {};
+  const cardStyle =
+    derived === APPOINTMENT_STATUS.CANCELADO ? { opacity: 0.6 } : {};
 
   return (
     <div
@@ -109,7 +133,8 @@ function AppointmentCard({ appt, saving, onComplete, onCancel, onReopen }) {
                 {startTime} – {endTime}
               </div>
               <div className="appt-time-sub">
-                {appt.service?.name ?? appt.service_name} · {dateLabel} ⏱ {duration} min
+                {appt.service?.name ?? appt.service_name} · {dateLabel} ⏱{" "}
+                {duration} min
               </div>
             </div>
           </div>
@@ -226,7 +251,7 @@ function AppointmentCard({ appt, saving, onComplete, onCancel, onReopen }) {
 }
 
 const FILTERS = [
-  { key: "all",      label: "Todos" },
+  { key: "all", label: "Todos" },
   { key: "em_aberto", label: "Próximos" },
   { key: "concluido", label: "Concluídos" },
   { key: "cancelado", label: "Cancelados" },
@@ -250,9 +275,10 @@ export default function AppointmentList({
   }, {});
   counts.all = appointments.length;
 
-  const filtered = activeFilter === "all"
-    ? appointments
-    : appointments.filter((a) => resolveStatus(a) === activeFilter);
+  const filtered =
+    activeFilter === "all"
+      ? appointments
+      : appointments.filter((a) => resolveStatus(a) === activeFilter);
 
   if (loading) {
     return <div className="appt-loading">A carregar agendamentos...</div>;

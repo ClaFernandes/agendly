@@ -21,7 +21,7 @@ const EMPTY_FORM = {
   active: true,
 };
 
-// ── Modal de criar/editar serviço ─────────────────────────────────
+// Modal de criar/editar serviço
 
 function ServiceModal({ service, saving, onClose, onSubmit }) {
   const isEditing = Boolean(service);
@@ -41,7 +41,10 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
 
   function handleChange(e) {
     const { name, value, type, checked } = e.target;
-    setForm(prev => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   }
 
   async function handleSubmit(e) {
@@ -71,7 +74,7 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
     <div className="modal-overlay" onClick={onClose}>
       <div
         className="modal"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
@@ -80,7 +83,13 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
           <h2 id="modal-title" className="modal-title">
             {isEditing ? "Editar serviço" : "Novo serviço"}
           </h2>
-          <button className="modal-close" onClick={onClose} aria-label="Fechar modal">×</button>
+          <button
+            className="modal-close"
+            onClick={onClose}
+            aria-label="Fechar modal"
+          >
+            ×
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
@@ -160,7 +169,10 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
                 onChange={handleChange}
                 className="form-checkbox"
               />
-              <label htmlFor="svc-active" className="form-label form-label--inline">
+              <label
+                htmlFor="svc-active"
+                className="form-label form-label--inline"
+              >
                 Serviço ativo
               </label>
             </div>
@@ -169,11 +181,20 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
           {formError && <p className="form-error">{formError}</p>}
 
           <div className="modal-actions">
-            <button type="button" className="btn-secondary" onClick={onClose} disabled={saving}>
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={onClose}
+              disabled={saving}
+            >
               Cancelar
             </button>
             <button type="submit" className="btn-primary" disabled={saving}>
-              {saving ? "A guardar..." : isEditing ? "Guardar alterações" : "Criar serviço"}
+              {saving
+                ? "A guardar..."
+                : isEditing
+                  ? "Guardar alterações"
+                  : "Criar serviço"}
             </button>
           </div>
         </form>
@@ -182,21 +203,29 @@ function ServiceModal({ service, saving, onClose, onSubmit }) {
   );
 }
 
-// ── Modal de confirmação de apagar ────────────────────────────────
+// Modal de confirmação de apagar
 
 function DeleteConfirmModal({ serviceName, saving, onConfirm, onCancel }) {
   return (
     <div className="modal-overlay" onClick={onCancel}>
       <div
         className="modal modal--sm"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="delete-modal-title"
       >
         <div className="modal-header">
-          <h2 id="delete-modal-title" className="modal-title">Apagar serviço</h2>
-          <button className="modal-close" onClick={onCancel} aria-label="Fechar">×</button>
+          <h2 id="delete-modal-title" className="modal-title">
+            Apagar serviço
+          </h2>
+          <button
+            className="modal-close"
+            onClick={onCancel}
+            aria-label="Fechar"
+          >
+            ×
+          </button>
         </div>
 
         <div className="delete-modal-body">
@@ -212,7 +241,11 @@ function DeleteConfirmModal({ serviceName, saving, onConfirm, onCancel }) {
         </div>
 
         <div className="modal-actions">
-          <button className="btn-secondary" onClick={onCancel} disabled={saving}>
+          <button
+            className="btn-secondary"
+            onClick={onCancel}
+            disabled={saving}
+          >
             Cancelar
           </button>
           <button className="btn-danger" onClick={onConfirm} disabled={saving}>
@@ -225,7 +258,7 @@ function DeleteConfirmModal({ serviceName, saving, onConfirm, onCancel }) {
   );
 }
 
-// ── Página principal ──────────────────────────────────────────────
+// Página principal
 
 export default function Services() {
   const {
@@ -240,8 +273,8 @@ export default function Services() {
     toggleActive,
   } = useServices();
 
-  const [modalMode, setModalMode]           = useState(null); // null | "new" | serviceObj
-  const [deleteTarget, setDeleteTarget]     = useState(null); // null | serviceObj
+  const [modalMode, setModalMode] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   async function handleCreate(fields) {
     const result = await createService(fields);
@@ -261,8 +294,8 @@ export default function Services() {
     setDeleteTarget(null);
   }
 
-  const totalServices  = services.length;
-  const activeServices = services.filter(s => s.active).length;
+  const totalServices = services.length;
+  const activeServices = services.filter((s) => s.active).length;
 
   return (
     <div className="db-page">
@@ -298,7 +331,9 @@ export default function Services() {
           <div className="pg-empty">
             <RiScissorsCutLine className="pg-empty-icon" aria-hidden="true" />
             <p className="pg-empty-text">Ainda não tens serviços criados</p>
-            <p className="pg-empty-subtext">Começa por criar o teu primeiro serviço.</p>
+            <p className="pg-empty-subtext">
+              Começa por criar o teu primeiro serviço.
+            </p>
             <button
               className="btn-primary"
               style={{ marginTop: "12px" }}
@@ -319,12 +354,17 @@ export default function Services() {
                 <th>Serviço</th>
                 <th>Estado</th>
                 <th>Preço</th>
-                <th className="svc-th-center" title="Destaque na página pública">★</th>
+                <th
+                  className="svc-th-center"
+                  title="Destaque na página pública"
+                >
+                  ★
+                </th>
                 <th className="svc-th-actions">Ações</th>
               </tr>
             </thead>
             <tbody>
-              {services.map(service => (
+              {services.map((service) => (
                 <tr key={service.id} className="svc-row">
                   {/* Nome + duração */}
                   <td className="svc-td-name">
@@ -337,7 +377,11 @@ export default function Services() {
                     <button
                       className={`svc-badge ${service.active ? "svc-badge--active" : "svc-badge--inactive"}`}
                       onClick={() => toggleActive(service.id, service.active)}
-                      title={service.active ? "Clica para desativar" : "Clica para ativar"}
+                      title={
+                        service.active
+                          ? "Clica para desativar"
+                          : "Clica para ativar"
+                      }
                     >
                       {service.active ? "ativo" : "inativo"}
                     </button>
@@ -348,21 +392,33 @@ export default function Services() {
                     €{Number(service.price).toFixed(2)}
                   </td>
 
-                  {/* Estrela — maior */}
+                  {/* Estrela */}
                   <td className="svc-td-center">
                     <button
                       className={`svc-star ${service.is_featured ? "svc-star--on" : "svc-star--off"}`}
-                      onClick={() => toggleFeatured(service.id, service.is_featured)}
-                      title={service.is_featured ? "Remover destaque" : "Marcar como destaque"}
-                      aria-label={service.is_featured ? "Remover destaque" : "Marcar como destaque"}
+                      onClick={() =>
+                        toggleFeatured(service.id, service.is_featured)
+                      }
+                      title={
+                        service.is_featured
+                          ? "Remover destaque"
+                          : "Marcar como destaque"
+                      }
+                      aria-label={
+                        service.is_featured
+                          ? "Remover destaque"
+                          : "Marcar como destaque"
+                      }
                     >
-                      {service.is_featured
-                        ? <RiStarFill aria-hidden="true" />
-                        : <RiStarLine aria-hidden="true" />}
+                      {service.is_featured ? (
+                        <RiStarFill aria-hidden="true" />
+                      ) : (
+                        <RiStarLine aria-hidden="true" />
+                      )}
                     </button>
                   </td>
 
-                  {/* Ações — alinhadas com o th */}
+                  {/* Ações */}
                   <td className="svc-td-actions">
                     <button
                       className="svc-action-btn"
