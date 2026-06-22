@@ -221,7 +221,8 @@
 
     .svc-row>td:nth-child(2),
     .svc-row>td:nth-child(3),
-    .svc-row>td:nth-child(4) {
+    .svc-row>td:nth-child(4), 
+    .svc-row>td:nth-child(5) {
         display: inline-flex;
         align-items: center;
         width: auto;
@@ -236,7 +237,7 @@
 
     .svc-star {
         font-size: 18px;
-        padding: 2px;
+        padding: 2px 12px;
     }
 
     .svc-td-actions {
@@ -247,7 +248,7 @@
     }
 
     .svc-action-btn {
-        padding: 8px 14px;
-        font-size: var(--text-sm);
+        padding: 8px 12px;
+        font-size: var(--text-base);
     }
 }

@@ -237,10 +237,10 @@
     .db-public-link {
         width: 100%;
         max-width: 100%;
+        justify-content: space-between;
     }
 
     .db-public-link-url {
-        max-width: 130px;
         flex: 1;
     }
 

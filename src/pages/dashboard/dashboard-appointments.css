@@ -831,6 +831,15 @@
     .calendar-wrapper {
         height: 560px;
     }
+
+    .appt-item-info {
+        max-width: 85%;
+        overflow: scroll;
+    }
+
+    .appt-strip-day {
+        justify-content:flex-start;
+    }
 }
 
 @media (max-width: 600px) {

@@ -120,6 +120,13 @@ export default function TimePage() {
       {slots.length === 0 && !loadingSlots ? (
         <div className="closed-message">
           Sem horários disponíveis. Seleciona outra data.
+          <button
+            type="button"
+            className="onboarding-btn-back"
+            onClick={() => navigate("../date")}
+          >
+            <FiArrowLeft /> Voltar
+          </button>
         </div>
       ) : (
         <div className="time-section">

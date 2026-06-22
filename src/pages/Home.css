@@ -457,6 +457,15 @@
         padding: 16px 20px;
         text-align: center;
     }
+    .home-footer-admin {
+        order: -1;
+        background-color: var(--color-primary-600);
+        color: var(--color-page-bg);
+        font-size: var(--text-sm);
+        padding: 13px 28px;
+        border-radius: var(--radius-md);
+        margin: 16px 0;
+    }
 }
 
 @media (max-width: 480px) {
