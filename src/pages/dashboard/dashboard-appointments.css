@@ -221,7 +221,6 @@
     margin-top: 1px;
 }
 
-/* Nome do cliente */
 .appt-item-name {
     font-size: var(--text-sm);
     font-weight: var(--font-medium);
@@ -231,7 +230,6 @@
     white-space: nowrap;
 }
 
-/* Right side */
 .appt-item-v2-right {
     display: flex;
     flex-direction: column;
@@ -364,9 +362,19 @@
     color: #fff;
 }
 
-/* react-big-calendar overrides */
+.appt-action-btn--noshow {
+    border-color: #C4B5FD;
+    color: #7C3AED;
+    background: #F5F3FF;
+}
 
-/* Base */
+.appt-action-btn--noshow:hover:not(:disabled) {
+    background: #7C3AED;
+    color: #fff;
+    border-color: #7C3AED;
+}
+
+/* react-big-calendar overrides */
 .calendar-wrapper .rbc-calendar {
     flex: 1;
     display: flex;
@@ -375,7 +383,6 @@
     font-family: inherit;
 }
 
-/* ── Month view ── */
 .calendar-wrapper .rbc-month-view {
     flex: 1;
     display: flex;
@@ -406,8 +413,7 @@
 .calendar-wrapper .rbc-row-content {
     flex: 1;
     overflow: auto;
-    overflow: overlay;
-    scrollbar-width: none; 
+    scrollbar-width: none;
 }
 
 .calendar-wrapper .rbc-month-view .rbc-event {
@@ -457,7 +463,6 @@
     cursor: pointer;
 }
 
-/* ── Day / Time views (shared) ── */
 .calendar-wrapper .rbc-time-view {
     border: 0.5px solid var(--color-border);
     border-radius: var(--radius-md);
@@ -496,7 +501,6 @@
     white-space: nowrap;
 }
 
-/* Content area */
 .calendar-wrapper .rbc-time-content {
     flex: 1;
     display: flex;
@@ -509,7 +513,6 @@
     position: relative;
 }
 
-/* Slot lines inside the day column */
 .calendar-wrapper .rbc-day-slot .rbc-timeslot-group {
     border-bottom: 0.5px solid var(--color-border);
 }
@@ -518,7 +521,6 @@
     border-top: 0.5px dashed var(--color-border);
 }
 
-/* Day view events */
 .calendar-wrapper .rbc-day-slot .rbc-event {
     border-radius: var(--radius-md) !important;
     border-width: 0 0 0 3px !important;
@@ -537,7 +539,6 @@
     filter: brightness(0.95);
 }
 
-/* Oculta o label padrão do RBC */
 .calendar-wrapper .rbc-day-slot .rbc-event-label {
     display: none;
 }
@@ -551,7 +552,6 @@
     align-items: flex-start;
 }
 
-/* Current time indicator */
 .calendar-wrapper .rbc-current-time-indicator {
     height: 2px;
     background: var(--color-brand);
@@ -572,7 +572,6 @@
     background: var(--color-brand);
 }
 
-/* Selected slot highlight */
 .calendar-wrapper .rbc-slot-selection {
     background: var(--color-brand-subtle);
     border: 1px solid var(--color-primary-400);
@@ -580,7 +579,7 @@
     opacity: 0.6;
 }
 
-/* Componente de evento customizado (dia/semana) */
+/* Evento customizado (dia/semana) */
 .rbc-day-event-custom {
     display: flex;
     flex-direction: column;
@@ -616,56 +615,7 @@
     text-overflow: ellipsis;
 }
 
-/* Responsividade */
-@media (max-width: 900px) {
-    .appt-layout {
-        grid-template-columns: 1fr;
-    }
-
-    .appt-sidebar-panel {
-        max-height: none;
-    }
-
-    .calendar-wrapper {
-        height: 560px;
-    }
-}
-
-@media (max-width: 640px) {
-    .appt-nav-label {
-        min-width: unset;
-        font-size: var(--text-sm);
-    }
-
-    .appt-calendar-panel {
-        display: none;
-    }
-
-    .appt-layout {
-        grid-template-columns: 1fr;
-    }
-
-    .appt-sidebar-panel {
-        padding: 12px;
-        max-height: none;
-    }
-
-    .appt-detail-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .appt-item-actions {
-        justify-content: stretch;
-    }
-
-    .appt-action-btn {
-        flex: 1;
-        justify-content: center;
-    }
-}
-
 /* Gestão de agendamentos (BookingsPage) */
-
 .bkg-toolbar {
     display: flex;
     align-items: center;
@@ -716,7 +666,7 @@
     color: var(--color-text-subtle);
 }
 
-/* Card de dia na sidebar do calendário (sem ações) */
+/* Card de dia na sidebar do calendário */
 .appt-day-card {
     border: 0.5px solid var(--color-border);
     border-radius: var(--radius-md);
@@ -735,35 +685,7 @@
     padding: 12px 14px;
 }
 
-@media (max-width: 640px) {
-    .bkg-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .bkg-period {
-        width: 100%;
-    }
-
-    .bkg-period .fin-select {
-        flex: 1;
-    }
-}
-
-/* No-show button */
-.appt-action-btn--noshow {
-    border-color: #C4B5FD;
-    color: #7C3AED;
-    background: #F5F3FF;
-}
-
-.appt-action-btn--noshow:hover:not(:disabled) {
-    background: #7C3AED;
-    color: #fff;
-    border-color: #7C3AED;
-}
-
-/* Navegação por semana */
+/* Navegação por semana (BookingsPage) */
 .bkg-week-nav {
     display: flex;
     align-items: center;
@@ -776,4 +698,210 @@
     color: var(--color-text);
     min-width: 160px;
     text-align: center;
+}
+
+/* Responsividade */
+
+/* navegação de semana compacta */
+.appt-mobile-week-nav {
+    display: none;
+}
+
+.appt-mobile-week-label {
+    flex: 1;
+    text-align: center;
+    font-size: var(--text-sm);
+    font-weight: var(--font-semi);
+    color: var(--color-text);
+}
+
+.appt-today-btn {
+    height: 32px;
+    padding: 0 12px;
+    font-size: var(--text-xs);
+}
+
+.appt-week-strip-wrapper {
+    display: none;
+    background: var(--color-surface);
+    border: 0.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    margin-bottom: 14px;
+    overflow: hidden;
+}
+
+.appt-week-strip {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    gap: 0;
+}
+
+.appt-week-strip::-webkit-scrollbar {
+    display: none;
+}
+
+.appt-strip-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    flex: 1;
+    min-width: 44px;
+    padding: 10px 4px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.15s;
+    border-radius: 0;
+}
+
+.appt-strip-day:hover {
+    background: var(--color-surface-2);
+}
+
+.appt-strip-day--today .appt-strip-num {
+    color: var(--color-brand);
+    font-weight: var(--font-semi);
+}
+
+.appt-strip-day--active {
+    background: var(--color-brand);
+}
+
+.appt-strip-day--active .appt-strip-weekday,
+.appt-strip-day--active .appt-strip-num {
+    color: #fff;
+}
+
+.appt-strip-day--active:hover {
+    background: var(--color-brand-hover);
+}
+
+.appt-strip-weekday {
+    font-size: 10px;
+    font-weight: var(--font-medium);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+.appt-strip-num {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-text);
+    line-height: 1;
+}
+
+.appt-strip-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-brand);
+    display: block;
+}
+
+.appt-strip-day--active .appt-strip-dot {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.appt-mobile-day-section {
+    display: none;
+}
+
+.appt-mobile-day-title {
+    font-size: var(--text-base);
+    font-weight: var(--font-semi);
+    color: var(--color-text);
+    margin-bottom: 12px;
+}
+
+@media (max-width: 900px) {
+    .appt-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .appt-sidebar-panel {
+        max-height: none;
+    }
+
+    .calendar-wrapper {
+        height: 560px;
+    }
+}
+
+@media (max-width: 600px) {
+    .appt-nav {
+        display: none;
+    }
+
+    .appt-layout {
+        display: none;
+    }
+
+    .appt-mobile-week-nav {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 10px;
+    }
+
+    .appt-week-strip-wrapper {
+        display: block;
+    }
+
+    .appt-mobile-day-section {
+        display: block;
+    }
+
+    .appt-filters {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding-bottom: 2px;
+        margin-bottom: 10px;
+        -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
+        mask-image: linear-gradient(to right, black 80%, transparent 100%);
+    }
+
+    .appt-filters::-webkit-scrollbar {
+        display: none;
+    }
+
+    .bkg-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .bkg-week-nav {
+        width: 100%;
+    }
+
+    .bkg-week-label {
+        min-width: unset;
+        flex: 1;
+    }
+
+    .bkg-search {
+        min-width: unset;
+    }
+
+    .appt-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .appt-item-actions {
+        justify-content: stretch;
+    }
+
+    .appt-action-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 9px 8px;
+    }
 }

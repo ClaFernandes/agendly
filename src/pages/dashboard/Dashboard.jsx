@@ -39,7 +39,7 @@ function formatTime(iso) {
 }
 
 function formatDateShort(iso) {
-  // Forçamos o timezone "UTC" para evitar que mudanças de fuso horário alterem o dia do agendamento
+  // Força o timezone "UTC" para evitar que mudanças de fuso horário alterem o dia do agendamento
   return new Date(iso).toLocaleDateString("pt-PT", {
     weekday: "short",
     day: "2-digit",
@@ -77,9 +77,9 @@ function UpcomingCard({ appt }) {
   const price =
     appt.service?.price != null
       ? Number(appt.service.price).toLocaleString("pt-PT", {
-          style: "currency",
-          currency: "EUR",
-        })
+        style: "currency",
+        currency: "EUR",
+      })
       : "—";
 
   return (
@@ -355,21 +355,23 @@ export default function Dashboard() {
       {/* Cards de estatísticas */}
       <div className="pg-stats-grid">
         <div className="pg-stat-card">
+          {/* [MOBILE] label abreviada para não quebrar linha */}
           <p className="pg-stat-label">Receita mensal</p>
           <div>
             <p className="pg-stat-value">
               {apptLoading
                 ? "—"
                 : new Intl.NumberFormat("pt-PT", {
-                    style: "currency",
-                    currency: "EUR",
-                  }).format(monthlyRevenue)}
+                  style: "currency",
+                  currency: "EUR",
+                }).format(monthlyRevenue)}
             </p>
             <p className="pg-stat-meta">mês actual</p>
           </div>
         </div>
         <div className="pg-stat-card">
-          <p className="pg-stat-label">Agendamentos hoje</p>
+          {/* [MOBILE] label abreviada */}
+          <p className="pg-stat-label">Hoje</p>
           <div>
             <p className="pg-stat-value">{apptLoading ? "—" : todayCount}</p>
             <p className="pg-stat-meta">
@@ -380,7 +382,8 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="pg-stat-card">
-          <p className="pg-stat-label">Agendamentos semana</p>
+          {/* [MOBILE] label abreviada */}
+          <p className="pg-stat-label">Esta semana</p>
           <div>
             <p className="pg-stat-value">{apptLoading ? "—" : weekCount}</p>
             <p className="pg-stat-meta">esta semana</p>
@@ -396,7 +399,8 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="pg-stat-card">
-          <p className="pg-stat-label">Serviços em destaque</p>
+          {/* [MOBILE] label abreviada */}
+          <p className="pg-stat-label">Em destaque</p>
           <div>
             <p className="pg-stat-value">
               {svcLoading ? "—" : featuredServices}
@@ -438,8 +442,8 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Acesso rápido */}
-      <div className="pg-section">
+      {/* Acesso rápido — [MOBILE] escondido via CSS (a bottom nav já dá acesso a tudo) */}
+      <div className="pg-section db-quick-section">
         <div className="pg-section-header">
           <h2 className="pg-section-title">Acesso rápido</h2>
         </div>

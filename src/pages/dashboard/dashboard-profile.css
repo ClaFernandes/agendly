@@ -264,15 +264,28 @@
 }
 
 /* Responsividade */
-@media (max-width: 640px) {
+@media (max-width: 600px) {
     .set-logo-field {
         flex-direction: column;
         align-items: flex-start;
+        gap: 12px;
+    }
+
+    .set-logo-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .set-logo-remove {
+        flex: 1;
+        justify-content: center;
     }
 
     .set-public-row {
         flex-direction: column;
         align-items: flex-start;
+        gap: 8px;
     }
 
     .set-public-row .btn-secondary {

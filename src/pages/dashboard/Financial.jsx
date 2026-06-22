@@ -361,41 +361,65 @@ export default function Financial() {
             </p>
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart
-              data={revenueByService}
-              barSize={36}
-              margin={{ top: 4, right: 4, left: 0, bottom: 4 }}
+          /* Mobile */
+          <div className="fin-chart-scroll-wrapper">
+            <ResponsiveContainer
+              width="100%"
+              height={200}
+              minWidth={Math.max(revenueByService.length * 80, 240)}
             >
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="var(--color-border)"
-                vertical={false}
-              />
-              <XAxis
-                dataKey="name"
-                tick={{ fontSize: 12, fill: "var(--color-text-muted)" }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tickFormatter={(v) => `${v}€`}
-                tick={{ fontSize: 12, fill: "var(--color-text-muted)" }}
-                axisLine={false}
-                tickLine={false}
-                width={48}
-              />
-              <Tooltip
-                content={<CustomTooltip />}
-                cursor={{ fill: "var(--color-surface-2)" }}
-              />
-              <Bar
-                dataKey="total"
-                fill="var(--color-brand)"
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+              <BarChart
+                data={revenueByService}
+                barSize={40}
+                margin={{ top: 4, right: 8, left: 0, bottom: 8 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="var(--color-border)"
+                  vertical={false}
+                />
+                {/* Mobile */}
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  interval={0}
+                  tick={({ x, y, payload }) => {
+                    const label = payload.value.length > 10
+                      ? payload.value.slice(0, 10) + "…"
+                      : payload.value;
+                    return (
+                      <text
+                        x={x}
+                        y={y + 10}
+                        textAnchor="middle"
+                        fontSize={11}
+                        fill="var(--color-text-muted)"
+                      >
+                        {label}
+                      </text>
+                    );
+                  }}
+                />
+                <YAxis
+                  tickFormatter={(v) => `${v}€`}
+                  tick={{ fontSize: 12, fill: "var(--color-text-muted)" }}
+                  axisLine={false}
+                  tickLine={false}
+                  width={48}
+                />
+                <Tooltip
+                  content={<CustomTooltip />}
+                  cursor={{ fill: "var(--color-surface-2)" }}
+                />
+                <Bar
+                  dataKey="total"
+                  fill="var(--color-brand)"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         )}
       </div>
 
