@@ -106,7 +106,7 @@ export default function AdminUsers() {
           </div>
 
           <div className="admin-table-wrapper">
-            <table className="admin-table">
+            <table className="admin-table admin-table--pending">
               <thead>
                 <tr>
                   <th>Email</th>
@@ -168,7 +168,7 @@ export default function AdminUsers() {
         ) : (
           <>
             <div className="admin-table-wrapper">
-              <table className="admin-table">
+              <table className="admin-table admin-table--admins">
                 <thead>
                   <tr>
                     <th>Email</th>

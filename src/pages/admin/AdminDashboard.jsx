@@ -55,14 +55,7 @@ export default function AdminDashboard() {
       )}
 
       {/* Stats */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: 16,
-          marginBottom: 24,
-        }}
-      >
+      <div className="admin-stats-4col">
         <div className="admin-stat-card accent">
           <div className="admin-stat-label">Negócios registados</div>
           <div className="admin-stat-value">{stats.totalBusinesses}</div>
@@ -107,7 +100,7 @@ export default function AdminDashboard() {
       {/* Negócios recentes */}
       <div className="admin-section">
         <div className="admin-section-header">
-          <h2>Negócios recentes</h2>
+          <h2>Negócios</h2>
           <Link to="/admin/providers" className="admin-shortcut-link">
             Ver todos
           </Link>
@@ -120,7 +113,7 @@ export default function AdminDashboard() {
           </div>
         ) : (
           <div className="admin-table-wrapper">
-            <table className="admin-table">
+            <table className="admin-table admin-table--dashboard">
               <thead>
                 <tr>
                   <th>Negócio</th>
