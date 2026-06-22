@@ -407,6 +407,14 @@
   .step-name {
     font-size: 10px;
   }
+
+  .step-progress-container {
+    padding: 5px 5px;
+  }
+  
+  .step-name{
+    display: none;
+  }
 }
 
 .date-card {
@@ -517,6 +525,15 @@
   font-size: var(--text-xl);
   font-weight: 700;
   color: var(--color-text);
+}
+
+.closed-message {
+  text-align: center;
+  padding: 16px;
+}
+
+.closed-message button{
+  margin: 24px auto 8px;
 }
 
 .time-section {
