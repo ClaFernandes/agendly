@@ -1,7 +1,7 @@
 // src/pages/public-booking/BookingConfirm.jsx
 
 import { useBooking } from "../../context/BookingContext";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function BookingConfirm() {
   const { clientData, resetBooking } = useBooking();
@@ -17,7 +17,10 @@ export default function BookingConfirm() {
       <div className="page-header page-concluded">
         <h2>Agendamento feito com sucesso!</h2>
         <div>
-          <p>Um resumo foi enviado para: <strong>{clientData?.client_email}</strong></p>
+          <p>
+            Um resumo foi enviado para:{" "}
+            <strong>{clientData?.client_email}</strong>
+          </p>
         </div>
 
         <button

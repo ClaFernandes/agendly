@@ -16,6 +16,7 @@ const AuthContext = createContext();
 
 const INACTIVITY_TIMEOUT = 60 * 60 * 1000; // 60 minutos
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   return useContext(AuthContext);
 }
@@ -63,7 +64,7 @@ export function AuthProvider({ children }) {
     return data ?? { role: "provider", status: "active" };
   }
 
-  // Faz logout por inatividade 
+  // Faz logout por inatividade
   const logoutDueToInactivity = useCallback(async () => {
     try {
       await supabase.auth.signOut();
@@ -81,10 +82,13 @@ export function AuthProvider({ children }) {
     if (inactivityTimer.current) {
       clearTimeout(inactivityTimer.current);
     }
-    inactivityTimer.current = setTimeout(logoutDueToInactivity, INACTIVITY_TIMEOUT);
+    inactivityTimer.current = setTimeout(
+      logoutDueToInactivity,
+      INACTIVITY_TIMEOUT,
+    );
   }, [logoutDueToInactivity]);
 
-  // Ativa/desativa os listeners de atividade 
+  // Ativa/desativa os listeners de atividade
   useEffect(() => {
     if (!user) {
       // Utilizador não autenticado — limpa timer e não regista eventos
@@ -95,13 +99,23 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    const events = ["mousemove", "mousedown", "keydown", "scroll", "touchstart"];
+    const events = [
+      "mousemove",
+      "mousedown",
+      "keydown",
+      "scroll",
+      "touchstart",
+    ];
 
-    events.forEach((e) => window.addEventListener(e, resetInactivityTimer, { passive: true }));
+    events.forEach((e) =>
+      window.addEventListener(e, resetInactivityTimer, { passive: true }),
+    );
     resetInactivityTimer(); // arranca o timer ao fazer login
 
     return () => {
-      events.forEach((e) => window.removeEventListener(e, resetInactivityTimer));
+      events.forEach((e) =>
+        window.removeEventListener(e, resetInactivityTimer),
+      );
       if (inactivityTimer.current) {
         clearTimeout(inactivityTimer.current);
       }
@@ -152,7 +166,7 @@ export function AuthProvider({ children }) {
 
       justSignedOut.current = false;
 
-      // O supabase-js mantém um lock interno enquanto este callback corre.
+      // O supabase.js mantém um lock interno enquanto este callback corre.
       // Fazer await a queries à BD aqui dentro (que precisam do token de
       // sessão) provoca deadlock e a app fica presa em "A carregar..." ao
       // recarregar a página. Adiamos o trabalho com setTimeout para libertar

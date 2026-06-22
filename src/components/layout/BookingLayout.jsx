@@ -5,12 +5,10 @@ import "../../pages/public-booking/PublicBooking.css";
 import "../../pages/public-booking/DateCalendar.css";
 import StepProgress from "../../pages/public-booking/StepProgress";
 import { useBooking } from "../../context/BookingContext";
-import logo from "../../assets/logo.svg";
 
 export default function BookingLayout() {
   const bookingContext = useBooking();
 
-  // Se o contexto não existir, não quebra a página
   if (!bookingContext) {
     return <Outlet />;
   }
@@ -43,7 +41,7 @@ export default function BookingLayout() {
     if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
     return (words[0][0] + words[1][0]).toUpperCase();
   }
-  nameInitials = (getInitials(nameInitials))
+  nameInitials = getInitials(nameInitials);
 
   return (
     <div className="booking-container">
@@ -59,9 +57,7 @@ export default function BookingLayout() {
           <h1>{business.name}</h1>
         </div>
 
-        <div className="business-description">
-          {business.description || ""}
-        </div>
+        <div className="business-description">{business.description || ""}</div>
       </header>
 
       <main className="booking-content">

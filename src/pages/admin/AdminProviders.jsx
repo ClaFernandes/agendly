@@ -25,17 +25,21 @@ import "./AdminPanel.css";
 function formatDate(dateStr) {
   if (!dateStr) return "—";
   return new Date(dateStr).toLocaleDateString("pt-PT", {
-    day: "2-digit", month: "short", year: "numeric",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
   });
 }
 
 function formatPrice(value) {
   return new Intl.NumberFormat("pt-PT", {
-    style: "currency", currency: "EUR", minimumFractionDigits: 0,
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 0,
   }).format(value ?? 0);
 }
 
-// Modal de edição 
+// Modal de edição
 function EditModal({ business, onClose, onSave, saving }) {
   const [form, setForm] = useState({
     name: business.name ?? "",
@@ -53,10 +57,18 @@ function EditModal({ business, onClose, onSave, saving }) {
   async function handleSubmit(e) {
     e.preventDefault();
     setFormError(null);
-    if (!form.name.trim()) { setFormError("O nome é obrigatório."); return; }
-    if (!form.slug.trim()) { setFormError("O slug é obrigatório."); return; }
+    if (!form.name.trim()) {
+      setFormError("O nome é obrigatório.");
+      return;
+    }
+    if (!form.slug.trim()) {
+      setFormError("O slug é obrigatório.");
+      return;
+    }
     if (!/^[a-z0-9-]+$/.test(form.slug)) {
-      setFormError("O slug só pode conter letras minúsculas, números e hífens.");
+      setFormError(
+        "O slug só pode conter letras minúsculas, números e hífens.",
+      );
       return;
     }
     const result = await onSave(business.id, form);
@@ -65,46 +77,145 @@ function EditModal({ business, onClose, onSave, saving }) {
 
   return (
     <div className="admin-modal-overlay" onClick={onClose}>
-      <div className="admin-modal" style={{ maxWidth: 480 }} onClick={(e) => e.stopPropagation()}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+      <div
+        className="admin-modal"
+        style={{ maxWidth: 480 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: 20,
+          }}
+        >
           <h3 style={{ margin: 0 }}>Editar negócio</h3>
-          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-muted)", fontSize: 20 }}>
+          <button
+            onClick={onClose}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "var(--color-text-muted)",
+              fontSize: 20,
+            }}
+          >
             <FiX />
           </button>
         </div>
 
         {formError && (
-          <div style={{ background: "var(--color-error-subtle)", color: "var(--color-error)", padding: "8px 12px", borderRadius: 8, marginBottom: 16, fontSize: 13 }}>
+          <div
+            style={{
+              background: "var(--color-error-subtle)",
+              color: "var(--color-error)",
+              padding: "8px 12px",
+              borderRadius: 8,
+              marginBottom: 16,
+              fontSize: 13,
+            }}
+          >
             {formError}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <form
+          onSubmit={handleSubmit}
+          style={{ display: "flex", flexDirection: "column", gap: 14 }}
+        >
           {[
-            { key: "name", label: "Nome do negócio *", placeholder: "Nome do negócio" },
-            { key: "slug", label: "Slug *", placeholder: "nome-do-negocio", hint: `Só letras minúsculas, números e hífens. URL pública: /p/${form.slug}` },
-            { key: "phone", label: "Telefone", placeholder: "+351 9XX XXX XXX" },
+            {
+              key: "name",
+              label: "Nome do negócio *",
+              placeholder: "Nome do negócio",
+            },
+            {
+              key: "slug",
+              label: "Slug *",
+              placeholder: "nome-do-negocio",
+              hint: `Só letras minúsculas, números e hífens. URL pública: /p/${form.slug}`,
+            },
+            {
+              key: "phone",
+              label: "Telefone",
+              placeholder: "+351 9XX XXX XXX",
+            },
           ].map(({ key, label, placeholder, hint }) => (
             <div key={key}>
-              <label style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-muted)", display: "block", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <label
+                style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "var(--color-text-muted)",
+                  display: "block",
+                  marginBottom: 4,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                }}
+              >
                 {label}
               </label>
-              <input name={key} value={form[key]} onChange={handleChange} className="admin-edit-input" placeholder={placeholder} />
-              {hint && <p style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 4 }}>{hint}</p>}
+              <input
+                name={key}
+                value={form[key]}
+                onChange={handleChange}
+                className="admin-edit-input"
+                placeholder={placeholder}
+              />
+              {hint && (
+                <p
+                  style={{
+                    fontSize: 11,
+                    color: "var(--color-text-muted)",
+                    marginTop: 4,
+                  }}
+                >
+                  {hint}
+                </p>
+              )}
             </div>
           ))}
 
           <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: "var(--color-text-muted)", display: "block", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            <label
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: "var(--color-text-muted)",
+                display: "block",
+                marginBottom: 4,
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+              }}
+            >
               Descrição
             </label>
-            <textarea name="description" value={form.description} onChange={handleChange}
-              className="admin-edit-input" rows={3} placeholder="Descrição do negócio..." style={{ resize: "vertical" }} />
+            <textarea
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              className="admin-edit-input"
+              rows={3}
+              placeholder="Descrição do negócio..."
+              style={{ resize: "vertical" }}
+            />
           </div>
 
           <div className="admin-modal-actions">
-            <button type="button" className="admin-modal-cancel" onClick={onClose} disabled={saving}>Cancelar</button>
-            <button type="submit" className="admin-modal-submit" disabled={saving}>
+            <button
+              type="button"
+              className="admin-modal-cancel"
+              onClick={onClose}
+              disabled={saving}
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className="admin-modal-submit"
+              disabled={saving}
+            >
               {saving ? "A guardar..." : "Guardar alterações"}
             </button>
           </div>
@@ -116,7 +227,14 @@ function EditModal({ business, onClose, onSave, saving }) {
 
 // Linha de prestador
 
-function ProviderRow({ business, onToggle, onDelete, onEdit, onResetPassword, saving }) {
+function ProviderRow({
+  business,
+  onToggle,
+  onDelete,
+  onEdit,
+  onResetPassword,
+  saving,
+}) {
   const [expanded, setExpanded] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
@@ -140,15 +258,34 @@ function ProviderRow({ business, onToggle, onDelete, onEdit, onResetPassword, sa
         <td>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {business.logo_url ? (
-              <img src={business.logo_url} alt={business.name}
-                style={{ width: 32, height: 32, borderRadius: 8, objectFit: "cover", border: "1px solid var(--color-border)", flexShrink: 0 }} />
+              <img
+                src={business.logo_url}
+                alt={business.name}
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 8,
+                  objectFit: "cover",
+                  border: "1px solid var(--color-border)",
+                  flexShrink: 0,
+                }}
+              />
             ) : (
-              <div style={{
-                width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                background: "var(--color-brand-subtle)", color: "var(--color-brand)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontWeight: 600, fontSize: 12,
-              }}>
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 8,
+                  flexShrink: 0,
+                  background: "var(--color-brand-subtle)",
+                  color: "var(--color-brand)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: 600,
+                  fontSize: 12,
+                }}
+              >
                 {business.name?.slice(0, 2).toUpperCase()}
               </div>
             )}
@@ -159,22 +296,40 @@ function ProviderRow({ business, onToggle, onDelete, onEdit, onResetPassword, sa
           </div>
         </td>
 
-        <td style={{ fontSize: 13, color: "var(--color-text-muted)" }}>{business.email ?? "—"}</td>
-        <td style={{ whiteSpace: "nowrap" }}>{formatDate(business.created_at)}</td>
+        <td style={{ fontSize: 13, color: "var(--color-text-muted)" }}>
+          {business.email ?? "—"}
+        </td>
+        <td style={{ whiteSpace: "nowrap" }}>
+          {formatDate(business.created_at)}
+        </td>
 
         {/* Agendamentos */}
-        <td style={{ fontWeight: 600, color: "var(--color-text)", textAlign: "center" }}>
+        <td
+          style={{
+            fontWeight: 600,
+            color: "var(--color-text)",
+            textAlign: "center",
+          }}
+        >
           {business.appointment_count ?? 0}
         </td>
 
         {/* Receita */}
-        <td style={{ fontWeight: 600, color: "var(--color-ok)", whiteSpace: "nowrap" }}>
+        <td
+          style={{
+            fontWeight: 600,
+            color: "var(--color-ok)",
+            whiteSpace: "nowrap",
+          }}
+        >
           {formatPrice(business.revenue ?? 0)}
         </td>
 
         {/* Estado */}
         <td>
-          <span className={`admin-badge ${business.is_active ? "active" : "inactive"}`}>
+          <span
+            className={`admin-badge ${business.is_active ? "active" : "inactive"}`}
+          >
             <span className="admin-badge-dot" />
             {business.is_active ? "ativo" : "suspenso"}
           </span>
@@ -198,12 +353,19 @@ function ProviderRow({ business, onToggle, onDelete, onEdit, onResetPassword, sa
               className={`admin-action-btn admin-action-btn--labeled ${business.is_active ? "deactivate" : "activate"}`}
               onClick={() => onToggle(business.id, business.is_active)}
               disabled={saving}
-              title={business.is_active ? "Suspender acesso" : "Reativar acesso"}
-            >
-              {business.is_active
-                ? <><FiToggleRight size={13} /></>
-                : <><FiToggleLeft size={13} /></>
+              title={
+                business.is_active ? "Suspender acesso" : "Reativar acesso"
               }
+            >
+              {business.is_active ? (
+                <>
+                  <FiToggleRight size={13} />
+                </>
+              ) : (
+                <>
+                  <FiToggleLeft size={13} />
+                </>
+              )}
             </button>
 
             {/* Apagar */}
@@ -229,26 +391,73 @@ function ProviderRow({ business, onToggle, onDelete, onEdit, onResetPassword, sa
         <tr className="admin-provider-detail-row">
           <td colSpan={8} style={{ padding: 0 }}>
             <div className="admin-provider-detail">
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 16 }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+                  gap: 16,
+                }}
+              >
                 {[
                   { icon: FiMail, label: "Email", value: business.email },
                   { icon: FiPhone, label: "Telefone", value: business.phone },
-                  { icon: FiCalendar, label: "Registado", value: formatDate(business.created_at) },
-                ].filter((f) => f.value).map(({ icon: Icon, label, value }) => (
-                  <div key={label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <Icon size={14} style={{ color: "var(--color-text-muted)", flexShrink: 0 }} />
-                    <div>
-                      <div style={{ fontSize: 11, color: "var(--color-text-muted)", marginBottom: 2, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</div>
-                      <div style={{ fontSize: 13 }}>{value}</div>
+                  {
+                    icon: FiCalendar,
+                    label: "Registado",
+                    value: formatDate(business.created_at),
+                  },
+                ]
+                  .filter((f) => f.value)
+                  .map(({ icon: Icon, label, value }) => (
+                    <div
+                      key={label}
+                      style={{ display: "flex", alignItems: "center", gap: 8 }}
+                    >
+                      <Icon
+                        size={14}
+                        style={{
+                          color: "var(--color-text-muted)",
+                          flexShrink: 0,
+                        }}
+                      />
+                      <div>
+                        <div
+                          style={{
+                            fontSize: 11,
+                            color: "var(--color-text-muted)",
+                            marginBottom: 2,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.05em",
+                          }}
+                        >
+                          {label}
+                        </div>
+                        <div style={{ fontSize: 13 }}>{value}</div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
 
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <FiGlobe size={14} style={{ color: "var(--color-text-muted)", flexShrink: 0 }} />
+                  <FiGlobe
+                    size={14}
+                    style={{ color: "var(--color-text-muted)", flexShrink: 0 }}
+                  />
                   <div>
-                    <div style={{ fontSize: 11, color: "var(--color-text-muted)", marginBottom: 2, textTransform: "uppercase", letterSpacing: "0.05em" }}>Link público</div>
-                    <a href={`/p/${business.slug}`} target="_blank" rel="noopener noreferrer"
+                    <div
+                      style={{
+                        fontSize: 11,
+                        color: "var(--color-text-muted)",
+                        marginBottom: 2,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                      }}
+                    >
+                      Link público
+                    </div>
+                    <a
+                      href={`/p/${business.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       style={{ fontSize: 13, color: "var(--color-brand)" }}
                       onClick={(e) => e.stopPropagation()}
                     >
@@ -260,16 +469,37 @@ function ProviderRow({ business, onToggle, onDelete, onEdit, onResetPassword, sa
 
               {/* Reset de password */}
               {business.email && (
-                <div style={{ borderTop: "0.5px solid var(--color-border)", paddingTop: 12, marginTop: 12 }}>
-                  <p style={{ fontSize: 12, color: "var(--color-text-muted)", marginBottom: 8 }}>
-                    Se o prestador perdeu acesso, podes enviar um email de recuperação de password.
+                <div
+                  style={{
+                    borderTop: "0.5px solid var(--color-border)",
+                    paddingTop: 12,
+                    marginTop: 12,
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: 12,
+                      color: "var(--color-text-muted)",
+                      marginBottom: 8,
+                    }}
+                  >
+                    Se o prestador perdeu acesso, podes enviar um email de
+                    recuperação de password.
                   </p>
                   <button
                     className={`admin-action-btn ${resetSent ? "approve" : ""}`}
                     onClick={handleReset}
                     disabled={saving || resetSent}
                   >
-                    {resetSent ? <><FiCheck /> Email enviado!</> : <><FiSend /> Enviar reset de password</>}
+                    {resetSent ? (
+                      <>
+                        <FiCheck /> Email enviado!
+                      </>
+                    ) : (
+                      <>
+                        <FiSend /> Enviar reset de password
+                      </>
+                    )}
                   </button>
                 </div>
               )}
@@ -280,19 +510,56 @@ function ProviderRow({ business, onToggle, onDelete, onEdit, onResetPassword, sa
 
       {/* ── Modal apagar ── */}
       {confirmDelete && (
-        <div className="admin-modal-overlay" onClick={() => setConfirmDelete(false)} style={{ position: "fixed" }}>
+        <div
+          className="admin-modal-overlay"
+          onClick={() => setConfirmDelete(false)}
+          style={{ position: "fixed" }}
+        >
           <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 48, height: 48, borderRadius: "50%", background: "var(--color-error-subtle)", color: "var(--color-error)", margin: "0 auto 16px" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 48,
+                height: 48,
+                borderRadius: "50%",
+                background: "var(--color-error-subtle)",
+                color: "var(--color-error)",
+                margin: "0 auto 16px",
+              }}
+            >
               <FiAlertTriangle size={22} />
             </div>
             <h3 style={{ textAlign: "center" }}>Apagar prestador?</h3>
-            <p style={{ textAlign: "center", fontSize: 14, color: "var(--color-text-muted)" }}>
-              Vais apagar <strong>{business.name}</strong> permanentemente. Todos os dados serão removidos e o acesso revogado. Esta ação é irreversível.
+            <p
+              style={{
+                textAlign: "center",
+                fontSize: 14,
+                color: "var(--color-text-muted)",
+              }}
+            >
+              Vais apagar <strong>{business.name}</strong> permanentemente.
+              Todos os dados serão removidos e o acesso revogado. Esta ação é
+              irreversível.
             </p>
             <div className="admin-modal-actions">
-              <button className="admin-modal-cancel" onClick={() => setConfirmDelete(false)} disabled={saving}>Cancelar</button>
-              <button className="admin-modal-submit" style={{ background: "var(--color-error)" }}
-                onClick={() => { onDelete(business.id); setConfirmDelete(false); }} disabled={saving}>
+              <button
+                className="admin-modal-cancel"
+                onClick={() => setConfirmDelete(false)}
+                disabled={saving}
+              >
+                Cancelar
+              </button>
+              <button
+                className="admin-modal-submit"
+                style={{ background: "var(--color-error)" }}
+                onClick={() => {
+                  onDelete(business.id);
+                  setConfirmDelete(false);
+                }}
+                disabled={saving}
+              >
                 {saving ? "A apagar..." : "Apagar tudo"}
               </button>
             </div>
@@ -317,9 +584,16 @@ function ProviderRow({ business, onToggle, onDelete, onEdit, onResetPassword, sa
   );
 }
 
-// Card de prestador (mobile) 
+// Card de prestador (mobile)
 // Em telemóvel a tabela é substituída por cards empilhados.
-function ProviderCard({ business, onToggle, onDelete, onEdit, onResetPassword, saving }) {
+function ProviderCard({
+  business,
+  onToggle,
+  onDelete,
+  onEdit,
+  onResetPassword,
+  saving,
+}) {
   const [showEdit, setShowEdit] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [resetSent, setResetSent] = useState(false);
@@ -331,27 +605,52 @@ function ProviderCard({ business, onToggle, onDelete, onEdit, onResetPassword, s
   }
 
   return (
-    <div className={`admin-provider-card ${!business.is_active ? "admin-provider-card--inactive" : ""}`}>
+    <div
+      className={`admin-provider-card ${!business.is_active ? "admin-provider-card--inactive" : ""}`}
+    >
       {/* Cabeçalho do card */}
       <div className="admin-provider-card__header">
         {business.logo_url ? (
-          <img src={business.logo_url} alt={business.name}
-            style={{ width: 40, height: 40, borderRadius: 10, objectFit: "cover", border: "1px solid var(--color-border)", flexShrink: 0 }} />
+          <img
+            src={business.logo_url}
+            alt={business.name}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 10,
+              objectFit: "cover",
+              border: "1px solid var(--color-border)",
+              flexShrink: 0,
+            }}
+          />
         ) : (
-          <div style={{
-            width: 40, height: 40, borderRadius: 10, flexShrink: 0,
-            background: "var(--color-brand-subtle)", color: "var(--color-brand)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontWeight: 700, fontSize: 14,
-          }}>
+          <div
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 10,
+              flexShrink: 0,
+              background: "var(--color-brand-subtle)",
+              color: "var(--color-brand)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontWeight: 700,
+              fontSize: 14,
+            }}
+          >
             {business.name?.slice(0, 2).toUpperCase()}
           </div>
         )}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div className="admin-table-name" style={{ fontSize: 15 }}>{business.name}</div>
+          <div className="admin-table-name" style={{ fontSize: 15 }}>
+            {business.name}
+          </div>
           <span className="admin-table-slug">{business.slug}</span>
         </div>
-        <span className={`admin-badge ${business.is_active ? "active" : "inactive"}`}>
+        <span
+          className={`admin-badge ${business.is_active ? "active" : "inactive"}`}
+        >
           <span className="admin-badge-dot" />
           {business.is_active ? "ativo" : "suspenso"}
         </span>
@@ -359,10 +658,16 @@ function ProviderCard({ business, onToggle, onDelete, onEdit, onResetPassword, s
 
       {/* Metadados */}
       <div className="admin-provider-card__meta">
-        <span><FiMail size={12} /> {business.email ?? "—"}</span>
-        <span><FiCalendar size={12} /> {formatDate(business.created_at)}</span>
+        <span>
+          <FiMail size={12} /> {business.email ?? "—"}
+        </span>
+        <span>
+          <FiCalendar size={12} /> {formatDate(business.created_at)}
+        </span>
         <span>📅 {business.appointment_count ?? 0} agendamentos</span>
-        <span style={{ color: "var(--color-ok)", fontWeight: 600 }}>💶 {formatPrice(business.revenue ?? 0)}</span>
+        <span style={{ color: "var(--color-ok)", fontWeight: 600 }}>
+          💶 {formatPrice(business.revenue ?? 0)}
+        </span>
       </div>
 
       {/* Ações */}
@@ -379,10 +684,15 @@ function ProviderCard({ business, onToggle, onDelete, onEdit, onResetPassword, s
           onClick={() => onToggle(business.id, business.is_active)}
           disabled={saving}
         >
-          {business.is_active
-            ? <><FiToggleRight size={13} /></>
-            : <><FiToggleLeft size={13} /></>
-          }
+          {business.is_active ? (
+            <>
+              <FiToggleRight size={13} />
+            </>
+          ) : (
+            <>
+              <FiToggleLeft size={13} />
+            </>
+          )}
         </button>
         <button
           className="admin-action-btn admin-action-btn--labeled delete"
@@ -395,33 +705,83 @@ function ProviderCard({ business, onToggle, onDelete, onEdit, onResetPassword, s
 
       {/* Reset de password */}
       {business.email && (
-        <div style={{ borderTop: "1px solid var(--color-border)", paddingTop: 10, marginTop: 4 }}>
+        <div
+          style={{
+            borderTop: "1px solid var(--color-border)",
+            paddingTop: 10,
+            marginTop: 4,
+          }}
+        >
           <button
             className={`admin-action-btn ${resetSent ? "approve" : ""}`}
             onClick={handleReset}
             disabled={saving || resetSent}
             style={{ fontSize: 12 }}
           >
-            {resetSent ? <><FiCheck /> Email enviado!</> : <><FiSend /> Enviar reset de password</>}
+            {resetSent ? (
+              <>
+                <FiCheck /> Email enviado!
+              </>
+            ) : (
+              <>
+                <FiSend /> Enviar reset de password
+              </>
+            )}
           </button>
         </div>
       )}
 
       {/* Modais */}
       {confirmDelete && (
-        <div className="admin-modal-overlay" onClick={() => setConfirmDelete(false)} style={{ position: "fixed" }}>
+        <div
+          className="admin-modal-overlay"
+          onClick={() => setConfirmDelete(false)}
+          style={{ position: "fixed" }}
+        >
           <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 48, height: 48, borderRadius: "50%", background: "var(--color-error-subtle)", color: "var(--color-error)", margin: "0 auto 16px" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 48,
+                height: 48,
+                borderRadius: "50%",
+                background: "var(--color-error-subtle)",
+                color: "var(--color-error)",
+                margin: "0 auto 16px",
+              }}
+            >
               <FiAlertTriangle size={22} />
             </div>
             <h3 style={{ textAlign: "center" }}>Apagar prestador?</h3>
-            <p style={{ textAlign: "center", fontSize: 14, color: "var(--color-text-muted)" }}>
-              Vais apagar <strong>{business.name}</strong> permanentemente. Esta ação é irreversível.
+            <p
+              style={{
+                textAlign: "center",
+                fontSize: 14,
+                color: "var(--color-text-muted)",
+              }}
+            >
+              Vais apagar <strong>{business.name}</strong> permanentemente. Esta
+              ação é irreversível.
             </p>
             <div className="admin-modal-actions">
-              <button className="admin-modal-cancel" onClick={() => setConfirmDelete(false)} disabled={saving}>Cancelar</button>
-              <button className="admin-modal-submit" style={{ background: "var(--color-error)" }}
-                onClick={() => { onDelete(business.id); setConfirmDelete(false); }} disabled={saving}>
+              <button
+                className="admin-modal-cancel"
+                onClick={() => setConfirmDelete(false)}
+                disabled={saving}
+              >
+                Cancelar
+              </button>
+              <button
+                className="admin-modal-submit"
+                style={{ background: "var(--color-error)" }}
+                onClick={() => {
+                  onDelete(business.id);
+                  setConfirmDelete(false);
+                }}
+                disabled={saving}
+              >
                 {saving ? "A apagar..." : "Apagar tudo"}
               </button>
             </div>
@@ -445,10 +805,19 @@ function ProviderCard({ business, onToggle, onDelete, onEdit, onResetPassword, s
   );
 }
 
-// Página principal 
+// Página principal
 
 export default function AdminProviders() {
-  const { businesses, loading, error, saving, toggleBusinessActive, deleteBusiness, updateBusiness, sendPasswordReset } = useAdmin();
+  const {
+    businesses,
+    loading,
+    error,
+    saving,
+    toggleBusinessActive,
+    deleteBusiness,
+    updateBusiness,
+    sendPasswordReset,
+  } = useAdmin();
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
@@ -460,23 +829,36 @@ export default function AdminProviders() {
     if (filter === "inactive") list = list.filter((b) => !b.is_active);
     if (search.trim()) {
       const q = search.toLowerCase();
-      list = list.filter((b) =>
-        b.name?.toLowerCase().includes(q) || b.slug?.toLowerCase().includes(q) || b.email?.toLowerCase().includes(q)
+      list = list.filter(
+        (b) =>
+          b.name?.toLowerCase().includes(q) ||
+          b.slug?.toLowerCase().includes(q) ||
+          b.email?.toLowerCase().includes(q),
       );
     }
-    if (sort === "name") list.sort((a, b) => a.name.localeCompare(b.name, "pt"));
-    else if (sort === "revenue") list.sort((a, b) => (b.revenue ?? 0) - (a.revenue ?? 0));
+    if (sort === "name")
+      list.sort((a, b) => a.name.localeCompare(b.name, "pt"));
+    else if (sort === "revenue")
+      list.sort((a, b) => (b.revenue ?? 0) - (a.revenue ?? 0));
     else list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     return list;
   }, [businesses, filter, search, sort]);
 
-  const counts = useMemo(() => ({
-    all: businesses.length,
-    active: businesses.filter((b) => b.is_active).length,
-    inactive: businesses.filter((b) => !b.is_active).length,
-  }), [businesses]);
+  const counts = useMemo(
+    () => ({
+      all: businesses.length,
+      active: businesses.filter((b) => b.is_active).length,
+      inactive: businesses.filter((b) => !b.is_active).length,
+    }),
+    [businesses],
+  );
 
-  if (loading) return <div className="admin-loading"><div className="admin-spinner" />A carregar prestadores...</div>;
+  if (loading)
+    return (
+      <div className="admin-loading">
+        <div className="admin-spinner" />A carregar prestadores...
+      </div>
+    );
 
   const sharedProps = {
     onToggle: toggleBusinessActive,
@@ -495,7 +877,12 @@ export default function AdminProviders() {
         </div>
       </div>
 
-      {error && <div className="admin-error-banner"><FiAlertCircle />{error}</div>}
+      {error && (
+        <div className="admin-error-banner">
+          <FiAlertCircle />
+          {error}
+        </div>
+      )}
 
       <div className="admin-section">
         {/* Toolbar */}
@@ -524,7 +911,11 @@ export default function AdminProviders() {
               </button>
             ))}
           </div>
-          <select className="admin-sort-select" value={sort} onChange={(e) => setSort(e.target.value)}>
+          <select
+            className="admin-sort-select"
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+          >
             <option value="date">Mais recentes</option>
             <option value="name">Nome A→Z</option>
             <option value="revenue">Maior receita</option>
@@ -532,7 +923,10 @@ export default function AdminProviders() {
         </div>
 
         {filtered.length === 0 ? (
-          <div className="admin-empty"><FiAlertCircle /><p>Nenhum negócio encontrado.</p></div>
+          <div className="admin-empty">
+            <FiAlertCircle />
+            <p>Nenhum negócio encontrado.</p>
+          </div>
         ) : (
           <>
             {/* Tabela (desktop/tablet) */}

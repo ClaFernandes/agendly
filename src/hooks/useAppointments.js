@@ -7,7 +7,7 @@ import { useBusiness } from "../context/BusinessContext";
 export const APPOINTMENT_STATUS = {
   EM_ABERTO: "em_aberto",
   CONCLUIDO: "concluido",
-  AWAITING_CONFIRMATION: "awaiting_confirmation", // Novo estado derivado
+  AWAITING_CONFIRMATION: "awaiting_confirmation",
   CANCELADO: "cancelado",
   NAO_COMPARECEU: "nao_compareceu",
 };
@@ -40,20 +40,21 @@ export const STATUS_CONFIG = {
   },
 };
 
-/** Define o status visual de um agendamento */
+// Define o status visual de um agendamento
 export function resolveStatus(appt) {
   if (appt.status !== APPOINTMENT_STATUS.EM_ABERTO) return appt.status;
   // Se já passou, aguarda confirmação. Se não, continua em aberto.
-  if (new Date(appt.ends_at) < new Date()) return APPOINTMENT_STATUS.AWAITING_CONFIRMATION;
+  if (new Date(appt.ends_at) < new Date())
+    return APPOINTMENT_STATUS.AWAITING_CONFIRMATION;
   return APPOINTMENT_STATUS.EM_ABERTO;
 }
 
-/** Indica se um agendamento é no futuro (ainda não aconteceu) */
+// Indica se um agendamento é no futuro (ainda não aconteceu)
 export function isFuture(appt) {
   return new Date(appt.starts_at) > new Date();
 }
 
-/** Indica se um agendamento já passou */
+// Indica se um agendamento já passou
 export function isPast(appt) {
   return new Date(appt.ends_at) < new Date();
 }
@@ -86,7 +87,10 @@ export function useAppointments({
   }, [business?.id, status, dateFrom, dateTo]);
 
   async function load() {
-    if (!business?.id) { setLoading(false); return; }
+    if (!business?.id) {
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -113,7 +117,7 @@ export function useAppointments({
 
     // Optimistic update
     setAppointments((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a))
+      prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a)),
     );
 
     const { error } = await supabase
@@ -124,7 +128,7 @@ export function useAppointments({
 
     if (error) {
       setAppointments((prev) =>
-        prev.map((a) => (a.id === id ? { ...a, status: previous?.status } : a))
+        prev.map((a) => (a.id === id ? { ...a, status: previous?.status } : a)),
       );
       setError(error.message);
       setSaving(false);
@@ -135,10 +139,14 @@ export function useAppointments({
     return { success: true };
   }
 
-  const completeAppointment = (id) => updateStatus(id, APPOINTMENT_STATUS.CONCLUIDO);
-  const cancelAppointment = (id) => updateStatus(id, APPOINTMENT_STATUS.CANCELADO);
-  const reopenAppointment = (id) => updateStatus(id, APPOINTMENT_STATUS.EM_ABERTO);
-  const markNoShow = (id) => updateStatus(id, APPOINTMENT_STATUS.NAO_COMPARECEU);
+  const completeAppointment = (id) =>
+    updateStatus(id, APPOINTMENT_STATUS.CONCLUIDO);
+  const cancelAppointment = (id) =>
+    updateStatus(id, APPOINTMENT_STATUS.CANCELADO);
+  const reopenAppointment = (id) =>
+    updateStatus(id, APPOINTMENT_STATUS.EM_ABERTO);
+  const markNoShow = (id) =>
+    updateStatus(id, APPOINTMENT_STATUS.NAO_COMPARECEU);
 
   async function rescheduleAppointment(id, startsAt, endsAt) {
     return updateAppointment(id, { starts_at: startsAt, ends_at: endsAt });
@@ -165,7 +173,9 @@ export function useAppointments({
     }
 
     setAppointments((prev) =>
-      [...prev, data].sort((a, b) => new Date(a.starts_at) - new Date(b.starts_at))
+      [...prev, data].sort(
+        (a, b) => new Date(a.starts_at) - new Date(b.starts_at),
+      ),
     );
     setSaving(false);
     return { success: true, data };
@@ -192,21 +202,31 @@ export function useAppointments({
     setAppointments((prev) =>
       prev
         .map((a) => (a.id === id ? data : a))
-        .sort((a, b) => new Date(a.starts_at) - new Date(b.starts_at))
+        .sort((a, b) => new Date(a.starts_at) - new Date(b.starts_at)),
     );
     setSaving(false);
     return { success: true, data };
   }
 
   // Agrupamentos usando status derivado
-  const emAberto = appointments.filter((a) => resolveStatus(a) === APPOINTMENT_STATUS.EM_ABERTO);
-  const aConfirmar = appointments.filter((a) => resolveStatus(a) === APPOINTMENT_STATUS.AWAITING_CONFIRMATION);
-  const concluidos = appointments.filter((a) => resolveStatus(a) === APPOINTMENT_STATUS.CONCLUIDO);
-  const cancelados = appointments.filter((a) => resolveStatus(a) === APPOINTMENT_STATUS.CANCELADO);
-  const naoCompareceu = appointments.filter((a) => resolveStatus(a) === APPOINTMENT_STATUS.NAO_COMPARECEU);
+  const emAberto = appointments.filter(
+    (a) => resolveStatus(a) === APPOINTMENT_STATUS.EM_ABERTO,
+  );
+  const aConfirmar = appointments.filter(
+    (a) => resolveStatus(a) === APPOINTMENT_STATUS.AWAITING_CONFIRMATION,
+  );
+  const concluidos = appointments.filter(
+    (a) => resolveStatus(a) === APPOINTMENT_STATUS.CONCLUIDO,
+  );
+  const cancelados = appointments.filter(
+    (a) => resolveStatus(a) === APPOINTMENT_STATUS.CANCELADO,
+  );
+  const naoCompareceu = appointments.filter(
+    (a) => resolveStatus(a) === APPOINTMENT_STATUS.NAO_COMPARECEU,
+  );
 
   const today = appointments.filter(
-    (a) => new Date(a.starts_at).toDateString() === new Date().toDateString()
+    (a) => new Date(a.starts_at).toDateString() === new Date().toDateString(),
   );
 
   return {

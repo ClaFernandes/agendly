@@ -17,7 +17,7 @@ import { useBusiness } from "../../context/BusinessContext";
 import { useAuth } from "../../context/AuthContext";
 import "./Dashboard.css";
 
-// Utilitários 
+// Utilitários
 function generateSlug(value) {
   return value
     .toLowerCase()
@@ -31,13 +31,16 @@ function generateSlug(value) {
 function getInitials(name) {
   if (!name) return "?";
   const stopWords = new Set(["do", "da", "de", "dos", "das", "e", "o", "a"]);
-  const words = name.trim().split(/\s+/).filter(w => !stopWords.has(w.toLowerCase()));
+  const words = name
+    .trim()
+    .split(/\s+/)
+    .filter((w) => !stopWords.has(w.toLowerCase()));
   if (words.length === 0) return name.slice(0, 2).toUpperCase();
   if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
   return (words[0][0] + words[1][0]).toUpperCase();
 }
 
-// Modal de confirmação de apagar conta 
+// Modal de confirmação de apagar conta
 
 function DeleteAccountModal({ onConfirm, onCancel, deleting }) {
   const [confirmed, setConfirmed] = useState(false);
@@ -46,14 +49,22 @@ function DeleteAccountModal({ onConfirm, onCancel, deleting }) {
     <div className="modal-overlay" onClick={onCancel}>
       <div
         className="modal modal--sm"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="delete-account-title"
       >
         <div className="modal-header">
-          <h2 id="delete-account-title" className="modal-title">Apagar conta</h2>
-          <button className="modal-close" onClick={onCancel} aria-label="Fechar">×</button>
+          <h2 id="delete-account-title" className="modal-title">
+            Apagar conta
+          </h2>
+          <button
+            className="modal-close"
+            onClick={onCancel}
+            aria-label="Fechar"
+          >
+            ×
+          </button>
         </div>
 
         <div className="delete-modal-body">
@@ -64,9 +75,14 @@ function DeleteAccountModal({ onConfirm, onCancel, deleting }) {
             Esta acção é <strong>irreversível</strong>.
           </p>
           <p className="delete-modal-subtext">
-            Ao confirmar, todos os dados do teu negócio serão apagados permanentemente —
-            serviços, horários, agendamentos, clientes favoritos e a tua conta.
-            <br/><br/><strong>Os clientes com agendamentos abertos serão notificados por email.</strong>
+            Ao confirmar, todos os dados do teu negócio serão apagados
+            permanentemente — serviços, horários, agendamentos, clientes
+            favoritos e a tua conta.
+            <br />
+            <br />
+            <strong>
+              Os clientes com agendamentos abertos serão notificados por email.
+            </strong>
           </p>
 
           {/* Checkbox de confirmação extra */}
@@ -74,14 +90,18 @@ function DeleteAccountModal({ onConfirm, onCancel, deleting }) {
             <input
               type="checkbox"
               checked={confirmed}
-              onChange={e => setConfirmed(e.target.checked)}
+              onChange={(e) => setConfirmed(e.target.checked)}
             />
             Confirmo que quero apagar a minha conta e todos os dados associados.
           </label>
         </div>
 
         <div className="modal-actions">
-          <button className="btn-secondary" onClick={onCancel} disabled={deleting}>
+          <button
+            className="btn-secondary"
+            onClick={onCancel}
+            disabled={deleting}
+          >
             Cancelar
           </button>
           <button
@@ -98,7 +118,7 @@ function DeleteAccountModal({ onConfirm, onCancel, deleting }) {
   );
 }
 
-// Página principal 
+// Página principal
 
 export default function Profile() {
   const { business, updateBusiness } = useBusiness();
@@ -135,6 +155,7 @@ export default function Profile() {
   // Preenche o formulário com os dados actuais
   useEffect(() => {
     if (!business) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setName(business.name ?? "");
     setSlug(business.slug ?? "");
     setPhone(business.phone ?? "");
@@ -145,10 +166,11 @@ export default function Profile() {
 
   useEffect(() => {
     if (!user) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setEmail(user.email ?? "");
   }, [user]);
 
-  // Slug 
+  // Slug
   async function checkSlug(value) {
     if (!value || value === business?.slug) {
       setSlugAvailable(null);
@@ -183,7 +205,7 @@ export default function Profile() {
     setSlugAvailable(null);
   }
 
-  // Logo 
+  // Logo
   function handleLogoChange(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -214,17 +236,25 @@ export default function Profile() {
       .from("business-assets")
       .upload(path, logoFile, { upsert: true, contentType: logoFile.type });
     if (uploadError) throw uploadError;
-    const { data } = supabase.storage.from("business-assets").getPublicUrl(path);
+    const { data } = supabase.storage
+      .from("business-assets")
+      .getPublicUrl(path);
     return data.publicUrl;
   }
 
-  // Guardar alterações 
+  // Guardar alterações
   async function handleSave() {
     setError(null);
     setSuccess(false);
 
-    if (!name.trim()) { setError("O nome do negócio é obrigatório."); return; }
-    if (!slug.trim()) { setError("O URL público é obrigatório."); return; }
+    if (!name.trim()) {
+      setError("O nome do negócio é obrigatório.");
+      return;
+    }
+    if (!slug.trim()) {
+      setError("O URL público é obrigatório.");
+      return;
+    }
     if (phone && !/^\+?[\d\s\-()]{8,20}$/.test(phone)) {
       setError("Formato de telefone inválido.");
       return;
@@ -232,7 +262,10 @@ export default function Profile() {
 
     if (slug !== business?.slug) {
       const available = await checkSlug(slug);
-      if (!available) { setError("Este URL já está a ser usado. Escolhe outro."); return; }
+      if (!available) {
+        setError("Este URL já está a ser usado. Escolhe outro.");
+        return;
+      }
     }
 
     setSaving(true);
@@ -274,7 +307,7 @@ export default function Profile() {
     }
   }
 
-  // Apagar conta 
+  // Apagar conta
   async function handleDeleteAccount() {
     if (!user?.id) return;
     setDeleting(true);
@@ -297,10 +330,10 @@ export default function Profile() {
         .from("profiles")
         .delete()
         .eq("id", user.id);
-        
+
       if (profileError) throw profileError;
 
-      // Apaga o utilizador do Auth via RPC 
+      // Apaga o utilizador do Auth via RPC
       const { error: rpcError } = await supabase.rpc("delete_user_by_id", {
         user_id: user.id,
       });
@@ -309,10 +342,11 @@ export default function Profile() {
       // Faz logout local e redireciona
       await logout();
       navigate("/login", { replace: true });
-
     } catch (err) {
       console.error("Erro ao apagar conta:", err);
-      setDeleteError("Ocorreu um erro ao apagar a conta. Tenta novamente ou contacta o suporte.");
+      setDeleteError(
+        "Ocorreu um erro ao apagar a conta. Tenta novamente ou contacta o suporte.",
+      );
       setDeleting(false);
     }
   }
@@ -326,7 +360,9 @@ export default function Profile() {
       <div className="pg-header">
         <div>
           <h1 className="pg-title">Perfil</h1>
-          <p className="pg-subtitle">Edita os dados públicos e de identificação do teu negócio.</p>
+          <p className="pg-subtitle">
+            Edita os dados públicos e de identificação do teu negócio.
+          </p>
         </div>
         <button className="btn-primary" onClick={handleSave} disabled={saving}>
           <RiSaveLine aria-hidden="true" />
@@ -336,7 +372,9 @@ export default function Profile() {
 
       {/* Feedback */}
       {error && <p className="set-error">{error}</p>}
-      {success && <p className="set-success">Alterações guardadas com sucesso!</p>}
+      {success && (
+        <p className="set-success">Alterações guardadas com sucesso!</p>
+      )}
       {deleteError && <p className="set-error">{deleteError}</p>}
 
       {/* Link público */}
@@ -345,7 +383,12 @@ export default function Profile() {
           <p className="set-public-label">O teu link de agendamento</p>
           <div className="set-public-row">
             <span className="set-public-url">{publicUrl}</span>
-            <a href={publicUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary">
+            <a
+              href={publicUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-secondary"
+            >
               <RiExternalLinkLine aria-hidden="true" />
               Abrir
             </a>
@@ -361,7 +404,11 @@ export default function Profile() {
         <div className="set-logo-field">
           <div className="set-logo-preview">
             {logoPreview || currentLogoUrl ? (
-              <img src={logoPreview ?? currentLogoUrl} alt="Logo" className="set-logo-img" />
+              <img
+                src={logoPreview ?? currentLogoUrl}
+                alt="Logo"
+                className="set-logo-img"
+              />
             ) : (
               <div className="set-logo-initials">{getInitials(name)}</div>
             )}
@@ -379,7 +426,11 @@ export default function Profile() {
               style={{ display: "none" }}
             />
             {(logoPreview || currentLogoUrl) && (
-              <button type="button" className="set-logo-remove" onClick={handleRemoveLogo}>
+              <button
+                type="button"
+                className="set-logo-remove"
+                onClick={handleRemoveLogo}
+              >
                 <RiDeleteBinLine aria-hidden="true" />
                 Remover logo
               </button>
@@ -397,7 +448,7 @@ export default function Profile() {
         </div>
         <div className="set-form">
           {/* Nome */}
-          <div className="set-field">            
+          <div className="set-field">
             <label htmlFor="set-name" className="set-label">
               Nome do negócio <span className="set-required">*</span>
             </label>
@@ -431,25 +482,37 @@ export default function Profile() {
                 placeholder="barbearia-do-ze"
                 className="set-input"
               />
-              {checkingSlug && <span className="set-slug-checking">A verificar...</span>}
-              {!checkingSlug && slugAvailable === true && <span className="set-slug-ok">Disponível</span>}
-              {!checkingSlug && slugAvailable === false && <span className="set-slug-error">Indisponível</span>}
+              {checkingSlug && (
+                <span className="set-slug-checking">A verificar...</span>
+              )}
+              {!checkingSlug && slugAvailable === true && (
+                <span className="set-slug-ok">Disponível</span>
+              )}
+              {!checkingSlug && slugAvailable === false && (
+                <span className="set-slug-error">Indisponível</span>
+              )}
             </div>
             {slug && (
-              <p className="set-slug-preview">agendly.app/p/<strong>{slug}</strong></p>
+              <p className="set-slug-preview">
+                agendly.app/p/<strong>{slug}</strong>
+              </p>
             )}
           </div>
 
           {/* Telefone */}
           <div className="set-field">
-            <label htmlFor="set-phone" className="set-label">Telefone</label>
+            <label htmlFor="set-phone" className="set-label">
+              Telefone
+            </label>
             <div className="set-input-wrapper">
               <RiPhoneLine className="set-input-icon" aria-hidden="true" />
               <input
                 id="set-phone"
                 type="tel"
                 value={phone}
-                onChange={e => setPhone(e.target.value.replace(/[^\d\s+\-()]/g, ""))}
+                onChange={(e) =>
+                  setPhone(e.target.value.replace(/[^\d\s+\-()]/g, ""))
+                }
                 placeholder="+351 XXX XXX XXX"
                 className="set-input"
               />
@@ -461,11 +524,13 @@ export default function Profile() {
 
           {/* Descrição */}
           <div className="set-field">
-            <label htmlFor="set-description" className="set-label">Descrição</label>
+            <label htmlFor="set-description" className="set-label">
+              Descrição
+            </label>
             <textarea
               id="set-description"
               value={description}
-              onChange={e => setDescription(e.target.value)}
+              onChange={(e) => setDescription(e.target.value)}
               placeholder="Breve descrição do teu negócio..."
               rows={3}
               className="set-textarea"
@@ -488,7 +553,8 @@ export default function Profile() {
           <div>
             <p className="danger-zone-label">Apagar conta</p>
             <p className="danger-zone-desc">
-              Remove permanentemente a tua conta e todos os dados associados. Esta acção não pode ser desfeita.
+              Remove permanentemente a tua conta e todos os dados associados.
+              Esta acção não pode ser desfeita.
             </p>
           </div>
           <button
@@ -505,7 +571,10 @@ export default function Profile() {
       {showDeleteModal && (
         <DeleteAccountModal
           onConfirm={handleDeleteAccount}
-          onCancel={() => { setShowDeleteModal(false); setDeleteError(null); }}
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setDeleteError(null);
+          }}
           deleting={deleting}
         />
       )}

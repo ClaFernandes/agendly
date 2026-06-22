@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
-
 import {
   FiMail,
   FiLock,
@@ -13,7 +12,6 @@ import {
   FiCheck,
   FiX,
 } from "react-icons/fi";
-
 import logo from "../../assets/logo.svg";
 import "./Auth.css";
 
@@ -76,7 +74,10 @@ export default function AdminRegister() {
       if (signUpError) throw signUpError;
 
       const newUserId = signUpData.user?.id;
-      if (!newUserId) throw new Error("Não foi possível criar o utilizador. Tenta novamente.");
+      if (!newUserId)
+        throw new Error(
+          "Não foi possível criar o utilizador. Tenta novamente.",
+        );
 
       // Upsert do perfil com role "admin" e status "pending"
       const { error: profileError } = await supabase
@@ -104,7 +105,9 @@ export default function AdminRegister() {
         err.message?.includes("already registered") ||
         err.message?.includes("User already registered")
       ) {
-        setError("Este email já está registado. Tenta fazer login ou usa outro email.");
+        setError(
+          "Este email já está registado. Tenta fazer login ou usa outro email.",
+        );
       } else {
         setError(err.message || "Erro ao criar conta. Tenta novamente.");
       }

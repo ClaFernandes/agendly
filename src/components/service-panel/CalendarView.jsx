@@ -77,7 +77,8 @@ export default function CalendarView({
   );
 
   function eventStyleGetter(event) {
-    const config = STATUS_CONFIG[event.derivedStatus] ?? STATUS_CONFIG.em_aberto;
+    const config =
+      STATUS_CONFIG[event.derivedStatus] ?? STATUS_CONFIG.em_aberto;
     const bg = config.bg;
     const color = config.color;
 
@@ -89,8 +90,8 @@ export default function CalendarView({
           borderColor: color,
           borderRadius: "var(--radius-md)",
           fontSize: "var(--text-xs)",
-          // cancelados ficam com risco no texto
-          textDecoration: event.derivedStatus === "cancelado" ? "line-through" : "none",
+          textDecoration:
+            event.derivedStatus === "cancelado" ? "line-through" : "none",
           opacity: event.derivedStatus === "cancelado" ? 0.6 : 1,
         },
       };

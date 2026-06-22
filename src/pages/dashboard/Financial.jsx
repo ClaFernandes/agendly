@@ -89,7 +89,7 @@ export default function Financial() {
     return Array.from(set).sort((a, b) => b - a);
   }, [appointments]);
 
-  // ── Todos os confirmados de sempre ──────────────────────────────
+  // Todos os confirmados de sempre
   const allConfirmed = useMemo(
     () => appointments.filter((a) => resolveStatus(a) === "concluido"),
     [appointments],
@@ -101,7 +101,7 @@ export default function Financial() {
     [allConfirmed],
   );
 
-  // ── Dados mensais do ano seleccionado (gráfico de evolução) ─────
+  // Dados mensais do ano seleccionado (gráfico de evolução)
   const monthlyData = useMemo(() => {
     return MONTH_NAMES.map((name, i) => {
       const total = appointments
@@ -118,7 +118,7 @@ export default function Financial() {
     });
   }, [appointments, selectedYear, selectedMonth]);
 
-  // ── Período seleccionado (mês + ano) — exclui cancelados ────────
+  // Período seleccionado (mês + ano) — exclui cancelados
   const periodAll = useMemo(() => {
     return appointments.filter((a) => {
       const d = new Date(a.starts_at);
@@ -164,7 +164,7 @@ export default function Financial() {
     [periodFuture],
   );
 
-  // ── Receita por serviço (gráfico vertical) ──────────────────────
+  // Receita por serviço (gráfico vertical)
   const revenueByService = useMemo(() => {
     const map = {};
     periodConfirmed.forEach((a) => {
@@ -190,7 +190,7 @@ export default function Financial() {
 
   return (
     <div className="db-page">
-      {/* ── Cabeçalho ─────────────────────────────────────────── */}
+      {/* Cabeçalho */}
       <div className="pg-header">
         <div>
           <h1 className="pg-title">Financeiro</h1>
@@ -210,7 +210,7 @@ export default function Financial() {
 
       {error && <p className="sch-error">{error}</p>}
 
-      {/* ── Selector de período ───────────────────────────────── */}
+      {/* Selector de período */}
       <div className="fin-period-selector">
         <select
           value={selectedMonth}
@@ -236,7 +236,7 @@ export default function Financial() {
         </select>
       </div>
 
-      {/* ── 5 cards ───────────────────────────────────────────── */}
+      {/* 5 cards */}
       <div className="pg-stats-grid">
         <div className="pg-stat-card">
           <p className="pg-stat-label">Receita total</p>
@@ -268,9 +268,7 @@ export default function Financial() {
             <p className="pg-stat-value">
               {loading ? "—" : formatPrice(projectedRevenue)}
             </p>
-            <p className="pg-stat-meta">
-              {periodFuture.length} agend. futuros
-            </p>
+            <p className="pg-stat-meta">{periodFuture.length} agend. futuros</p>
           </div>
         </div>
 
@@ -299,7 +297,7 @@ export default function Financial() {
         </div>
       </div>
 
-      {/* ── Evolução mensal ───────────────────────────────────── */}
+      {/* Evolução mensal */}
       <div className="pg-section">
         <div className="pg-section-header">
           <h2 className="pg-section-title">Evolução mensal</h2>
@@ -346,7 +344,7 @@ export default function Financial() {
         </ResponsiveContainer>
       </div>
 
-      {/* ── Receita por serviço (barras verticais) ────────────── */}
+      {/* Receita por serviço (barras verticais) */}
       <div className="pg-section">
         <div className="pg-section-header">
           <h2 className="pg-section-title">Receita por serviço</h2>
@@ -401,7 +399,7 @@ export default function Financial() {
         )}
       </div>
 
-      {/* ── Tabela de transacções ─────────────────────────────── */}
+      {/* Tabela de transacções */}
       <div className="pg-section">
         <div className="pg-section-header">
           <h2 className="pg-section-title">Transacções confirmadas</h2>

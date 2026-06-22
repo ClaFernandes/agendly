@@ -23,7 +23,6 @@ const NotFound = () => {
         </div>
 
         {/* Conteúdo Principal */}
-        {/* Conteúdo Principal */}
         <div className="notfound-content">
           <div className="notfound-badge">
             <span>4</span>
