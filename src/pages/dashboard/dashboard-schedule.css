@@ -82,6 +82,7 @@
     font-size: var(--text-sm);
     color: var(--color-text-subtle);
     padding-bottom: 8px;
+    flex-shrink: 0;
 }
 
 .sch-remove-btn {
@@ -99,7 +100,7 @@
     background: var(--color-error-subtle);
 }
 
-/* Toggle liga/desliga */
+/* Toggle */
 .sch-toggle {
     position: relative;
     width: 36px;
@@ -156,7 +157,6 @@
     margin-bottom: 16px;
 }
 
-/* Botão guardar no rodapé */
 .sch-footer-actions {
     display: flex;
     justify-content: flex-end;
@@ -164,12 +164,38 @@
 }
 
 /* Responsividade */
-@media (max-width: 640px) {
+@media (max-width: 600px) {
+    .sch-day {
+        padding: 12px 14px;
+    }
+
     .sch-intervals {
         padding-left: 0;
     }
 
     .sch-interval-row {
         flex-wrap: wrap;
+        gap: 8px;
+        padding: 10px 10px;
+    }
+
+    .sch-time-input {
+        flex: 1;
+        width: auto;
+        min-width: 80px;
+    }
+
+    .sch-sep {
+        padding-bottom: 0;
+        align-self: center;
+    }
+
+    .sch-footer-actions {
+        justify-content: stretch;
+    }
+
+    .sch-footer-actions .btn-primary {
+        width: 100%;
+        justify-content: center;
     }
 }
