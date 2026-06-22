@@ -6,7 +6,7 @@
     background-color: var(--color-page-bg);
 }
 
-/* Sidebar */
+/* ── Sidebar ── */
 .admin-sidebar {
     width: 260px;
     flex-shrink: 0;
@@ -22,7 +22,6 @@
     overflow: hidden;
 }
 
-/* Logo + título */
 .admin-sidebar-brand {
     display: flex;
     align-items: center;
@@ -37,6 +36,7 @@
     border-radius: var(--radius-md);
     background: rgba(255, 255, 255, 0.15);
     padding: 5px;
+    flex-shrink: 0;
 }
 
 .admin-sidebar-brand span {
@@ -57,9 +57,9 @@
     letter-spacing: 0.03em;
     text-transform: uppercase;
     margin-left: auto;
+    white-space: nowrap;
 }
 
-/* Navegação */
 .admin-sidebar nav {
     flex: 1;
     display: flex;
@@ -94,7 +94,6 @@
     text-decoration: none;
 }
 
-/* Link ativo */
 .admin-sidebar nav a.active {
     background: rgba(255, 255, 255, 0.14);
     color: #fff;
@@ -105,7 +104,6 @@
     opacity: 1;
 }
 
-/* Rodapé da sidebar */
 .admin-sidebar-footer {
     padding: 16px 12px 0;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -152,7 +150,7 @@
     flex-shrink: 0;
 }
 
-/* Área de conteúdo */
+/* ── Conteúdo ── */
 .admin-content {
     margin-left: 260px;
     flex: 1;
@@ -161,7 +159,9 @@
     max-width: 1200px;
 }
 
-/* Responsividade básica */
+/* ════════════════════════════════════════════
+   900px — sidebar colapsa para ícones
+   ════════════════════════════════════════════ */
 @media (max-width: 900px) {
     .admin-sidebar {
         width: 64px;
@@ -171,7 +171,8 @@
     .admin-sidebar-brand span,
     .admin-sidebar-badge,
     .admin-sidebar-email,
-    .admin-sidebar nav a span {
+    .admin-sidebar nav a span,
+    .admin-sidebar-logout span {
         display: none;
     }
 
@@ -198,10 +199,134 @@
     .admin-sidebar-logout {
         justify-content: center;
         padding: 9px;
+        width: auto;
     }
 
     .admin-content {
         margin-left: 64px;
         padding: 24px 20px 40px;
+    }
+}
+
+/* ════════════════════════════════════════════
+   600px — bottom tab bar
+   ════════════════════════════════════════════ */
+@media (max-width: 600px) {
+
+    .admin-sidebar {
+        width: 100%;
+        height: 56px;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        flex-direction: row;
+        align-items: stretch;
+        padding: 0;
+        overflow: visible;
+    }
+
+    .admin-sidebar-brand {
+        display: none;
+    }
+
+    /* Nav ocupa todo o espaço disponível */
+    .admin-sidebar nav {
+        flex-direction: row;
+        flex: 1;
+        min-width: 0;
+        padding: 0;
+        gap: 0;
+        align-items: stretch;
+        justify-content: stretch;
+    }
+
+    .admin-sidebar nav a {
+        flex: 1;
+        min-width: 0;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 3px;
+        padding: 6px 2px;
+        border-radius: 0;
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.55);
+        overflow: hidden;
+    }
+
+    .admin-sidebar nav a span {
+        display: block;
+        font-size: 10px;
+        font-weight: var(--font-medium);
+        line-height: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        text-align: center;
+    }
+
+    .admin-sidebar nav a svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+    }
+
+    .admin-sidebar nav a.active {
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+    }
+
+    /* Footer — botão Sair como tab */
+    .admin-sidebar-footer {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        flex-shrink: 0;
+        width: 72px; /* largura fixa para não espremer */
+        padding: 0;
+        margin: 0;
+        border: none;
+        gap: 0;
+    }
+
+    .admin-sidebar-email {
+        display: none;
+    }
+
+    .admin-sidebar-logout {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 3px;
+        padding: 6px 4px;
+        border-radius: 0;
+        font-size: 10px;
+        font-weight: var(--font-medium);
+        color: rgba(255, 255, 255, 0.55);
+        width: 100%;
+        text-align: center;
+    }
+
+    .admin-sidebar-logout span {
+        display: block;
+        font-size: 10px;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    .admin-sidebar-logout svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+    }
+
+    .admin-content {
+        margin-left: 0;
+        width: 100%;
+        max-width: 100%;
+        min-height: 100vh;
+        padding: 16px 12px 72px;
     }
 }

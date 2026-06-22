@@ -67,7 +67,10 @@ export function useAdmin() {
       }));
 
       setBusinesses(enriched);
-      setRecentBusinesses(enriched.slice(0, 5));
+
+      // Ordena por receita decrescente e mostra todos
+      const byRevenue = [...enriched].sort((a, b) => b.revenue - a.revenue);
+      setRecentBusinesses(byRevenue);
 
       // Stats globais
       const totalRevenue = Object.values(revenueMap).reduce((s, v) => s + v, 0);
