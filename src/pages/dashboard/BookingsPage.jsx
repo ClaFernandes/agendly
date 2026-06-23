@@ -56,11 +56,13 @@ function getInitials(name = "") {
     .join("")
     .toUpperCase();
 }
+
 function getColorIndex(name = "") {
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash += name.charCodeAt(i);
   return hash % AVATAR_COLORS.length;
 }
+
 function formatTime(iso) {
   return new Date(iso).toLocaleTimeString("pt-PT", {
     hour: "2-digit",
@@ -74,9 +76,10 @@ function formatDateLabel(iso) {
     weekday: "short",
     day: "2-digit",
     month: "2-digit",
-    timeZone: "UTC", 
+    timeZone: "UTC",
   });
 }
+
 function getDurationMinutes(start, end) {
   return Math.round((new Date(end) - new Date(start)) / 60000);
 }
@@ -90,18 +93,21 @@ function getWeekStart(date) {
   d.setHours(0, 0, 0, 0);
   return d;
 }
+
 function getWeekEnd(weekStart) {
   const d = new Date(weekStart);
   d.setDate(d.getDate() + 6);
   d.setHours(23, 59, 59, 999);
   return d;
 }
+
 function formatWeekLabel(weekStart) {
   const end = getWeekEnd(weekStart);
   const startStr = weekStart.toLocaleDateString("pt-PT", {
     day: "2-digit",
     month: "short",
   });
+
   const endStr = end.toLocaleDateString("pt-PT", {
     day: "2-digit",
     month: "short",
@@ -145,9 +151,9 @@ function BookingCard({ appt, saving, onComplete, onCancel, onEdit, onNoShow, onR
   const price =
     appt.service?.price != null
       ? Number(appt.service.price).toLocaleString("pt-PT", {
-          style: "currency",
-          currency: "EUR",
-        })
+        style: "currency",
+        currency: "EUR",
+      })
       : "—";
 
   const isNoShow = appt.status === APPOINTMENT_STATUS.NAO_COMPARECEU;
@@ -273,7 +279,7 @@ function BookingCard({ appt, saving, onComplete, onCancel, onEdit, onNoShow, onR
                 >
                   <RiCloseLine aria-hidden="true" />
                   Cancelar
-                </button>                
+                </button>
               </>
             )}
 
@@ -422,7 +428,7 @@ export default function BookingsPage() {
   const filtered = useMemo(() => {
     return appointments.filter((a) => {
       const apptUtc = new Date(a.starts_at);
-      // Criamos uma data baseada nos números literais do UTC do agendamento
+      // Cria uma data baseada nos números literais do UTC do agendamento
       const d = new Date(
         apptUtc.getUTCFullYear(),
         apptUtc.getUTCMonth(),
@@ -598,6 +604,7 @@ export default function BookingsPage() {
           initialDate={modalState.initialDate}
           services={activeServices}
           clients={clientSuggestions}
+          appointments={appointments}
           saving={saving}
           onClose={() => setModalState(null)}
           onSubmit={handleModalSubmit}
