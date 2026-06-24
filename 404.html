@@ -4,8 +4,7 @@
 <head>
     <meta charset="utf-8">
     <script>
-        var path = location.pathname.replace('/agendly', '') + location.search + location.hash;
-        sessionStorage.redirect = path;
+        sessionStorage.redirect = location.pathname + location.search + location.hash;
         window.location.replace('/agendly/');
     </script>
 </head>
