@@ -4,8 +4,7 @@
 <head>
     <meta charset="utf-8">
     <script>
-        // Guarda o path completo na sessão e redireciona para a raiz
-        sessionStorage.redirect = location.href;
+        sessionStorage.redirect = location.pathname + location.search + location.hash;
         window.location.replace('/agendly/');
     </script>
 </head>
