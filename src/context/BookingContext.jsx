@@ -12,7 +12,8 @@ export function useBooking() {
 }
 
 export function BookingProvider({ children }) {
-  const { slug } = useParams();
+  const { slug: paramSlug } = useParams();
+  const slug = paramSlug || (window.location.pathname.match(/\/p\/([^/]+)/)?.[1] ?? null);
 
   // Estados do Negócio
   const [business, setBusiness] = useState(null);
