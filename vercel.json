@@ -1,19 +1,8 @@
 {
     "rewrites": [
         {
-            "source": "/(.*)",
+            "source": "/:path((?!assets|favicon).*)",
             "destination": "/index.html"
-        }
-    ],
-    "headers": [
-        {
-            "source": "/assets/(.*)",
-            "headers": [
-                {
-                    "key": "Content-Type",
-                    "value": "application/javascript"
-                }
-            ]
         }
     ]
 }
