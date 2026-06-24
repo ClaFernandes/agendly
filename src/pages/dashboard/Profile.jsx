@@ -351,7 +351,7 @@ export default function Profile() {
     }
   }
 
-  const PUBLIC_BASE = "https://clafernandes.github.io/agendly/p";
+  const PUBLIC_BASE = "https://agendly.app/p";
   const publicUrl = business?.slug ? `${PUBLIC_BASE}/${business.slug}` : null;
 
   return (
@@ -469,9 +469,7 @@ export default function Profile() {
           <div className="set-field">
             <label htmlFor="set-slug" className="set-label">
               URL pública <span className="set-required">*</span>
-              <span className="set-label-hint">
-                https://clafernandes.github.io/agendly/p/
-              </span>
+              <span className="set-label-hint">agendly.app/p/</span>
             </label>
             <div className="set-input-wrapper">
               <RiLinkM className="set-input-icon" aria-hidden="true" />
@@ -496,7 +494,7 @@ export default function Profile() {
             </div>
             {slug && (
               <p className="set-slug-preview">
-                https://clafernandes.github.io/agendly/p/<strong>{slug}</strong>
+                agendly.app/p/<strong>{slug}</strong>
               </p>
             )}
           </div>

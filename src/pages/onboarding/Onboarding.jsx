@@ -40,7 +40,7 @@ const initialHours = DAYS.map((day) => ({
 
 const STEP_LABELS = ["Dados", "Identidade", "Horários", "Confirmação"];
 
-const PUBLIC_BASE = "https://clafernandes.github.io/agendly/p";
+const PUBLIC_BASE = "https://agendly.app/p";
 
 function generateSlug(value) {
   return value
@@ -430,8 +430,7 @@ export default function Onboarding() {
               </div>
               {slug && (
                 <p className="onboarding-slug-preview">
-                  https://clafernandes.github.io/agendly/p/
-                  <strong>{slug}</strong>
+                  agendly.app/p/<strong>{slug}</strong>
                 </p>
               )}
             </div>

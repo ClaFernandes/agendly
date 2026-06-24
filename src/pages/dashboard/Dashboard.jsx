@@ -204,7 +204,7 @@ export default function Dashboard() {
   const { appointments, today, loading: apptLoading } = useAppointments();
   const [copied, setCopied] = useState(false);
 
-  const PUBLIC_BASE = "https://clafernandes.github.io/agendly/p";
+  const PUBLIC_BASE = "https://agendly.app/p";
   const publicUrl = business?.slug ? `${PUBLIC_BASE}/${business.slug}` : null;
 
   async function handleCopy() {
