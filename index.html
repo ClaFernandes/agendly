@@ -21,8 +21,12 @@
     (function () {
       var redirect = sessionStorage.redirect;
       delete sessionStorage.redirect;
-      if (redirect && redirect !== '/agendly/') {
-        history.replaceState(null, null, '/agendly' + redirect);
+      if (redirect && redirect !== '/' && redirect !== '/agendly/') {
+        var newPath = '/agendly' + redirect;
+        if (window.location.pathname !== newPath) {
+          window.location.replace(newPath);
+          return;
+        }
       }
     })();
   </script>
