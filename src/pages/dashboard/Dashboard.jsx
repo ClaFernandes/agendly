@@ -77,9 +77,9 @@ function UpcomingCard({ appt }) {
   const price =
     appt.service?.price != null
       ? Number(appt.service.price).toLocaleString("pt-PT", {
-        style: "currency",
-        currency: "EUR",
-      })
+          style: "currency",
+          currency: "EUR",
+        })
       : "—";
 
   return (
@@ -204,7 +204,7 @@ export default function Dashboard() {
   const { appointments, today, loading: apptLoading } = useAppointments();
   const [copied, setCopied] = useState(false);
 
-  const PUBLIC_BASE = "https://agendly.app/p";
+  const PUBLIC_BASE = "https://clafernandes.github.io/agendly/p";
   const publicUrl = business?.slug ? `${PUBLIC_BASE}/${business.slug}` : null;
 
   async function handleCopy() {
@@ -362,9 +362,9 @@ export default function Dashboard() {
               {apptLoading
                 ? "—"
                 : new Intl.NumberFormat("pt-PT", {
-                  style: "currency",
-                  currency: "EUR",
-                }).format(monthlyRevenue)}
+                    style: "currency",
+                    currency: "EUR",
+                  }).format(monthlyRevenue)}
             </p>
             <p className="pg-stat-meta">mês actual</p>
           </div>

@@ -40,7 +40,7 @@ const initialHours = DAYS.map((day) => ({
 
 const STEP_LABELS = ["Dados", "Identidade", "Horários", "Confirmação"];
 
-const PUBLIC_BASE = "https://agendly.app/p";
+const PUBLIC_BASE = "https://clafernandes.github.io/agendly/p";
 
 function generateSlug(value) {
   return value
@@ -330,12 +330,12 @@ export default function Onboarding() {
       prev.map((h) =>
         h.day_of_week === dayId
           ? {
-            ...h,
-            intervals: [
-              ...h.intervals,
-              { start_time: "09:00", end_time: "18:00" },
-            ],
-          }
+              ...h,
+              intervals: [
+                ...h.intervals,
+                { start_time: "09:00", end_time: "18:00" },
+              ],
+            }
           : h,
       ),
     );

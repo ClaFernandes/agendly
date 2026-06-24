@@ -351,7 +351,7 @@ export default function Profile() {
     }
   }
 
-  const PUBLIC_BASE = "https://agendly.app/p";
+  const PUBLIC_BASE = "https://clafernandes.github.io/agendly/p";
   const publicUrl = business?.slug ? `${PUBLIC_BASE}/${business.slug}` : null;
 
   return (
