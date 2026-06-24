@@ -19,6 +19,13 @@
 
   <script>
     (function () {
+      var path = window.location.pathname;
+      // Corrige o /agendly/agendly/ duplicado
+      if (path.indexOf('/agendly/agendly/') === 0) {
+        var corrected = path.replace('/agendly/agendly/', '/agendly/');
+        history.replaceState(null, null, corrected);
+      }
+      // Lógica normal do sessionStorage
       var redirect = sessionStorage.redirect;
       delete sessionStorage.redirect;
       if (redirect && redirect !== '/agendly/' && redirect !== '/agendly') {
