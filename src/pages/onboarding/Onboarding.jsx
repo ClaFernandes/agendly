@@ -430,7 +430,8 @@ export default function Onboarding() {
               </div>
               {slug && (
                 <p className="onboarding-slug-preview">
-                  agendly.app/p/<strong>{slug}</strong>
+                  https://clafernandes.github.io/agendly/p/
+                  <strong>{slug}</strong>
                 </p>
               )}
             </div>

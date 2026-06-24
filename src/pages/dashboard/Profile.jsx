@@ -469,7 +469,9 @@ export default function Profile() {
           <div className="set-field">
             <label htmlFor="set-slug" className="set-label">
               URL pública <span className="set-required">*</span>
-              <span className="set-label-hint">agendly.app/p/</span>
+              <span className="set-label-hint">
+                https://clafernandes.github.io/agendly/p/
+              </span>
             </label>
             <div className="set-input-wrapper">
               <RiLinkM className="set-input-icon" aria-hidden="true" />
@@ -494,7 +496,7 @@ export default function Profile() {
             </div>
             {slug && (
               <p className="set-slug-preview">
-                agendly.app/p/<strong>{slug}</strong>
+                https://clafernandes.github.io/agendly/p/<strong>{slug}</strong>
               </p>
             )}
           </div>

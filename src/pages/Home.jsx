@@ -145,7 +145,9 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="home-footer">
-        <p>© 2026 Agendly · Desenvolvido por Clarice Fernandes & Glauber Carlos</p>
+        <p>
+          © 2026 Agendly · Desenvolvido por Clarice Fernandes & Glauber Carlos
+        </p>
         <Link to="/admin/login" className="home-footer-admin">
           Acesso administrador
         </Link>
